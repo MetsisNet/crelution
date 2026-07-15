@@ -330,7 +330,6 @@
             box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
         }
         
-        /* Master Save Small Circle Styling */
         .btn-master-save-circle {
             width: 34px;
             height: 34px;
@@ -649,7 +648,9 @@
                 verBtn.onclick = (e) => {
                     e.stopPropagation();
                     toggleMobileSidebar(false);
-                    runSourceCodeSandbox(ver.c);
+                    // Dynamically routes to requested repository directory target file inside a new window frame
+                    const formattedExternalUrl = `https://metsisnet.github.io/crelution/forms/${systemMenuCode}.html`;
+                    window.open(formattedExternalUrl, '_blank');
                 };
 
                 const copyBtn = document.createElement('button');
@@ -724,7 +725,6 @@
         }
     }
 
-    // Handles downloading strictly only the last/newest release layer version for each asset namespace profiles
     async function triggerGlobalMasterSaveBatch() {
         const items = Object.values(database);
         if (items.length === 0) return;
@@ -744,7 +744,6 @@
             
             for (const record of items) {
                 if (record.v && record.v.length > 0) {
-                    // Extract strictly the absolute last element item index representing the newest sequential version update layer
                     const lastReleaseLayer = record.v[record.v.length - 1]; 
                     const outName = `${record.i}.html`;
                     
@@ -940,7 +939,7 @@
                     <span class="badge bg-dark font-monospace me-2">v${versionNode.s}</span>
                     <span class="text-secondary small time-span"></span>
                 </div>
-                <button class="btn btn-sm btn-light border run-btn">Run</button>
+                <button class="btn btn-sm btn-light border run-btn">Run Sandbox</button>
             `;
             wrapper.querySelector('.time-span').textContent = new Date(versionNode.u).toLocaleString();
             wrapper.querySelector('.run-btn').onclick = () => runSourceCodeSandbox(database[idKey].v[i].c);
