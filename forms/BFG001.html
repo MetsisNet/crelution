@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METSIS SCM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --sidebar-width: 320px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .scm-sidebar {
+            width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: calc(-1 * var(--sidebar-width)); 
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            will-change: left;
+            transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scm-sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-menu-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 1090;
+            display: none;
+            will-change: opacity;
+        }
+
+        .sidebar-backdrop.show {
+            display: block;
+        }
+
+        .main-workspace {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .navbar-custom {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .namespace-menu-item {
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .namespace-menu-item.active-node {
+            border-color: var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            background-color: #fafafa;
+        }
+
+        .namespace-trigger {
+            width: 100%;
+            padding: 11px 14px;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .namespace-trigger:hover {
+            background-color: #f1f5f9;
+        }
+
+        .namespace-label-block {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .custom-menu-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-main);
+        }
+
+        .fixed-namespace-subtitle {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .version-submenu {
+            background-color: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            padding: 4px;
+            display: none;
+        }
+
+        .version-submenu.open {
+            display: block;
+        }
+
+        .version-action-btn-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 6px;
+            padding-right: 4px;
+        }
+        .version-action-btn-wrapper:hover {
+            background-color: #e2e8f0;
+        }
+
+        .version-action-btn {
+            flex: 1;
+            padding: 8px 8px 8px 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .version-action-btn span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .version-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .version-copy-btn, .version-save-file-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .version-copy-btn:hover, .version-save-file-btn:hover {
+            background-color: #cbd5e1;
+            color: var(--text-main);
+        }
+        .version-copy-btn.copied, .version-save-file-btn.saved {
+            color: #10b981 !important;
+        }
+
+        .node-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .node-action-btn:hover {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .premium-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+        
+        .search-wrapper-box {
+            position: relative;
+        }
+        .search-wrapper-box .input-group {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #ffffff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .search-wrapper-box .input-group:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        .search-wrapper-box .form-control {
+            border: none;
+            padding: 14px 16px;
+        }
+        .search-wrapper-box .form-control:focus { box-shadow: none; }
+        .search-wrapper-box .input-group-text { background: transparent; border: none; padding-left: 18px; color: var(--text-muted); display: inline-flex; align-items: center; }
+
+        .suggest-dropdown {
+            position: absolute;
+            top: 105%;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            padding: 6px;
+        }
+        .suggest-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .suggest-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .version-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+        .version-card:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
+
+        .code-editor {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            background-color: #f8fafc !important;
+            min-height: 340px;
+            border-radius: 10px;
+        }
+
+        .btn-premium-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+        }
+        .btn-premium-primary:hover { background-color: var(--primary-hover); color:#fff; }
+
+        .btn-premium-action-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Master Save Small Circle Styling */
+        .btn-master-save-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--text-main);
+            color: #ffffff;
+            border: none;
+            padding: 0;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-master-save-circle:hover {
+            background-color: #1e293b;
+        }
+        .btn-master-save-circle:active {
+            transform: scale(0.95);
+        }
+
+        #toastContainerStack {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            left: 24px;
+            margin: auto;
+            max-width: 350px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .custom-toast-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            will-change: transform, opacity;
+            animation: slideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @media (min-width: 992px) {
+            .scm-sidebar { left: 0; }
+            .main-workspace { padding-left: var(--sidebar-width); }
+            .sidebar-toggle-btn, .sidebar-close-btn, .navbar-mobile-brand { display: none !important; }
+            #toastContainerStack { left: auto; right: 24px; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleMobileSidebar(false)"></div>
+<div id="toastContainerStack"></div>
+
+<aside id="scmSidebar" class="scm-sidebar">
+    <div class="sidebar-header">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="navbar-brand-title">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" class="text-primary me-2"><path fill-rule="evenodd" d="M6 1a1 1 0 1 1 2 0v2.07A2.5 2.5 0 0 1 9.93 5H11.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H9.93A2.5 2.5 0 0 1 8 8.93V11.07a2.5 2.5 0 0 1 1.93 1.93h1.57a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H9.93A2.5 2.5 0 0 1 8 15.93V15a1 1 0 1 1-2 0v-.93A2.5 2.5 0 0 1 4.07 13H2.5a.5.5 0 0 1-.5-.5v1a.5.5 0 0 1 .5.5h1.57A2.5 2.5 0 0 1 6 11.07V8.93A2.5 2.5 0 0 1 4.07 7H2.5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h1.57A2.5 2.5 0 0 1 6 3.07V1zm1 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                METSIS SCM
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <button id="masterSaveAllBtn" class="btn-master-save-circle" onclick="triggerGlobalMasterSaveBatch()" title="Master Save All Latest HTML Releases">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm2.5 1a.5.5 0 0 1 .5.5V4h6V2.5a.5.5 0 0 1 1 0V4.5a.5.5 0 0 1-.5.5H3.5a.5.5 0 0 1-.5-.5V2.5a.5.5 0 0 1 .5-.5h1zM4 12v-3h8v3H4z"/></svg>
+                </button>
+                <button class="btn btn-light btn-sm sidebar-close-btn border border-0 d-inline-flex align-items-center" onclick="toggleMobileSidebar(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="row g-2 pt-1 border-top">
+            <div class="col-6">
+                <input type="file" id="importDatabaseInput" accept=".json,.gz" class="d-none" onchange="importDatabaseFromJson(event)">
+                <button class="btn btn-sm btn-outline-secondary w-100 py-1.5 px-2 rounded-3 text-truncate d-inline-flex align-items-center justify-content-center" style="font-size:0.75rem;" onclick="document.getElementById('importDatabaseInput').click()">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" class="me-1"><path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.466 4.63A4.004 4.004 0 0 1 13 14.5H3a4 4 0 0 1-1.528-7.7A5.498 5.498 0 0 1 4.406 3.342zm.712.917a4.51 4.51 0 0 0-1.704 2.417c-.12.403-.46.703-.88.75A3 3 0 0 0 3 13.5h10a3 3 0 0 0 .612-5.938c-.424-.044-.761-.341-.884-.746A4.5 4.5 0 0 0 4.5 3c-.19 0-.376.012-.558.036z"/><path d="M7.646 5.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2z"/></svg>Import DB
+                </button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-sm btn-outline-secondary w-100 py-1.5 px-2 rounded-3 text-truncate d-inline-flex align-items-center justify-content-center" style="font-size:0.75rem;" onclick="exportDatabaseToJson()">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" class="me-1"><path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.466 4.63A4.004 4.004 0 0 1 13 14.5H3a4 4 0 0 1-1.528-7.7A5.498 5.498 0 0 1 4.406 3.342zm.712.917a4.51 4.51 0 0 0-1.704 2.417c-.12.403-.46.703-.88.75A3 3 0 0 0 3 13.5h10a3 3 0 0 0 .612-5.938c-.424-.044-.761-.341-.884-.746A4.5 4.5 0 0 0 4.5 3c-.19 0-.376.012-.558.036z"/><path d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/></svg>Export DB
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-menu-wrapper">
+        <div class="text-uppercase text-muted small fw-bold tracking-wider mb-3" style="font-size: 0.72rem; letter-spacing: 0.05em;">Active Namespaces</div>
+        <div id="dynamicTreeMenuRoot"></div>
+    </div>
+</aside>
+
+<main class="main-workspace">
+    <nav class="navbar-custom d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-light border sidebar-toggle-btn d-inline-flex align-items-center" onclick="toggleMobileSidebar(true)">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>
+            </button>
+            <span class="navbar-brand-title navbar-mobile-brand">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" class="text-primary me-2"><path fill-rule="evenodd" d="M6 1a1 1 0 1 1 2 0v2.07A2.5 2.5 0 0 1 9.93 5H11.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H9.93A2.5 2.5 0 0 1 8 8.93V11.07a2.5 2.5 0 0 1 1.93 1.93h1.57a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H9.93A2.5 2.5 0 0 1 8 15.93V15a1 1 0 1 1-2 0v-.93A2.5 2.5 0 0 1 4.07 13H2.5a.5.5 0 0 1-.5-.5v1a.5.5 0 0 1 .5.5h1.57A2.5 2.5 0 0 1 6 11.07V8.93A2.5 2.5 0 0 1 4.07 7H2.5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h1.57A2.5 2.5 0 0 1 6 3.07V1zm1 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                METSIS SCM
+            </span>
+        </div>
+        <div>
+            <button id="dynamicActionFormBtn" class="btn-premium-action-circle" onclick="openInputMatrixModal()" title="Add / Update Configuration">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container-fluid p-3 p-md-4">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="premium-card p-3 p-md-4">
+                    <div class="search-wrapper-box">
+                        <label class="form-label small fw-semibold text-muted mb-2">Active Namespace Lookup / Router Path</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+                            </span>
+                            <input type="text" id="pageNameInput" class="form-control" placeholder="Search file namespace or type to compile new versions..." autocomplete="off" onfocus="showSuggestions()" oninput="handleNameInputInputEvent()">
+                            <button class="btn btn-light border-start px-3 text-muted d-inline-flex align-items-center" type="button" onclick="clearSearchFilter()">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                            </button>
+                        </div>
+                        <div id="suggestionBox" class="suggest-dropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="premium-card p-3 p-md-4 d-none" id="historyCardContainer">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold tracking-wider d-block mb-1">Log Feed Scope</span>
+                            <h4 class="fw-bold h5 m-0 text-dark" id="targetViewLabel">---</h4>
+                        </div>
+                        <span class="badge bg-light border text-dark font-monospace px-3 py-2 rounded-3" id="targetIdLabel"></span>
+                    </div>
+                    <div class="d-flex flex-column gap-3" id="timelineStream"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="modal fade" id="codeInsertionFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-0 px-4 py-3">
+                <h6 class="modal-title fw-bold" id="codeInsertionFormModalLabel">Setup Core Code Matrix</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">Payload Buffer</label>
+                    <textarea id="codeBufferInput" class="form-control code-editor p-3" placeholder="// Insert or drop asset codebase payloads seamlessly..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0 px-4 py-3">
+                <button type="button" class="btn btn-light border px-4 rounded-3" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-premium-primary px-4 rounded-3" onclick="commitCodeVersion()">Save Version</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="aliasCustomizerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-0 px-4 py-3">
+                <h6 class="modal-title fw-bold">Customize Menu Display Name</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="aliasTargetId">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">Fixed System Namespace</label>
+                    <input type="text" id="aliasFixedNamespace" class="form-control bg-light font-monospace" readonly>
+                </div>
+                <div>
+                    <label class="form-label small fw-semibold text-muted mb-1">Custom Menu Display Label</label>
+                    <input type="text" id="aliasCustomNameInput" class="form-control" placeholder="Enter friendly title display text...">
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0 px-4 py-3">
+                <button type="button" class="btn btn-light border px-3 rounded-3" onclick="resetMenuAliasToDefault()">Reset Default</button>
+                <button type="button" class="btn btn-premium-primary px-4 rounded-3" onclick="saveMenuAliasCustomization()">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const elPageName = document.getElementById('pageNameInput');
+    const elSuggestionBox = document.getElementById('suggestionBox');
+    const elBuffer = document.getElementById('codeBufferInput');
+    const elDynamicActionBtn = document.getElementById('dynamicActionFormBtn');
+    const elTreeMenuRoot = document.getElementById('dynamicTreeMenuRoot');
+    const elHistoryContainer = document.getElementById('historyCardContainer');
+    const elTargetViewLabel = document.getElementById('targetViewLabel');
+    const elTargetIdLabel = document.getElementById('targetIdLabel');
+    const elTimelineStream = document.getElementById('timelineStream');
+    
+    const elSidebar = document.getElementById('scmSidebar');
+    const elBackdrop = document.getElementById('sidebarBackdrop');
+    const formModalElement = document.getElementById('codeInsertionFormModal');
+    
+    let bootstrapFormModal = null;
+    let bootstrapAliasModal = null;
+    const STORAGE_KEY = 'METSIS_SCM_COMPRESSED_DB';
+    let database = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let lookupDebounceTimeout = null;
+    let chosenDirectoryHandle = null; 
+
+    const SVG_PENCIL = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>';
+    const SVG_PLUS = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>';
+    const SVG_PLAY = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" class="me-2"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>';
+    const SVG_COPY = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/></svg>';
+    const SVG_CHECK = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>';
+    const SVG_DOWNLOAD = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        bootstrapFormModal = new bootstrap.Modal(formModalElement);
+        bootstrapAliasModal = new bootstrap.Modal(document.getElementById('aliasCustomizerModal'));
+        renderTreeNavigationMenu();
+        handleNameInputInputEvent();
+    });
+
+    function toggleMobileSidebar(shouldOpen) {
+        requestAnimationFrame(() => {
+            elSidebar.classList.toggle('active', shouldOpen);
+            elBackdrop.classList.toggle('show', shouldOpen);
+        });
+    }
+
+    function evaluateButtonContextState() {
+        const val = elPageName.value.trim().toLowerCase();
+        if(!val) {
+            elDynamicActionBtn.style.backgroundColor = "var(--primary-color)";
+            return;
+        }
+        const matches = Object.values(database).some(x => x.n.toLowerCase() === val);
+        elDynamicActionBtn.style.backgroundColor = matches ? "#10b981" : "var(--primary-color)";
+    }
+
+    function renderTreeNavigationMenu() {
+        elTreeMenuRoot.innerHTML = '';
+        const items = Object.values(database);
+
+        if(items.length === 0) {
+            const noRecords = document.createElement('div');
+            noRecords.className = 'text-muted small ps-2 font-italic';
+            noRecords.textContent = 'No active records stored.';
+            elTreeMenuRoot.appendChild(noRecords);
+            return;
+        }
+
+        items.sort((a, b) => b.u - a.u);
+        const fragment = document.createDocumentFragment();
+
+        items.forEach(entry => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'namespace-menu-item';
+            const descVersions = [...entry.v].sort((a, b) => b.s - a.s);
+            const displayTitle = entry.m ? entry.m : entry.n;
+            const systemMenuCode = entry.i; 
+
+            wrapper.innerHTML = `
+                <div class="namespace-trigger" onclick="toggleSubmenuTreeVisibility(this)">
+                    <div class="d-flex align-items-center min-w-0 flex-1">
+                        <div class="namespace-label-block text-truncate">
+                            <span class="custom-menu-title text-truncate"></span>
+                            <span class="fixed-namespace-subtitle"></span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0" onclick="event.stopPropagation();">
+                        <button class="node-action-btn add-ver-btn" title="Add New Version">${SVG_PLUS}</button>
+                        <button class="node-action-btn edit-alias-btn" title="Customize Menu Name">${SVG_PENCIL}</button>
+                        <span class="badge bg-light text-dark border rounded-pill small font-monospace">${descVersions.length}</span>
+                    </div>
+                </div>
+                <div class="version-submenu" data-nid="${entry.i}"></div>
+            `;
+
+            wrapper.querySelector('.custom-menu-title').textContent = displayTitle;
+            const subSpan = wrapper.querySelector('.fixed-namespace-subtitle');
+            if (entry.m) {
+                subSpan.textContent = entry.n;
+            } else {
+                subSpan.remove();
+            }
+
+            wrapper.querySelector('.add-ver-btn').onclick = () => {
+                elPageName.value = entry.n;
+                handleNameInputInputEvent();
+                openInputMatrixModal();
+            };
+            
+            wrapper.querySelector('.edit-alias-btn').onclick = () => openAliasCustomizer(entry.i);
+            const submenuContainer = wrapper.querySelector('.version-submenu');
+            
+            descVersions.forEach(ver => {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'version-action-btn-wrapper';
+
+                const verBtn = document.createElement('button');
+                verBtn.className = 'version-action-btn';
+                verBtn.innerHTML = `<span>${SVG_PLAY}Release v${ver.s}</span>`;
+                verBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleMobileSidebar(false);
+                    runSourceCodeSandbox(ver.c);
+                };
+
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'version-copy-btn';
+                copyBtn.innerHTML = SVG_COPY;
+                copyBtn.title = "Copy Code";
+                copyBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(ver.c).then(() => {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = SVG_CHECK;
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = SVG_COPY;
+                        }, 1500);
+                    });
+                };
+
+                const saveFileBtn = document.createElement('button');
+                saveFileBtn.className = 'version-save-file-btn';
+                saveFileBtn.innerHTML = SVG_DOWNLOAD;
+                saveFileBtn.title = `Save strictly as ${systemMenuCode}.html inside Source Code Manager SCM HTML file folder`;
+                saveFileBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    const outputFileName = `${systemMenuCode}.html`;
+                    const statusSuccess = await saveCodeToFlatDirectoryStructure(outputFileName, ver.c);
+                    
+                    if(statusSuccess) {
+                        saveFileBtn.classList.add('saved');
+                        saveFileBtn.innerHTML = SVG_CHECK;
+                        setTimeout(() => {
+                            saveFileBtn.classList.remove('saved');
+                            saveFileBtn.innerHTML = SVG_DOWNLOAD;
+                        }, 1500);
+                    }
+                };
+
+                itemRow.appendChild(verBtn);
+                itemRow.appendChild(copyBtn);
+                itemRow.appendChild(saveFileBtn);
+                submenuContainer.appendChild(itemRow);
+            });
+
+            fragment.appendChild(wrapper);
+        });
+        elTreeMenuRoot.appendChild(fragment);
+    }
+
+    async function saveCodeToFlatDirectoryStructure(fileName, sourceCode) {
+        try {
+            if (!chosenDirectoryHandle) {
+                chosenDirectoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            }
+            const masterDirectoryHandle = await chosenDirectoryHandle.getDirectoryHandle('Source Code Manager SCM HTML file', { create: true });
+            const fileHandle = await masterDirectoryHandle.getFileHandle(fileName, { create: true });
+            const writableStream = await fileHandle.createWritable();
+            
+            await writableStream.write(sourceCode);
+            await writableStream.close();
+            return true;
+        } catch (error) {
+            console.error("Flat directory processing failed:", error);
+            if(error.name !== 'AbortError') {
+                const blob = new Blob([sourceCode], { type: 'text/html' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                a.click();
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // Handles downloading strictly only the last/newest release layer version for each asset namespace profiles
+    async function triggerGlobalMasterSaveBatch() {
+        const items = Object.values(database);
+        if (items.length === 0) return;
+
+        const masterBtn = document.getElementById('masterSaveAllBtn');
+        const defaultHtmlIcon = masterBtn.innerHTML;
+
+        try {
+            if (!chosenDirectoryHandle) {
+                chosenDirectoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            }
+            
+            masterBtn.innerHTML = `<span class="spinner-border spinner-border-sm text-light" role="status"></span>`;
+            masterBtn.disabled = true;
+
+            const masterDirectoryHandle = await chosenDirectoryHandle.getDirectoryHandle('Source Code Manager SCM HTML file', { create: true });
+            
+            for (const record of items) {
+                if (record.v && record.v.length > 0) {
+                    // Extract strictly the absolute last element item index representing the newest sequential version update layer
+                    const lastReleaseLayer = record.v[record.v.length - 1]; 
+                    const outName = `${record.i}.html`;
+                    
+                    const fileHandle = await masterDirectoryHandle.getFileHandle(outName, { create: true });
+                    const writableStream = await fileHandle.createWritable();
+                    await writableStream.write(lastReleaseLayer.c);
+                    await writableStream.close();
+                }
+            }
+
+            masterBtn.innerHTML = SVG_CHECK;
+            masterBtn.style.backgroundColor = "#10b981";
+            
+            setTimeout(() => {
+                masterBtn.innerHTML = defaultHtmlIcon;
+                masterBtn.style.backgroundColor = "var(--text-main)";
+                masterBtn.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error("Batch processing operation error: ", error);
+            masterBtn.innerHTML = defaultHtmlIcon;
+            masterBtn.disabled = false;
+            
+            if(error.name !== 'AbortError') {
+                items.forEach((record, index) => {
+                    if (record.v && record.v.length > 0) {
+                        setTimeout(() => {
+                            const lastReleaseLayer = record.v[record.v.length - 1];
+                            const blob = new Blob([lastReleaseLayer.c], { type: 'text/html' });
+                            const a = document.createElement('a');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = `${record.i}.html`;
+                            a.click();
+                        }, index * 200); 
+                    }
+                });
+            }
+        }
+    }
+
+    function toggleSubmenuTreeVisibility(triggerElement) {
+        const itemContainer = triggerElement.closest('.namespace-menu-item');
+        const sub = triggerElement.nextElementSibling;
+        
+        if(sub.classList.contains('open')) {
+            sub.classList.remove('open');
+            itemContainer.classList.remove('active-node');
+        } else {
+            document.querySelectorAll('.version-submenu').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.namespace-menu-item').forEach(el => el.classList.remove('active-node'));
+            
+            sub.classList.add('open');
+            itemContainer.classList.add('active-node');
+        }
+    }
+
+    function openAliasCustomizer(idKey) {
+        const targetRecord = database[idKey];
+        if(!targetRecord) return;
+
+        document.getElementById('aliasTargetId').value = idKey;
+        document.getElementById('aliasFixedNamespace').value = targetRecord.n;
+        document.getElementById('aliasCustomNameInput').value = targetRecord.m || '';
+        bootstrapAliasModal.show();
+    }
+
+    function saveMenuAliasCustomization() {
+        const idKey = document.getElementById('aliasTargetId').value;
+        const inputVal = document.getElementById('aliasCustomNameInput').value.trim();
+
+        if(!database[idKey]) return;
+        if(inputVal === "") {
+            delete database[idKey].m;
+        } else {
+            database[idKey].m = inputVal;
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+        bootstrapAliasModal.hide();
+        renderTreeNavigationMenu();
+        buildSearchSuggestionsBoxList();
+    }
+
+    function resetMenuAliasToDefault() {
+        document.getElementById('aliasCustomNameInput').value = '';
+        saveMenuAliasCustomization();
+    }
+
+    function handleNameInputInputEvent() {
+        clearTimeout(lookupDebounceTimeout);
+        lookupDebounceTimeout = setTimeout(() => {
+            const typedValue = elPageName.value.trim();
+            const calculatedId = generateNID(typedValue);
+
+            if(calculatedId !== '------' && database[calculatedId]) {
+                showHistoricalStreamFeed(calculatedId);
+            } else {
+                elHistoryContainer.classList.add('d-none');
+            }
+            evaluateButtonContextState();
+            buildSearchSuggestionsBoxList();
+        }, 60);
+    }
+
+    function clearSearchFilter() {
+        elPageName.value = '';
+        handleNameInputInputEvent();
+        elPageName.focus();
+        buildSearchSuggestionsBoxList(true);
+    }
+
+    function showSuggestions() {
+        buildSearchSuggestionsBoxList();
+    }
+
+    function buildSearchSuggestionsBoxList(forceShowAll = false) {
+        const query = elPageName.value.trim().toLowerCase();
+        const entries = Object.values(database);
+        elSuggestionBox.innerHTML = '';
+
+        if (!forceShowAll && query !== '') {
+            if (entries.some(item => item.n.toLowerCase() === query)) {
+                hideSuggestions();
+                return;
+            }
+        }
+
+        let filtered = (query === '' || forceShowAll) ? entries : entries.filter(item => 
+            item.n.toLowerCase().includes(query) || (item.m && item.m.toLowerCase().includes(query))
+        );
+        
+        if(filtered.length === 0) {
+            hideSuggestions();
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'suggest-item d-flex justify-content-between align-items-center';
+            const displayLabel = item.m ? `${item.m} (${item.n})` : item.n;
+            
+            div.innerHTML = `
+                <div><span class="text-primary font-monospace fw-bold small hash-span"></span> <span class="text-dark ms-2 label-span"></span></div>
+                <span class="badge bg-light text-muted border count-span"></span>
+            `;
+            
+            div.querySelector('.hash-span').textContent = item.i;
+            div.querySelector('.label-span').textContent = displayLabel;
+            div.querySelector('.count-span').textContent = `${item.v.length} layers`;
+
+            div.onpointerdown = () => {
+                elPageName.value = item.n;
+                handleNameInputInputEvent();
+                hideSuggestions();
+            };
+            fragment.appendChild(div);
+        });
+        elSuggestionBox.appendChild(fragment);
+        elSuggestionBox.style.display = 'block';
+    }
+
+    function hideSuggestions() {
+        elSuggestionBox.style.display = 'none';
+    }
+
+    elPageName.addEventListener('blur', () => {
+        setTimeout(hideSuggestions, 180);
+    });
+
+    function showHistoricalStreamFeed(idKey) {
+        const targetRecord = database[idKey];
+        if(!targetRecord || targetRecord.v.length === 0) {
+            elHistoryContainer.classList.add('d-none');
+            return;
+        }
+
+        elHistoryContainer.classList.remove('d-none');
+        elTargetViewLabel.textContent = targetRecord.m ? `${targetRecord.m} [ ${targetRecord.n} ]` : targetRecord.n;
+        elTargetIdLabel.textContent = targetRecord.i;
+        elTimelineStream.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
+
+        for(let i = targetRecord.v.length - 1; i >= 0; i--) {
+            const versionNode = targetRecord.v[i];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'version-card d-flex justify-content-between align-items-center';
+            wrapper.innerHTML = `
+                <div>
+                    <span class="badge bg-dark font-monospace me-2">v${versionNode.s}</span>
+                    <span class="text-secondary small time-span"></span>
+                </div>
+                <button class="btn btn-sm btn-light border run-btn">Run</button>
+            `;
+            wrapper.querySelector('.time-span').textContent = new Date(versionNode.u).toLocaleString();
+            wrapper.querySelector('.run-btn').onclick = () => runSourceCodeSandbox(database[idKey].v[i].c);
+            fragment.appendChild(wrapper);
+        }
+        elTimelineStream.appendChild(fragment);
+    }
+
+    function openInputMatrixModal() {
+        const currentTargetName = elPageName.value.trim();
+        if(!currentTargetName) return;
+        
+        const isExisting = Object.values(database).some(item => item.n.toLowerCase() === currentTargetName.toLowerCase());
+        document.getElementById('codeInsertionFormModalLabel').textContent = isExisting ? 
+            `Compile Version: ${currentTargetName}` : `Initialize Asset Profile: ${currentTargetName}`;
+        bootstrapFormModal.show();
+    }
+
+    function generateNID(stringName) {
+        const cleanName = stringName.trim();
+        if (!cleanName) return '------';
+        const existingEntry = Object.values(database).find(item => item.n.toLowerCase() === cleanName.toLowerCase());
+        if (existingEntry) return existingEntry.i;
+
+        const currentYearString = new Date().getFullYear().toString().slice(-2);
+        const charCodeOffset = 64;
+        const firstLetter = String.fromCharCode(parseInt(currentYearString[0]) + 10 + charCodeOffset);
+        const secondLetter = String.fromCharCode(parseInt(currentYearString[1]) + 10 + charCodeOffset);
+        const monthLetter = String.fromCharCode((new Date().getMonth() + 1) + charCodeOffset);
+        const basePrefix = `${firstLetter}${secondLetter}${monthLetter}`;
+
+        const matchingPrefixCount = Object.values(database).filter(item => item.i.startsWith(basePrefix)).length;
+        return `${basePrefix}${String(matchingPrefixCount + 1).padStart(3, '0')}`;
+    }
+
+    function commitCodeVersion() {
+        let pageName = elPageName.value.trim();
+        const codePayload = elBuffer.value;
+
+        if(!pageName || !codePayload) return;
+
+        const matchedProfile = Object.values(database).find(item => item.n.toLowerCase() === pageName.toLowerCase());
+        if(matchedProfile) pageName = matchedProfile.n;
+
+        const calculatedId = generateNID(pageName);
+        const rightNowUnix = Date.now();
+
+        if(!database[calculatedId]) {
+            database[calculatedId] = { i: calculatedId, n: pageName, u: rightNowUnix, v: [] };
+        }
+
+        database[calculatedId].u = rightNowUnix;
+        const currentArray = database[calculatedId].v;
+        const nextSequence = currentArray.length + 1;
+
+        currentArray.push({ s: nextSequence, u: rightNowUnix, c: codePayload });
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+        elBuffer.value = '';
+        bootstrapFormModal.hide();
+
+        renderTreeNavigationMenu();
+        handleNameInputInputEvent();
+    }
+
+    async function exportDatabaseToJson() {
+        try {
+            const rawJsonText = JSON.stringify(database);
+            const timestampString = new Date().toISOString().slice(0, 19).replace(/[-T:]/g, '_');
+
+            const stream = new Blob([rawJsonText]).stream();
+            const compressedStream = stream.pipeThrough(new CompressionStream('gzip'));
+            const compressedBlob = await new Response(compressedStream).blob();
+
+            const url = URL.createObjectURL(compressedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `metsis_scm_backup_${timestampString}.json.gz`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function importDatabaseFromJson(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                let jsonString = "";
+                if (file.name.endsWith('.gz')) {
+                    const stream = new Blob([e.target.result]).stream();
+                    const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
+                    jsonString = await new Response(decompressedStream).text();
+                } else {
+                    jsonString = new TextDecoder("utf-8").decode(e.target.result);
+                }
+
+                const parsedImport = JSON.parse(jsonString);
+                if (typeof parsedImport === 'object' && parsedImport !== null) {
+                    database = parsedImport;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+                    
+                    renderTreeNavigationMenu();
+                    handleNameInputInputEvent();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        event.target.value = '';
+    }
+
+    function runSourceCodeSandbox(rawCode) {
+        const sandboxWindow = window.open();
+        if(!sandboxWindow) return;
+
+        if (/<html|<body|<div|<script/i.test(rawCode)) {
+            sandboxWindow.document.open();
+            sandboxWindow.document.write(rawCode);
+            sandboxWindow.document.close();
+        } else {
+            const dynamicWrapper = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Execution Sandbox Console</title>
+                    <style>
+                        body { background: #0f172a; color: #38bdf8; font-family: 'JetBrains Mono', monospace; padding: 24px; font-size:14px; }
+                        .line { border-bottom: 1px solid #1e293b; padding: 6px 0; white-space: pre-wrap; }
+                    </style>
+                </head>
+                <body>
+                    <h5 style="color:#94a3b8; margin:0 0 16px 0;">[Console Output Sandbox Stream]</h5>
+                    <div id="output"></div>
+                    <script>
+                        const out = document.getElementById('output');
+                        window.console.log = function(...args) {
+                            const d = document.createElement('div');
+                            d.className = 'line';
+                            d.textContent = args.join(' ');
+                            out.appendChild(d);
+                        };
+                        try { ${rawCode} } catch(e) { out.innerHTML += '<div style="color:#f43f5e; padding:6px 0;">Runtime Error: ' + e.message + '</div>'; }
+                    <\/script>
+                </body>
+                </html>`;
+            sandboxWindow.document.open();
+            sandboxWindow.document.write(dynamicWrapper);
+            sandboxWindow.document.close();
+        }
+    }
+</script>
+</body>
+</html>

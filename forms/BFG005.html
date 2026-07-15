@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METSIS OTB - Overtime Workspace Ledger</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --ynex-body-bg: #f0f3f7;
+            --ynex-menu-bg: #ffffff;
+            --ynex-header-bg: #ffffff;
+            --ynex-card-bg: #ffffff;
+            --ynex-border: #f3f3f3;
+            
+            --ynex-primary: #5c67f7;
+            --ynex-primary-transparent: rgba(92, 103, 247, 0.1);
+            --ynex-success: #26c026;
+            --ynex-danger: #e6533c;
+            --ynex-warning: #fbb225;
+            --ynex-info: #00b9ff;
+            
+            --ynex-text-primary: #333335;
+            --ynex-text-secondary: #6c757d;
+            --ynex-text-muted: #8c90a6;
+            
+            --ynex-sidebar-width: 240px;
+            --ynex-header-height: 60px;
+        }
+
+        body { 
+            background-color: var(--ynex-body-bg);
+            color: var(--ynex-text-primary);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 0.85rem;
+            overflow-x: hidden;
+        }
+
+        .ynex-sidebar {
+            width: var(--ynex-sidebar-width);
+            height: 100vh;
+            background: var(--ynex-menu-bg);
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1040;
+            border-right: 1px solid var(--ynex-border);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .ynex-brand {
+            height: var(--ynex-header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--ynex-border);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--ynex-primary);
+            letter-spacing: 0.5px;
+        }
+        .ynex-menu {
+            padding: 15px 0;
+            list-style: none;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .ynex-menu-category {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--ynex-text-muted);
+            padding: 10px 24px 5px 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ynex-menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            color: #495057;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            gap: 12px;
+        }
+        .ynex-menu-item.active a, .ynex-menu-item a:hover {
+            color: var(--ynex-primary);
+            background: var(--ynex-primary-transparent);
+        }
+
+        .ynex-header {
+            height: var(--ynex-header-height);
+            background: var(--ynex-header-bg);
+            position: fixed;
+            top: 0; right: 0; left: var(--ynex-sidebar-width);
+            z-index: 1020;
+            border-bottom: 1px solid var(--ynex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            transition: left 0.3s ease;
+        }
+
+        .ynex-main-content {
+            margin-top: var(--ynex-header-height);
+            margin-left: var(--ynex-sidebar-width);
+            padding: 24px;
+            transition: margin-left 0.3s ease;
+        }
+
+        @media(max-width: 991.98px) {
+            .ynex-sidebar { transform: translateX(-100%); }
+            .ynex-sidebar.open { transform: translateX(0); }
+            .ynex-header { left: 0; }
+            .ynex-main-content { margin-left: 0; padding: 16px; }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(0,0,0,0.4);
+                z-index: 1035;
+                display: none;
+            }
+            .sidebar-overlay.show { display: block; }
+        }
+
+        .card.ynex-card {
+            background-color: var(--ynex-card-bg);
+            border: 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+        .ynex-card .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--ynex-border);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .ynex-card .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ynex-text-primary);
+            margin: 0;
+        }
+        .ynex-card .card-body { padding: 20px; }
+
+        .ynex-btn {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ynex-btn-primary { background-color: var(--ynex-primary); color: #fff; border: 1px solid var(--ynex-primary); }
+        .ynex-btn-primary:hover { background-color: #4b54e0; color: #fff; }
+        .ynex-btn-outline { border: 1px solid #dcdcdc; color: var(--ynex-text-secondary); background: transparent; }
+        .ynex-btn-outline:hover { background: #f5f6f7; color: var(--ynex-text-primary); }
+        .ynex-btn-danger-light { background-color: rgba(230,83,60,0.1); color: var(--ynex-danger); border: 0; }
+        .ynex-btn-danger-light:hover { background-color: var(--ynex-danger); color: #fff; }
+
+        .ynex-input {
+            border: 1px solid var(--ynex-border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: var(--ynex-text-primary);
+            background-color: #fff;
+        }
+        .ynex-input:focus {
+            border-color: var(--ynex-primary);
+            box-shadow: 0 0 0 2px var(--ynex-primary-transparent);
+            outline: 0;
+        }
+
+        .avatar-circle {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .avatar-primary { background: rgba(92,103,247,0.1); color: var(--ynex-primary); }
+        .avatar-success { background: rgba(38,192,38,0.1); color: var(--ynex-success); }
+        .avatar-warning { background: rgba(251,178,37,0.1); color: var(--ynex-warning); }
+        .avatar-danger { background: rgba(230,83,60,0.1); color: var(--ynex-danger); }
+
+        .table-ynex { margin: 0; width: 100%; }
+        .table-ynex th {
+            background-color: #f9fafb;
+            color: var(--ynex-text-primary);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--ynex-border);
+            white-space: nowrap;
+        }
+        .table-ynex td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--ynex-border);
+            color: var(--ynex-text-secondary);
+            white-space: nowrap;
+        }
+        .table-ynex tbody tr:last-child td { border-bottom: 0; }
+
+        .glass-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1060; opacity: 0; transition: opacity 0.2s ease;
+        }
+        .glass-backdrop.show { display: flex; opacity: 1; }
+        .modal-pane {
+            background: #fff; border-radius: 8px; width: 92%; max-width: 520px;
+            padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .modal-pane-lg { max-width: 760px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlayNode" onclick="toggleSidebarMenu(false)"></div>
+
+<div class="ynex-sidebar" id="sidebarNode">
+    <div class="ynex-brand">
+        <span><i class="bi bi-layers-half me-2"></i>METSIS OTB</span>
+        <button class="btn btn-sm text-muted d-lg-none p-0" onclick="toggleSidebarMenu(false)"><i class="bi bi-x-lg fs-5"></i></button>
+    </div>
+    <ul class="ynex-menu">
+        <li class="ynex-menu-category">Main Console</li>
+        <li class="ynex-menu-item active">
+            <a href="#" onclick="toggleSidebarMenu(false); scrollToSection('mainLedgerDashboard');"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+        </li>
+        <li class="ynex-menu-item">
+            <a href="#" onclick="toggleSidebarMenu(false); launchProfileModal();"><i class="bi bi-person-gear"></i>Employee Info</a>
+        </li>
+        
+        <li class="ynex-menu-category">Report Engines</li>
+        <li class="ynex-menu-item">
+            <a href="#" onclick="toggleSidebarMenu(false); openReportPreviewModal('monthly');"><i class="bi bi-file-earmark-spreadsheet"></i>Monthly Report</a>
+        </li>
+        <li class="ynex-menu-item">
+            <a href="#" onclick="toggleSidebarMenu(false); openReportPreviewModal('yearly');"><i class="bi bi-calendar-check"></i>Annual Report</a>
+        </li>
+        <li class="ynex-menu-item">
+            <a href="#" onclick="toggleSidebarMenu(false); scrollToSection('historicalLogsLedgerSection');"><i class="bi bi-clock-history"></i>Historical Ledger</a>
+        </li>
+    </ul>
+</div>
+
+<div class="ynex-header">
+    <div class="d-flex align-items-center gap-2">
+        <button class="ynex-btn ynex-btn-outline d-lg-none" onclick="toggleSidebarMenu(true)">
+            <i class="bi bi-list m-0"></i>
+        </button>
+        <span class="fw-semibold text-muted d-none d-sm-inline">METSIS OTB</span>
+    </div>
+    <div class="d-flex gap-2">
+        <input type="file" id="importFile" accept=".csv" class="d-none">
+        <button class="ynex-btn ynex-btn-outline px-2 px-sm-3" onclick="document.getElementById('importFile').click()">
+            <i class="bi bi-upload"></i><span class="d-none d-md-inline">Import ID CSV</span>
+        </button>
+        <button id="exportCsv" class="ynex-btn ynex-btn-primary px-2 px-sm-3">
+            <i class="bi bi-download"></i><span class="d-none d-md-inline">Export ID Wise CSV</span>
+        </button>
+    </div>
+</div>
+
+<div class="ynex-main-content" id="mainLedgerDashboard">
+    <div class="container-fluid p-0">
+        
+        <div class="card ynex-card">
+            <div class="card-body py-3">
+                <div class="row align-items-center g-3">
+                    <div class="col-sm-7">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle avatar-primary"><i class="bi bi-person-badge"></i></div>
+                            <div>
+                                <h6 class="m-0 fw-bold" id="lblDisplayEmpName">Loading Account...</h6>
+                                <span class="text-muted small">ID: <strong id="lblDisplayEmpId" class="text-dark">—</strong></span>
+                                <span class="text-muted small px-1">|</span>
+                                <span class="text-muted small" id="lblDisplayDesignation">—</span> 
+                                <span class="text-muted small px-1">|</span> 
+                                <span class="text-muted small" id="lblDisplayDepartment">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 text-sm-end">
+                        <small class="text-muted d-block mb-1">Overtime Rate (Per Hour)</small>
+                        <strong class="fs-5 text-primary" id="displayRate">0.00 BDT</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-xl-8">
+                <div class="card ynex-card h-100 mb-0">
+                    <div class="card-header"><h3 class="card-title">Overtime Execution Space</h3></div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-semibold">Overtime Date</label>
+                                <div class="input-group">
+                                    <button class="btn ynex-btn-outline px-3" id="btnPrevDate"><i class="bi bi-chevron-left"></i></button>
+                                    <input type="text" id="logDateDisplay" class="form-control ynex-input text-center fw-bold" readonly style="background:#fff !important;">
+                                    <button class="btn ynex-btn-outline px-3" id="btnNextDate"><i class="bi bi-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="manualHours" class="form-label text-muted small fw-semibold">OT Duration</label>
+                                <input type="number" id="manualHours" class="form-control ynex-input text-center fw-bold text-primary" step="0.1" value="5.5">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <button id="btnLogData" class="ynex-btn ynex-btn-primary w-100 py-2 justify-content-center"><i class="bi bi-plus-circle"></i>Commit Log</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="card ynex-card h-100 mb-0">
+                    <div class="card-body d-flex align-items-center justify-content-between py-4">
+                        <div>
+                            <span class="text-muted d-block mb-1 small fw-semibold">AUTOMATED SHIFT PATTERN</span>
+                            <h4 class="fw-bold m-0" id="displayScheduleMode">Weekday</h4>
+                        </div>
+                        <div class="avatar-circle avatar-warning"><i class="bi bi-clock-history"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="py-2"></div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card ynex-card mb-0">
+                    <div class="card-header">
+                        <h3 class="card-title" id="monthlyTitle">Current Month</h3>
+                        <button class="ynex-btn ynex-btn-outline btn-sm" onclick="openReportPreviewModal('monthly')">Invoice View</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 border-end" style="border-color: var(--ynex-border) !important;">
+                                <span class="text-muted small d-block mb-1">Tracked Scale</span>
+                                <h4 class="fw-bold text-dark" id="monthlyHours">0.0 hrs</h4>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small d-block mb-1">Net Earnings</span>
+                                <h4 class="fw-bold text-primary" id="monthlyEarnings">0.00 BDT</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card ynex-card mb-0">
+                    <div class="card-header">
+                        <h3 class="card-title" id="yearlyTitle">Annual Consolidation</h3>
+                        <button class="ynex-btn ynex-btn-outline btn-sm" onclick="openReportPreviewModal('yearly')">Framework View</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 border-end" style="border-color: var(--ynex-border) !important;">
+                                <span class="text-muted small d-block mb-1">Tracked Scale</span>
+                                <h4 class="fw-bold text-dark" id="yearlyHours">0.0 hrs</h4>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small d-block mb-1">Net Earnings</span>
+                                <h4 class="fw-bold text-success" id="yearlyEarnings">0.00 BDT</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="py-2"></div>
+
+        <div class="card ynex-card" id="historicalLogsLedgerSection">
+            <div class="card-header">
+                <h3 class="card-title">Ledger Historical Logs Framework</h3>
+                <button onclick="launchCustomConfirmModal('ALL_RECORDS', 'Are you absolutely sure you want to completely wipe out and reset the entire historical logs ledger dataset configuration metrics baseline portfolio array?')" class="ynex-btn ynex-btn-danger-light btn-sm"><i class="bi bi-trash3"></i>Clear Dataset</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-ynex align-middle">
+                    <thead>
+                        <tr>
+                            <th>Calendar Date</th>
+                            <th>Day Category</th>
+                            <th>Tracked Duration</th>
+                            <th>Applied Rate</th>
+                            <th>Gross Allocation</th>
+                            <th class="text-center" style="width: 120px;">Control Systems</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="glass-backdrop" id="customAlertModal">
+    <div class="modal-pane" style="max-width: 420px;">
+        <div class="text-center py-2">
+            <div id="alertModalIconContainer" class="avatar-circle mx-auto mb-3" style="width:56px; height:56px; font-size:1.8rem;">
+                <i id="alertModalIcon" class="bi bi-info-circle"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2" id="alertModalTitle">Notification</h5>
+            <p class="text-muted small px-2 mb-4" id="alertModalDescriptionText">Dynamic customized feedback context layout description message frame.</p>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="ynex-btn ynex-btn-primary px-5" onclick="closePopupModal('customAlertModal')">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-backdrop" id="customConfirmModal">
+    <div class="modal-pane" style="max-width: 440px;">
+        <div class="text-center py-2">
+            <div class="avatar-circle avatar-warning mx-auto mb-3" style="width:56px; height:56px; font-size:1.8rem;"><i class="bi bi-exclamation-triangle"></i></div>
+            <h5 class="fw-bold text-dark mb-2">Destructive Confirmation Action</h5>
+            <p class="text-muted small px-2 mb-4" id="confirmModalDescriptionText">Are you sure you want to alter the dataset configuration parameters mapping rows state?</p>
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="ynex-btn ynex-btn-outline px-4" onclick="closePopupModal('customConfirmModal')">Cancel</button>
+                <button type="button" id="btnExecuteConfirmedAction" class="ynex-btn text-white px-4" style="background-color: var(--ynex-danger);">Confirm Execution</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-backdrop" id="customEditModal">
+    <div class="modal-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--ynex-border) !important;">
+            <h6 class="fw-bold m-0"><i class="bi bi-pencil-square text-primary me-2"></i>Modify Entry Parameters</h6>
+            <button type="button" class="btn-close" onclick="closePopupModal('customEditModal')" style="font-size:0.75rem;"></button>
+        </div>
+        <input type="hidden" id="editTargetUid">
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-semibold">Target Entry Date</label>
+            <input type="text" id="editDisplayDate" class="form-control ynex-input w-100 text-muted" readonly disabled>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <label for="editHours" class="form-label text-muted small fw-semibold">Tracked Hours</label>
+                <input type="number" id="editHours" class="form-control ynex-input w-100 text-primary fw-bold" step="0.1">
+            </div>
+            <div class="col-6">
+                <label for="editRate" class="form-label text-muted small fw-semibold">Hourly Scale (BDT)</label>
+                <input type="number" id="editRate" class="form-control ynex-input w-100 text-success fw-bold" step="0.01">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="ynex-btn ynex-btn-outline" onclick="closePopupModal('customEditModal')">Cancel</button>
+            <button type="button" id="btnSaveChanges" class="ynex-btn ynex-btn-primary">Update Array Row</button>
+        </div>
+    </div>
+</div>
+
+<div class="glass-backdrop" id="customProfileModal">
+    <div class="modal-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--ynex-border) !important;">
+            <h6 class="fw-bold m-0"><i class="bi bi-person-gear text-primary me-2"></i>Profile Architecture Identity</h6>
+            <button type="button" class="btn-close" onclick="closePopupModal('customProfileModal')" style="font-size:0.75rem;"></button>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <label for="profileEmpId" class="form-label text-muted small fw-semibold">Employee ID (File Reference Index)</label>
+                <input type="text" id="profileEmpId" class="form-control ynex-input w-100 fw-bold text-dark">
+            </div>
+            <div class="col-6">
+                <label for="profileEmpName" class="form-label text-muted small fw-semibold">Full Profile Name</label>
+                <input type="text" id="profileEmpName" class="form-control ynex-input w-100">
+            </div>
+            <div class="col-6">
+                <label for="profileDesignation" class="form-label text-muted small fw-semibold">Designation Context</label>
+                <input type="text" id="profileDesignation" class="form-control ynex-input w-100">
+            </div>
+            <div class="col-6">
+                <label for="profileDepartment" class="form-label text-muted small fw-semibold">Department Structure</label>
+                <input type="text" id="profileDepartment" class="form-control ynex-input w-100">
+            </div>
+            <div class="col-12">
+                <label for="profileGlobalRate" class="form-label text-muted small fw-semibold">Standard Compensation Rate Baseline (BDT/Hr)</label>
+                <input type="number" id="profileGlobalRate" class="form-control ynex-input w-100 fw-bold" step="0.01">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="ynex-btn ynex-btn-outline" onclick="closePopupModal('customProfileModal')">Dismiss</button>
+            <button type="button" id="btnSaveProfileInfo" class="ynex-btn ynex-btn-primary">Commit Array</button>
+        </div>
+    </div>
+</div>
+
+<div class="glass-backdrop" id="customPreviewModal">
+    <div class="modal-pane modal-pane-lg">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--ynex-border) !important;">
+            <h6 class="fw-bold m-0" id="previewModalHeaderTitle"><i class="bi bi-printer text-primary me-2"></i>Document Matrix Filters Preview</h6>
+            <button type="button" class="btn-close" onclick="closePopupModal('customPreviewModal')" style="font-size:0.75rem;"></button>
+        </div>
+        <div class="row g-3 mb-3 p-3 bg-light rounded mx-0">
+            <div class="col-md-6" id="containerParamMonth">
+                <label for="selectParamMonth" class="form-label text-muted small fw-semibold">Target Filtering Month</label>
+                <select id="selectParamMonth" class="form-select ynex-input w-100"></select>
+            </div>
+            <div class="col-md-6" id="containerParamYear">
+                <label for="selectParamYear" class="form-label text-muted small fw-semibold">Target Processing Year</label>
+                <select id="selectParamYear" class="form-select ynex-input w-100"></select>
+            </div>
+        </div>
+        <div class="p-3 bg-light rounded mb-3">
+            <div class="row text-center">
+                <div class="col-6 border-end" style="border-color: var(--ynex-border) !important;">
+                    <span class="text-muted small d-block mb-1">Target Total Scale</span>
+                    <strong class="text-primary fs-5" id="previewParamHours">0.0 hrs</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted small d-block mb-1">Target Total Allocation</span>
+                    <strong class="text-success fs-5" id="previewParamEarnings">0.00 BDT</strong>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4" style="max-height: 220px; overflow-y: auto; border:1px solid var(--ynex-border);">
+            <table class="table table-ynex align-middle">
+                <thead class="position-sticky top-0" style="z-index:5;" id="previewTableHeader"></thead>
+                <tbody id="previewTableBody"></tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="ynex-btn ynex-btn-outline" onclick="closePopupModal('customPreviewModal')">Close View</button>
+            <button type="button" id="btnConfirmDownloadPdf" class="ynex-btn text-white" style="background-color: var(--ynex-danger);"><i class="bi bi-file-earmark-pdf"></i>Generate PDF Statement</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const FULL_MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const DOM = {
+        sidebar: document.getElementById('sidebarNode'),
+        sidebarOverlay: document.getElementById('sidebarOverlayNode'),
+        dateDisplayInput: document.getElementById('logDateDisplay'),
+        manualHoursInput: document.getElementById('manualHours'),
+        scheduleModeBadge: document.getElementById('displayScheduleMode'),
+        rateLabelDisplay: document.getElementById('displayRate'),
+        lblEmpId: document.getElementById('lblDisplayEmpId'),
+        lblEmpName: document.getElementById('lblDisplayEmpName'),
+        lblDesignation: document.getElementById('lblDisplayDesignation'),
+        lblDepartment: document.getElementById('lblDisplayDepartment'),
+        logsTableBody: document.getElementById('logsTableBody'),
+        monthlyTitle: document.getElementById('monthlyTitle'),
+        yearlyTitle: document.getElementById('yearlyTitle'),
+        monthlyHours: document.getElementById('monthlyHours'),
+        monthlyEarnings: document.getElementById('monthlyEarnings'),
+        yearlyHours: document.getElementById('yearlyHours'),
+        yearlyEarnings: document.getElementById('yearlyEarnings'),
+        editTargetUid: document.getElementById('editTargetUid'),
+        editDisplayDate: document.getElementById('editDisplayDate'),
+        editHours: document.getElementById('editHours'),
+        editRate: document.getElementById('editRate'),
+        profileEmpId: document.getElementById('profileEmpId'),
+        profileEmpName: document.getElementById('profileEmpName'),
+        profileDesignation: document.getElementById('profileDesignation'),
+        profileDepartment: document.getElementById('profileDepartment'),
+        profileGlobalRate: document.getElementById('profileGlobalRate'),
+        selectParamMonth: document.getElementById('selectParamMonth'),
+        selectParamYear: document.getElementById('selectParamYear'),
+        containerParamMonth: document.getElementById('containerParamMonth'),
+        previewModalHeaderTitle: document.getElementById('previewModalHeaderTitle'),
+        previewTableHeader: document.getElementById('previewTableHeader'),
+        previewTableBody: document.getElementById('previewTableBody'),
+        previewParamHours: document.getElementById('previewParamHours'),
+        previewParamEarnings: document.getElementById('previewParamEarnings'),
+        confirmModalDescriptionText: document.getElementById('confirmModalDescriptionText'),
+        btnExecuteConfirmedAction: document.getElementById('btnExecuteConfirmedAction'),
+        
+        alertTitle: document.getElementById('alertModalTitle'),
+        alertDescription: document.getElementById('alertModalDescriptionText'),
+        alertIconContainer: document.getElementById('alertModalIconContainer'),
+        alertIcon: document.getElementById('alertModalIcon')
+    };
+
+    let appState = {
+        logs: JSON.parse(localStorage.getItem('ot_v67_logs')) || [],
+        rate: parseFloat(localStorage.getItem('ot_v67_rate')) || 250.00,
+        employeeInfo: JSON.parse(localStorage.getItem('ot_v67_profile')) || { empId: 'EMP-001', empName: 'Default Workspace Profile', designation: 'General Associate', department: 'Operations' },
+        currentDate: new Date(),
+        activePreviewScope: 'monthly', 
+        selectedReportMonth: new Date().getMonth(), 
+        selectedReportYear: new Date().getFullYear(),
+        pendingConfirmationContext: { actionType: null, referenceTarget: null }
+    };
+
+    window.toggleSidebarMenu = function(forceOpen) {
+        if (forceOpen) {
+            DOM.sidebar.classList.add('open');
+            DOM.sidebarOverlay.classList.add('show');
+        } else {
+            DOM.sidebar.classList.remove('open');
+            DOM.sidebarOverlay.classList.remove('show');
+        }
+    };
+
+    window.scrollToSection = function(sectionId) {
+        const targetElement = document.getElementById(sectionId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    window.launchCustomAlertModal = function(title, description, variant = 'info') {
+        DOM.alertTitle.innerText = title;
+        DOM.alertDescription.innerText = description;
+        DOM.alertIconContainer.className = "avatar-circle mx-auto mb-3";
+        DOM.alertIcon.className = "bi";
+        
+        if (variant === 'success') {
+            DOM.alertIconContainer.classList.add('avatar-success');
+            DOM.alertIcon.classList.add('bi-check-circle');
+        } else if (variant === 'danger') {
+            DOM.alertIconContainer.classList.add('avatar-danger');
+            DOM.alertIcon.classList.add('bi-x-circle');
+        } else if (variant === 'warning') {
+            DOM.alertIconContainer.classList.add('avatar-warning');
+            DOM.alertIcon.classList.add('bi-exclamation-circle');
+        } else {
+            DOM.alertIconContainer.classList.add('avatar-primary');
+            DOM.alertIcon.classList.add('bi-info-circle');
+        }
+        openPopupModal('customAlertModal');
+    };
+
+    function parseLocalDate(dateStr) {
+        const parts = dateStr.split('-');
+        return parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date(dateStr);
+    }
+
+    function formatToCustomDateString(dateObj) {
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${day} ${MONTH_NAMES[dateObj.getMonth()]} ${String(dateObj.getFullYear()).substring(2)}`;
+    }
+
+    function syncDatePickerDisplay() {
+        DOM.dateDisplayInput.value = formatToCustomDateString(appState.currentDate);
+        const dayOfWeek = appState.currentDate.getDay();
+        const isWeekend = (dayOfWeek === 5 || dayOfWeek === 6);
+        DOM.manualHoursInput.value = isWeekend ? "9.5" : "5.5";
+        DOM.scheduleModeBadge.innerText = isWeekend ? "Weekend" : "Weekday";
+        DOM.scheduleModeBadge.className = `fw-bold m-0 ${isWeekend ? 'text-danger' : 'text-primary'}`;
+    }
+
+    function applyLatestSavedRateOrProfile() {
+        localStorage.setItem('ot_v67_rate', appState.rate);
+        localStorage.setItem('ot_v67_profile', JSON.stringify(appState.employeeInfo));
+        DOM.rateLabelDisplay.innerText = `${appState.rate.toFixed(2)} BDT`;
+        DOM.lblEmpId.innerText = appState.employeeInfo.empId || '—';
+        DOM.lblEmpName.innerText = appState.employeeInfo.empName || 'Unconfigured Profile';
+        DOM.lblDesignation.innerText = appState.employeeInfo.designation || '—';
+        DOM.lblDepartment.innerText = appState.employeeInfo.department || '—';
+    }
+
+    function updateViewPipeline() {
+        const activeClock = new Date();
+        const activeYear = activeClock.getFullYear();
+        const activeMonth = activeClock.getMonth();
+        
+        DOM.monthlyTitle.innerText = `${FULL_MONTH_NAMES[activeMonth]} ${activeYear}`;
+        DOM.yearlyTitle.innerText = `${activeYear} Annual Framework`;
+
+        let mHrs = 0, mEarnings = 0, yHrs = 0, yEarnings = 0;
+        let htmlContent = '';
+
+        appState.logs.forEach(record => {
+            const parsedDate = parseLocalDate(record.rawDate);
+            const matchesYear = parsedDate.getFullYear() === activeYear;
+            const matchesMonth = matchesYear && parsedDate.getMonth() === activeMonth;
+
+            if (matchesMonth) { mHrs += record.hoursTracked; mEarnings += record.yieldGross; }
+            if (matchesYear) { yHrs += record.hoursTracked; yEarnings += record.yieldGross; }
+
+            const isWeekend = (record.dayName === 'Friday' || record.dayName === 'Saturday');
+            htmlContent += `
+                <tr>
+                    <td class="fw-bold text-dark">${record.formattedDate}</td>
+                    <td><span class="${isWeekend ? 'text-danger fw-bold' : 'text-secondary'}">${record.dayName}</span></td>
+                    <td><span class="badge bg-light text-primary px-2 py-1.5 fw-bold">${record.hoursTracked} hrs</span></td>
+                    <td>${record.appliedRate.toFixed(2)} BDT</td>
+                    <td class="text-success fw-bold">${record.yieldGross.toFixed(2)} BDT</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="ynex-btn ynex-btn-outline btn-sm px-2 py-1" onclick="launchEditPipelineModal('${record.uid}')"><i class="bi bi-pencil"></i></button>
+                            <button class="ynex-btn ynex-btn-danger-light btn-sm px-2 py-1" onclick="launchCustomConfirmModal('ROW_RECORD', 'Are you sure you want to permanently delete the log row entry recorded on ${record.formattedDate}?', '${record.uid}')"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+        DOM.logsTableBody.innerHTML = htmlContent || `<tr><td colspan="6" class="text-center text-muted py-4"><i class="bi bi-layers d-block mb-2 opacity-50"></i>Ledger history data structure grid framework is empty.</td></tr>`;
+        DOM.monthlyHours.innerText = `${mHrs.toFixed(1)} hrs`;
+        DOM.monthlyEarnings.innerText = `${mEarnings.toFixed(2)} BDT`;
+        DOM.yearlyHours.innerText = `${yHrs.toFixed(1)} hrs`;
+        DOM.yearlyEarnings.innerText = `${yEarnings.toFixed(2)} BDT`;
+    }
+
+    function openPopupModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    window.closePopupModal = function(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 150);
+    };
+
+    window.launchCustomConfirmModal = function(actionType, instructionText, referenceTarget = null) {
+        appState.pendingConfirmationContext = { actionType: actionType, referenceTarget: referenceTarget };
+        DOM.confirmModalDescriptionText.innerText = instructionText;
+        openPopupModal('customConfirmModal');
+    };
+
+    DOM.btnExecuteConfirmedAction.addEventListener('click', () => {
+        const ctx = appState.pendingConfirmationContext;
+        if (ctx.actionType === 'ROW_RECORD' && ctx.referenceTarget) {
+            appState.logs = appState.logs.filter(x => x.uid !== ctx.referenceTarget);
+            localStorage.setItem('ot_v67_logs', JSON.stringify(appState.logs));
+            launchCustomAlertModal("Log Removed", "The target tracking log item entry row record has been safely deleted.", "success");
+        } else if (ctx.actionType === 'ALL_RECORDS') {
+            appState.logs = [];
+            localStorage.setItem('ot_v67_logs', JSON.stringify([]));
+            launchCustomAlertModal("Dataset Flattened", "The historical framework ledger log database arrays have been fully reset.", "success");
+        }
+        updateViewPipeline();
+        closePopupModal('customConfirmModal');
+        appState.pendingConfirmationContext = { actionType: null, referenceTarget: null };
+    });
+
+    window.launchProfileModal = function() {
+        DOM.profileEmpId.value = appState.employeeInfo.empId || '';
+        DOM.profileEmpName.value = appState.employeeInfo.empName || '';
+        DOM.profileDesignation.value = appState.employeeInfo.designation || '';
+        DOM.profileDepartment.value = appState.employeeInfo.department || '';
+        DOM.profileGlobalRate.value = appState.rate.toFixed(2);
+        openPopupModal('customProfileModal');
+    };
+
+    document.getElementById('btnSaveProfileInfo').addEventListener('click', () => {
+        const targetRate = parseFloat(DOM.profileGlobalRate.value);
+        if (isNaN(targetRate) || targetRate < 0) {
+            return launchCustomAlertModal("Validation Error", "Please provide a valid compensation baseline hourly multiplier value.", "danger");
+        }
+        appState.employeeInfo = { 
+            empId: DOM.profileEmpId.value.trim() || 'EMP-UNKNOWN', 
+            empName: DOM.profileEmpName.value.trim() || 'Unnamed Resource', 
+            designation: DOM.profileDesignation.value.trim() || '—', 
+            department: DOM.profileDepartment.value.trim() || '—' 
+        };
+        appState.rate = targetRate;
+        applyLatestSavedRateOrProfile();
+        closePopupModal('customProfileModal');
+        updateViewPipeline();
+        launchCustomAlertModal("Profile Synchronized", "Identity parameters saved natively into system states.", "success");
+    });
+
+    document.getElementById('btnLogData').addEventListener('click', () => {
+        const canonicalIsoDateStr = `${appState.currentDate.getFullYear()}-${String(appState.currentDate.getMonth() + 1).padStart(2, '0')}-${String(appState.currentDate.getDate()).padStart(2, '0')}`;
+        const loggedHours = parseFloat(DOM.manualHoursInput.value) || 0;
+        
+        if (appState.logs.some(x => x.rawDate === canonicalIsoDateStr)) {
+            return launchCustomAlertModal("Entry Collision", `A tracking workspace pipeline record already exists for ${formatToCustomDateString(appState.currentDate)}.`, "warning");
+        }
+
+        appState.logs.push({
+            uid: 'tx_v67_' + Date.now(), rawDate: canonicalIsoDateStr, formattedDate: formatToCustomDateString(appState.currentDate),
+            dayName: WEEKDAY_NAMES[appState.currentDate.getDay()], hoursTracked: loggedHours, appliedRate: appState.rate, yieldGross: loggedHours * appState.rate
+        });
+        appState.logs.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+        localStorage.setItem('ot_v67_logs', JSON.stringify(appState.logs));
+        updateViewPipeline();
+        launchCustomAlertModal("Log Committed", "Hours computed and committed successfully.", "success");
+    });
+
+    window.launchEditPipelineModal = function(uid) {
+        const record = appState.logs.find(x => x.uid === uid);
+        if (!record) return;
+        DOM.editTargetUid.value = record.uid;
+        DOM.editDisplayDate.value = record.formattedDate;
+        DOM.editHours.value = record.hoursTracked;
+        DOM.editRate.value = record.appliedRate;
+        openPopupModal('customEditModal');
+    };
+
+    document.getElementById('btnSaveChanges').addEventListener('click', () => {
+        const targetUid = DOM.editTargetUid.value;
+        const idx = appState.logs.findIndex(x => x.uid === targetUid);
+        if (idx !== -1) {
+            const nextHours = parseFloat(DOM.editHours.value) || 0;
+            const nextRate = parseFloat(DOM.editRate.value) || 0;
+            appState.logs[idx].hoursTracked = nextHours;
+            appState.logs[idx].appliedRate = nextRate;
+            appState.logs[idx].yieldGross = nextHours * nextRate;
+            localStorage.setItem('ot_v67_logs', JSON.stringify(appState.logs));
+            updateViewPipeline();
+            closePopupModal('customEditModal');
+            launchCustomAlertModal("Parameters Modified", "Changes committed successfully.", "success");
+        }
+    });
+
+    window.openReportPreviewModal = function(scopeType) {
+        if (appState.logs.length === 0) {
+            return launchCustomAlertModal("Query Denied", "No log elements exist inside the history matrix.", "warning");
+        }
+        appState.activePreviewScope = scopeType;
+        populateParameterSelectors();
+
+        if (scopeType === 'monthly') {
+            DOM.containerParamMonth.style.display = 'block';
+            DOM.previewModalHeaderTitle.innerHTML = `<i class="bi bi-file-earmark-spreadsheet text-primary me-2"></i>Monthly Invoice Query Matrix`;
+            DOM.previewTableHeader.innerHTML = `<tr><th>Log Date</th><th>Day</th><th>Duration</th><th>Applied Rate</th><th>Gross Allocation</th></tr>`;
+        } else {
+            DOM.containerParamMonth.style.display = 'none';
+            DOM.previewModalHeaderTitle.innerHTML = `<i class="bi bi-file-earmark-spreadsheet text-success me-2"></i>Annual Consolidation Query Matrix`;
+            DOM.previewTableHeader.innerHTML = `<tr><th>Target Month</th><th>Aggregated Hours</th><th>Gross Allocation Yield</th></tr>`;
+        }
+        refreshModalParameterPreviewData();
+        openPopupModal('customPreviewModal');
+    };
+
+    function populateParameterSelectors() {
+        DOM.selectParamMonth.innerHTML = ''; DOM.selectParamYear.innerHTML = '';
+        FULL_MONTH_NAMES.forEach((name, index) => {
+            let opt = document.createElement('option'); opt.value = index; opt.text = name;
+            if (index === appState.selectedReportMonth) opt.selected = true;
+            DOM.selectParamMonth.appendChild(opt);
+        });
+        let operationalYearsList = [...new Set(appState.logs.map(log => parseLocalDate(log.rawDate).getFullYear()))];
+        const currentYear = new Date().getFullYear();
+        if (!operationalYearsList.includes(currentYear)) operationalYearsList.push(currentYear);
+        operationalYearsList.sort((a, b) => b - a);
+        operationalYearsList.forEach(yr => {
+            let opt = document.createElement('option'); opt.value = yr; opt.text = yr;
+            if (yr === appState.selectedReportYear) opt.selected = true;
+            DOM.selectParamYear.appendChild(opt);
+        });
+    }
+
+    function refreshModalParameterPreviewData() {
+        const scope = appState.activePreviewScope;
+        let dataRowsPipeline = appState.logs.filter(log => {
+            const parsingDateObj = parseLocalDate(log.rawDate);
+            return scope === 'monthly' ? (parsingDateObj.getFullYear() === appState.selectedReportYear && parsingDateObj.getMonth() === appState.selectedReportMonth) : parsingDateObj.getFullYear() === appState.selectedReportYear;
+        });
+
+        let accumulatedHrs = 0, accumulatedGross = 0, htmlRowsStr = '';
+
+        if (scope === 'monthly') {
+            dataRowsPipeline.forEach(row => {
+                accumulatedHrs += row.hoursTracked; accumulatedGross += row.yieldGross;
+                htmlRowsStr += `<tr><td><strong>${row.formattedDate}</strong></td><td><span class="small text-muted fw-semibold">${row.dayName}</span></td><td><span class="fw-bold text-primary">${row.hoursTracked.toFixed(1)} hrs</span></td><td>${row.appliedRate.toFixed(2)}</td><td class="text-success fw-bold">${row.yieldGross.toFixed(2)} BDT</td></tr>`;
+            });
+        } else {
+            let summaryMap = Array.from({length: 12}, (_, i) => ({ monthName: FULL_MONTH_NAMES[i], hours: 0, earnings: 0, hasData: false }));
+            dataRowsPipeline.forEach(row => {
+                const mIdx = parseLocalDate(row.rawDate).getMonth();
+                summaryMap[mIdx].hours += row.hoursTracked; summaryMap[mIdx].earnings += row.yieldGross; summaryMap[mIdx].hasData = true;
+                accumulatedHrs += row.hoursTracked; accumulatedGross += row.yieldGross;
+            });
+            summaryMap.forEach(s => {
+                if (s.hasData) htmlRowsStr += `<tr><td><strong>${s.monthName}</strong></td><td><span class="fw-bold text-primary">${s.hours.toFixed(1)} hrs</span></td><td class="text-success fw-bold">${s.earnings.toFixed(2)} BDT</td></tr>`;
+            });
+        }
+
+        DOM.previewTableBody.innerHTML = htmlRowsStr || `<tr><td colspan="5" class="text-center text-muted py-3">No matching transactional dataset rows discovered.</td></tr>`;
+        DOM.previewParamHours.innerText = `${accumulatedHrs.toFixed(1)} hrs`;
+        DOM.previewParamEarnings.innerText = `${accumulatedGross.toFixed(2)} BDT`;
+    }
+
+    // PDF Generation Engine Implementation Rule
+    document.getElementById('btnConfirmDownloadPdf').addEventListener('click', () => {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            
+            const scope = appState.activePreviewScope;
+            const emp = appState.employeeInfo;
+            
+            // Layout Construction Headers
+            doc.setFillColor(92, 103, 247); 
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.text("METSIS OVERTIME LEDGER", 14, 18);
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`Report Type: ${scope === 'monthly' ? 'Monthly Workspace Statement' : 'Annual Framework Statement'}`, 14, 26);
+            doc.text(`Generated On: ${new Date().toLocaleDateString()}`, 14, 32);
+            
+            // Profile Architectural Specifications Block
+            doc.setTextColor(50, 50, 50);
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text("EMPLOYEE METRIC PROFILE Identity", 14, 52);
+            
+            doc.setLineWidth(0.2);
+            doc.setDrawColor(230, 230, 230);
+            doc.line(14, 54, 196, 54);
+            
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.text(`Full Profile Name: ${emp.empName}`, 14, 61);
+            doc.text(`Employee Reference Index ID: ${emp.empId}`, 14, 67);
+            doc.text(`Designation Context: ${emp.designation}`, 14, 73);
+            doc.text(`Department Structure: ${emp.department}`, 14, 79);
+            
+            // Financial Balance Context Details
+            doc.setFillColor(245, 246, 247);
+            doc.rect(125, 58, 71, 23, 'F');
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(8.5);
+            doc.text(`TOTAL HOURS SCALE:`, 129, 64);
+            doc.text(`GROSS EARNINGS BDT:`, 129, 74);
+            
+            doc.setTextColor(92, 103, 247);
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text(DOM.previewParamHours.innerText, 172, 64);
+            doc.setTextColor(38, 192, 38);
+            doc.text(DOM.previewParamEarnings.innerText, 172, 74);
+            
+            // Data Pipeline Stream Execution mapping
+            let reportRows = [];
+            let tableHeaders = [];
+            
+            let dataRowsPipeline = appState.logs.filter(log => {
+                const parsingDateObj = parseLocalDate(log.rawDate);
+                return scope === 'monthly' ? (parsingDateObj.getFullYear() === appState.selectedReportYear && parsingDateObj.getMonth() === appState.selectedReportMonth) : parsingDateObj.getFullYear() === appState.selectedReportYear;
+            });
+            
+            if (scope === 'monthly') {
+                tableHeaders = [["Calendar Log Date", "Day Category", "Tracked Scale", "Hourly Applied Rate", "Gross Allocation"]];
+                dataRowsPipeline.forEach(row => {
+                    reportRows.push([
+                        row.formattedDate,
+                        row.dayName,
+                        `${row.hoursTracked.toFixed(1)} hrs`,
+                        `${row.appliedRate.toFixed(2)} BDT`,
+                        `${row.yieldGross.toFixed(2)} BDT`
+                    ]);
+                });
+            } else {
+                tableHeaders = [["Target Summary Month", "Aggregated Processed Hours", "Gross Allocation Yield"]];
+                let summaryMap = Array.from({length: 12}, (_, i) => ({ monthName: FULL_MONTH_NAMES[i], hours: 0, earnings: 0, hasData: false }));
+                dataRowsPipeline.forEach(row => {
+                    const mIdx = parseLocalDate(row.rawDate).getMonth();
+                    summaryMap[mIdx].hours += row.hoursTracked;
+                    summaryMap[mIdx].earnings += row.yieldGross;
+                    summaryMap[mIdx].hasData = true;
+                });
+                summaryMap.forEach(s => {
+                    if (s.hasData) {
+                        reportRows.push([
+                            s.monthName,
+                            `${s.hours.toFixed(1)} hrs`,
+                            `${s.earnings.toFixed(2)} BDT`
+                        ]);
+                    }
+                });
+            }
+            
+            if (reportRows.length === 0) {
+                reportRows.push([`No database records matching selection boundaries standard.`, "", "", "", ""]);
+            }
+            
+            doc.autoTable({
+                startY: 90,
+                head: tableHeaders,
+                body: reportRows,
+                theme: 'striped',
+                headStyles: { fillColor: [92, 103, 247], fontSize: 9, fontStyle: 'bold' },
+                bodyStyles: { fontSize: 8.5, textColor: [70, 70, 70] },
+                columnStyles: {
+                    0: { fontStyle: 'bold' },
+                    2: { halign: 'left' },
+                    4: { textColor: [38, 192, 38], fontStyle: 'bold' }
+                },
+                styles: { cellPadding: 3 }
+            });
+            
+            const cleanEmpId = (emp.empId || 'EMP').trim().replace(/[^a-zA-Z0-9-_]/g, '_');
+            doc.save(`OT_Statement_${cleanEmpId}_${appState.selectedReportYear}.pdf`);
+            
+        } catch (err) {
+            console.error(err);
+            launchCustomAlertModal("PDF Generation Failure", "An architectural context exception aborted the PDF file construct assembly layout compiler engine.", "danger");
+        }
+    });
+
+    document.getElementById('importFile').addEventListener('change', function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const rawContent = evt.target.result.trim();
+                let importedLogs = [];
+                
+                let parsedEmpId = '';
+                let parsedEmpName = '';
+                let parsedDesignation = '';
+                let parsedDepartment = '';
+                let parsedRate = null;
+
+                const rows = rawContent.split('\n');
+                for (let i = 0; i < rows.length; i++) {
+                    const currentRowStr = rows[i].trim();
+                    if (!currentRowStr) continue;
+                    
+                    if (currentRowStr.startsWith('#EMP_ID:')) { parsedEmpId = currentRowStr.replace('#EMP_ID:', '').trim(); continue; }
+                    if (currentRowStr.startsWith('#EMP_NAME:')) { parsedEmpName = currentRowStr.replace('#EMP_NAME:', '').trim(); continue; }
+                    if (currentRowStr.startsWith('#DESIGNATION:')) { parsedDesignation = currentRowStr.replace('#DESIGNATION:', '').trim(); continue; }
+                    if (currentRowStr.startsWith('#DEPARTMENT:')) { parsedDepartment = currentRowStr.replace('#DEPARTMENT:', '').trim(); continue; }
+                    if (currentRowStr.startsWith('#GLOBAL_RATE:')) {
+                        const tempVal = parseFloat(currentRowStr.replace('#GLOBAL_RATE:', '').trim());
+                        if (!isNaN(tempVal)) parsedRate = tempVal;
+                        continue;
+                    }
+
+                    const columns = currentRowStr.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if (columns.length >= 4 && i > 0 && !currentRowStr.startsWith('Date,')) {
+                        const dateVal = columns[0].replace(/"/g, '').trim();
+                        const parts = dateVal.split('-'); if (parts.length !== 3) continue;
+                        const parsedHours = parseFloat(columns[1]) || 0; 
+                        const appliedRowRate = parseFloat(columns[2]) || (parsedRate || appState.rate);
+                        
+                        importedLogs.push({
+                            uid: 'imported_' + i + '_' + Date.now(), rawDate: dateVal, formattedDate: formatToCustomDateString(parseLocalDate(dateVal)),
+                            dayName: WEEKDAY_NAMES[parseLocalDate(dateVal).getDay()], hoursTracked: parsedHours, appliedRate: appliedRowRate, yieldGross: parsedHours * appliedRowRate
+                        });
+                    }
+                }
+                
+                if (parsedEmpId || parsedEmpName || parsedDesignation || parsedDepartment || parsedRate !== null) {
+                    appState.employeeInfo = {
+                        empId: parsedEmpId || appState.employeeInfo.empId,
+                        empName: parsedEmpName || appState.employeeInfo.empName,
+                        designation: parsedDesignation || appState.employeeInfo.designation,
+                        department: parsedDepartment || appState.employeeInfo.department
+                    };
+                    if (parsedRate !== null) appState.rate = parsedRate;
+                }
+
+                if (importedLogs.length > 0) { appState.logs = importedLogs; }
+                appState.logs.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+                
+                localStorage.setItem('ot_v67_logs', JSON.stringify(appState.logs));
+                applyLatestSavedRateOrProfile();
+                updateViewPipeline(); 
+                
+                launchCustomAlertModal("Profile Synchronized", `Successfully loaded specialized metrics dataset for Employee ID: ${appState.employeeInfo.empId}.`, "success");
+            } catch (err) { 
+                launchCustomAlertModal("Parser Exception", "An unexpected parsing error occurred while reading the dataset layout matrix lines.", "danger"); 
+            }
+            e.target.value = ''; 
+        };
+        reader.readAsText(file);
+    });
+
+    document.getElementById('exportCsv').addEventListener('click', () => {
+        if (appState.logs.length === 0) return launchCustomAlertModal("Export Aborted", "Operational ledger data history lists arrays are empty.", "warning");
+        
+        let csvString = `#EMP_ID:${appState.employeeInfo.empId || 'EMP-001'}\n`;
+        csvString += `#EMP_NAME:${appState.employeeInfo.empName || 'Unconfigured Profile'}\n`;
+        csvString += `#DESIGNATION:${appState.employeeInfo.designation || '—'}\n`;
+        csvString += `#DEPARTMENT:${appState.employeeInfo.department || '—'}\n`;
+        csvString += `#GLOBAL_RATE:${appState.rate.toFixed(2)}\n`;
+        csvString += "Date,HoursLogged,AppliedRateBDT,GrossYieldEarningsBDT\n";
+        
+        appState.logs.forEach(x => { 
+            csvString += `"${x.rawDate}",${x.hoursTracked},${x.appliedRate.toFixed(2)},${x.yieldGross.toFixed(2)}\n`; 
+        });
+
+        const cleanEmpId = (appState.employeeInfo.empId || 'EMP').trim().replace(/[^a-zA-Z0-9-_]/g, '_');
+        
+        const link = document.createElement("a"); 
+        link.href = URL.createObjectURL(new Blob([csvString], { type: 'text/csv;charset=utf-8;' }));
+        link.setAttribute("download", `OT_Ledger_${cleanEmpId}_${new Date().getFullYear()}.csv`); 
+        link.click();
+    });
+
+    document.getElementById('btnPrevDate').addEventListener('click', () => { appState.currentDate.setDate(appState.currentDate.getDate() - 1); syncDatePickerDisplay(); });
+    document.getElementById('btnNextDate').addEventListener('click', () => { appState.currentDate.setDate(appState.currentDate.getDate() + 1); syncDatePickerDisplay(); });
+    DOM.selectParamMonth.addEventListener('change', (e) => { appState.selectedReportMonth = parseInt(e.target.value); refreshModalParameterPreviewData(); });
+    DOM.selectParamYear.addEventListener('change', (e) => { appState.selectedReportYear = parseInt(e.target.value); refreshModalParameterPreviewData(); });
+
+    applyLatestSavedRateOrProfile(); syncDatePickerDisplay(); updateViewPipeline();
+</script>
+</body>
+</html>

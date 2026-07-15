@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEM — Modern Family Expense Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-size: 14px;
+            overflow-x: hidden;
+        }
+
+        /* Modern Glassmorphic Nav Header */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            transition: all 0.3s ease;
+        }
+
+        /* Modernized Metric Card Custom Accents */
+        .metric-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #ffffff;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Table Responsiveness Enhancements */
+        @media (max-width: 991.98px) {
+            .responsive-table-stack table, 
+            .responsive-table-stack thead, 
+            .responsive-table-stack tbody, 
+            .responsive-table-stack th, 
+            .responsive-table-stack td, 
+            .responsive-table-stack tr { 
+                display: block; 
+            }
+            .responsive-table-stack thead tr { 
+                position: absolute; top: -9999px; left: -9999px; 
+            }
+            .responsive-table-stack tr { 
+                border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; margin-bottom: 1rem; padding: 0.5rem;
+            }
+            .responsive-table-stack td { 
+                border: none; border-bottom: 1px solid #f1f5f9; position: relative; padding-left: 45%; text-align: right; white-space: normal;
+            }
+            .responsive-table-stack td:last-child { border-bottom: none; }
+            .responsive-table-stack td:before { 
+                position: absolute; top: 50%; transform: translateY(-50%); left: 15px; width: 40%; text-align: left; font-weight: 600; color: #64748b; content: attr(data-label); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+            }
+        }
+
+        /* Autocomplete Layer Tweaks */
+        .suggestion-tray {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1050;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-top: 4px;
+        }
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .suggestion-item:hover { background-color: #f1f5f9; }
+
+        /* Smooth Segmented Control */
+        .btn-check:checked + .btn-outline-success { background-color: #10b981; color: white; }
+        .btn-check:checked + .btn-outline-danger { background-color: #ef4444; color: white; }
+        .btn-check:checked + .btn-outline-primary { background-color: #3b82f6; color: white; }
+    </style>
+</head>
+<body onclick="globallyCloseActiveSuggestionTrays(event)">
+
+    <nav class="navbar navbar-expand-xl navbar-light navbar-custom py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold text-dark d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-wallet2 text-primary"></i> FEM <span class="fw-light text-secondary small">LEDGER</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#femNavbar" aria-controls="femNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="femNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 gap-1 mt-2 mt-xl-0">
+                    <li class="nav-item"><button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn btn-sm btn-light text-dark fw-medium px-3 active">Dashboard</button></li>
+                    <li class="nav-item"><button onclick="toggleLedgerModalDisplayState(true)" class="btn btn-sm btn-light text-dark fw-medium px-3">Log Operation</button></li>
+                    <li class="nav-item"><button onclick="toggleModalDisplayState(true)" class="btn btn-sm btn-light text-dark fw-medium px-3">Rule Maps</button></li>
+                    <li class="nav-item"><button onclick="toggleReportsModalDisplayState(true)" class="btn btn-sm btn-light text-dark fw-medium px-3">Reports Engine</button></li>
+                    <li class="nav-item"><button onclick="document.getElementById('csv-upload-ghost').click()" class="btn btn-sm btn-light text-dark fw-medium px-3">Import CSV</button></li>
+                    <li class="nav-item"><button onclick="exportDataToCSV()" class="btn btn-sm btn-light text-dark fw-medium px-3">Export CSV</button></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2 mt-2 mt-xl-0">
+                    <input type="month" id="workspace-month" class="form-control form-control-sm" onchange="switchWorkspaceMonthContext()" style="width: auto;">
+                    <button type="button" onclick="toggleLedgerModalDisplayState(true)" class="btn btn-sm btn-primary d-flex align-items-center gap-1 shadow-sm px-3"><i class="bi bi-plus-lg"></i> Add New</button>
+                    <input type="file" id="csv-upload-ghost" style="display:none;" accept=".csv" onchange="importDataViaCSV(event)">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid px-4 py-4" style="max-width: 1400px;">
+        <section class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div>
+                        <span class="text-uppercase text-muted fw-semibold tracking-wider" style="font-size: 11px;">Gross Inflows</span>
+                        <h3 id="stat-income" class="fw-bold m-0 mt-1 text-dark">BDT 0.00</h3>
+                    </div>
+                    <div class="rounded-circle bg-success-subtle text-success p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;"><i class="bi bi-arrow-down-left-circle fs-5"></i></div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div>
+                        <span class="text-uppercase text-muted fw-semibold tracking-wider" style="font-size: 11px;">Capital Outflows</span>
+                        <h3 id="stat-expenses" class="fw-bold m-0 mt-1 text-dark">BDT 0.00</h3>
+                    </div>
+                    <div class="rounded-circle bg-danger-subtle text-danger p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;"><i class="bi bi-arrow-up-right-circle fs-5"></i></div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div>
+                        <span class="text-uppercase text-muted fw-semibold tracking-wider" style="font-size: 11px;">Cash Reserves</span>
+                        <h3 id="stat-savings" class="fw-bold m-0 mt-1 text-dark">BDT 0.00</h3>
+                    </div>
+                    <div class="rounded-circle bg-primary-subtle text-primary p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;"><i class="bi bi-bank fs-5"></i></div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div>
+                        <span class="text-uppercase text-muted fw-semibold tracking-wider" style="font-size: 11px;">Net Surplus Yield</span>
+                        <h3 id="stat-balance" class="fw-bold m-0 mt-1 text-dark">BDT 0.00</h3>
+                    </div>
+                    <div class="rounded-circle bg-warning-subtle text-warning p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;"><i class="bi bi-scale fs-5"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+            <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <h6 class="m-0 fw-bold text-secondary text-uppercase tracking-wider" style="font-size: 12px;">Record Dataset</h6>
+                <button type="button" onclick="exportDataToCSV()" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-download me-1"></i> Export CSV</button>
+            </div>
+            
+            <div class="table-responsive responsive-table-stack">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Date</th>
+                            <th class="text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Description</th>
+                            <th class="text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Group</th>
+                            <th class="text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Type</th>
+                            <th class="text-end text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Amount</th>
+                            <th class="text-end pe-4 text-uppercase tracking-wider text-muted" style="font-size: 11px; font-weight: 600;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-rows-target" class="border-top-0"></tbody>
+                </table>
+            </div>
+
+            <div id="ledger-empty-notice" class="text-center py-5 px-4 bg-light border-top" style="display: none;">
+                <i class="bi bi-folder-x fs-1 text-muted d-block mb-2"></i>
+                <p class="fw-medium text-secondary mb-3 small text-uppercase tracking-wider">No operational records found matching this timeline.</p>
+                <div id="prev-month-import-container" style="display: none;">
+                    <button type="button" onclick="executePreviousMonthRollover()" class="btn btn-sm btn-primary shadow-sm">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Mirror Historic Month Directive Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="configurationModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom bg-light py-3 px-4">
+                    <h6 class="modal-title fw-bold text-dark text-uppercase tracking-wider m-0" style="font-size:13px;">Adjust Allocation Mapping</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="modal-configuration-form" onsubmit="commitNewModalMappingStructure(event)" autocomplete="off">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Allocation Type</label>
+                            <select id="modal-type-selection" class="form-select form-select-sm" onchange="clearModalAutocompletes()">
+                                <option value="income">Inflow Channels Matrix</option>
+                                <option value="expense">Outflow Spending Channels</option>
+                                <option value="savings">Reserves Savings Channels</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">New Line Item</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="modal-input-line-item" class="form-control prevent-global-dismiss" required placeholder="e.g. Corporate Infrastructure Cloud..." oninput="evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line'); cachedModalLineSuggestions(this.value);" onfocus="evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line'); cachedModalLineSuggestions(this.value);">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-m-line" style="display:none;" onclick="clearTargetedInputNodeField('modal-input-line-item', 'btn-clear-m-line'); clearModalAutocompletes();">✕</button>
+                            </div>
+                            <div id="modal-line-autocomplete-tray" class="suggestion-tray" style="display:none;"></div>
+                        </div>
+                        <div class="mb-4 position-relative">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">New Category</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="modal-input-category-group" class="form-control prevent-global-dismiss" required placeholder="e.g. Monthly Operational Overhead..." oninput="evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat'); cachedModalCategorySuggestions(this.value);" onfocus="evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat'); cachedModalCategorySuggestions(this.value);">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-m-cat" style="display:none;" onclick="clearTargetedInputNodeField('modal-input-category-group', 'btn-clear-m-cat'); clearModalAutocompletes();">✕</button>
+                            </div>
+                            <div id="modal-cat-autocomplete-tray" class="suggestion-tray" style="display:none;"></div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                            <button type="button" class="btn btn-sm btn-light border fw-medium px-3" data-bs-dismiss="modal">Exit</button>
+                            <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm">Save Rules</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ledgerEntryModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom bg-light py-3 px-4">
+                    <h6 class="modal-title fw-bold text-dark text-uppercase tracking-wider m-0" style="font-size:13px;">Financial Statement Entry</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="ledger-entry-form" onsubmit="commitNewFormStatement(event)" autocomplete="off">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="btn-group btn-group-sm w-100" role="group">
+                                <input type="radio" name="entry_type" id="r-inc" value="income" class="btn-check" checked onchange="clearLiveSearchState()">
+                                <label for="r-inc" class="btn btn-outline-success fw-semibold text-uppercase" style="font-size:11px;">Inflow</label>
+                                <input type="radio" name="entry_type" id="r-exp" value="expense" class="btn-check" onchange="clearLiveSearchState()">
+                                <label for="r-exp" class="btn btn-outline-danger fw-semibold text-uppercase" style="font-size:11px;">Outflow</label>
+                                <input type="radio" name="entry_type" id="r-sav" value="savings" class="btn-check" onchange="clearLiveSearchState()">
+                                <label for="r-sav" class="btn btn-outline-primary fw-semibold text-uppercase" style="font-size:11px;">Reserves</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Line Item</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="search-line-item" class="form-control prevent-global-dismiss" placeholder="Query registered mapping targets..." oninput="evaluateInputFieldContentState('search-line-item', 'btn-clear-search'); cachedLiveSearchSuggestions(this.value);" onfocus="evaluateInputFieldContentState('search-line-item', 'btn-clear-search'); cachedLiveSearchSuggestions(this.value);">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="display:none;" onclick="clearTargetedInputNodeField('search-line-item', 'btn-clear-search'); clearLiveSearchState();">✕</button>
+                            </div>
+                            <div id="autocomplete-panel-tray" class="suggestion-tray" style="display:none;"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Category</label>
+                            <input type="text" id="display-bound-category" class="form-control form-control-sm bg-light text-muted" readonly placeholder="System mapped channel data text...">
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Amount (BDT)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" step="0.01" id="field-amount" class="form-control" required placeholder="0.00" oninput="evaluateInputFieldContentState('field-amount', 'btn-clear-amount')">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-amount" style="display:none;" onclick="clearTargetedInputNodeField('field-amount', 'btn-clear-amount')">✕</button>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Entry Date</label>
+                            <input type="date" id="field-date" class="form-control form-control-sm">
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                            <button type="button" class="btn btn-sm btn-light border fw-medium px-3" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm">Save Record</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reportsParameterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom bg-light py-3 px-4">
+                    <h6 class="modal-title fw-bold text-dark text-uppercase tracking-wider m-0" style="font-size:13px;"><i class="bi bi-bar-chart-line me-1 text-primary"></i> Business Intelligence Engine</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="reports-parameter-form" onsubmit="executeFinancialHTMLReportCompilation(event)">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Report Stream Structure</label>
+                                <select id="rpt-param-type" class="form-select form-select-sm">
+                                    <option value="line-item">Line-Item Distribution Matrix Analysis</option>
+                                    <option value="group-wise">Group Pipeline Aggregated Volumes Balance Sheets</option>
+                                    <option value="p-and-l">Structured Profit and Loss (P&L) Statement</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Temporal Scale</label>
+                                <select id="rpt-param-scale" class="form-select form-select-sm" onchange="synchronizeReportParameterFormViewState()">
+                                    <option value="monthly">Monthly Isolated Scope Timelines</option>
+                                    <option value="yearly">Yearly Consolidated Target History Matrix</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Target Calendar Year</label>
+                                <select id="rpt-param-year" class="form-select form-select-sm"></select>
+                            </div>
+                            <div class="col-sm-6" id="rpt-month-dropdown-wrapper">
+                                <label class="form-label fw-semibold text-secondary text-uppercase small tracking-wider" style="font-size:10px;">Target Month Segment</label>
+                                <select id="rpt-param-month" class="form-select form-select-sm">
+                                    <option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-4">
+                            <button type="button" class="btn btn-sm btn-light border fw-medium px-3" data-bs-dismiss="modal">Dismiss</button>
+                            <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm"><i class="bi bi-cpu me-1"></i> Compile Matrix Report</button>
+                        </div>
+                    </form>
+
+                    <div id="html-report-output-canvas" class="mt-4" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Instance References for Bootstrap JS Modal Layer Runtimes
+        let configModalInstance, ledgerModalInstance, reportsModalInstance;
+
+        const DOM = {
+            monthSelector: document.getElementById('workspace-month'),
+            ledgerTarget: document.getElementById('ledger-rows-target'),
+            emptyNotice: document.getElementById('ledger-empty-notice'),
+            prevImportBox: document.getElementById('prev-month-import-container'),
+            statIncome: document.getElementById('stat-income'),
+            statExpenses: document.getElementById('stat-expenses'),
+            statSavings: document.getElementById('stat-savings'),
+            statBalance: document.getElementById('stat-balance'),
+            configModalForm: document.getElementById('modal-configuration-form'),
+            ledgerModalForm: document.getElementById('ledger-entry-form'),
+            rptYearSelect: document.getElementById('rpt-param-year'),
+            rptMonthSelect: document.getElementById('rpt-param-month'),
+            rptScaleSelect: document.getElementById('rpt-param-scale'),
+            rptTypeSelect: document.getElementById('rpt-param-type'),
+            rptMonthWrapper: document.getElementById('rpt-month-dropdown-wrapper'),
+            rptCanvas: document.getElementById('html-report-output-canvas'),
+            searchLineInput: document.getElementById('search-line-item'),
+            boundCatDisplay: document.getElementById('display-bound-category'),
+            fieldAmount: document.getElementById('field-amount'),
+            fieldDate: document.getElementById('field-date'),
+            modalLineInput: document.getElementById('modal-input-line-item'),
+            modalCatInput: document.getElementById('modal-input-category-group'),
+            modalTypeSelect: document.getElementById('modal-type-selection'),
+            liveTray: document.getElementById('autocomplete-panel-tray'),
+            modalLineTray: document.getElementById('modal-line-autocomplete-tray'),
+            modalCatTray: document.getElementById('modal-cat-autocomplete-tray')
+        };
+
+        let storageTransactionsDb = JSON.parse(localStorage.getItem('aura_tx_ledger_db')) || [];
+        let globalEditTargetRowId = null;
+
+        const baselineIncomeBindings = [
+            { item: "Monthly Salary", cat: "Salary" },
+            { item: "Monthly Overtime Bill", cat: "Overtime" },
+            { item: "Eid-Ul-Fitre Bonus", cat: "Bonus" },
+            { item: "Eid-Ul-Azha Bonus", cat: "Bonus" },
+            { item: "Food Allowance", cat: "Allowance" },
+            { item: "Transport Allowance", cat: "Allowance" }
+        ];
+        const baselineExpenseBindings = [
+            { item: "House Rent", cat: "Household" },
+            { item: "Internet Bill", cat: "Internet" },
+            { item: "Electricity Bill", cat: "Electricity" },
+            { item: "Maid Bill", cat: "Household" },
+            { item: "Monthly School Fees", cat: "Education" },
+            { item: "Medicine Bill", cat: "Treatment" },
+            { item: "Transport Cost", cat: "Transport" }
+        ];
+        const baselineSavingsBindings = [
+            { item: "Monthly DPS", cat: "Bank Accounts" },
+            { item: "bKash Savings", cat: "Mobile Wallet" }
+        ];
+
+        let customIncomeRelations = JSON.parse(localStorage.getItem('a_inc_binds')) || baselineIncomeBindings;
+        let customExpenseRelations = JSON.parse(localStorage.getItem('a_exp_binds')) || baselineExpenseBindings;
+        let customSavingsRelations = JSON.parse(localStorage.getItem('a_sav_binds')) || baselineSavingsBindings;
+
+        const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        function parseAndFormatDateString(dateStr) {
+            if(!dateStr) return '';
+            const pieces = dateStr.split('-');
+            if(pieces.length !== 3) return dateStr;
+            const mIdx = parseInt(pieces[1], 10) - 1;
+            return (mIdx >= 0 && mIdx < 12) ? `${pieces[2]} ${MONTHS_SHORT[mIdx]} ${pieces[0].substring(2)}` : dateStr;
+        }
+
+        function debounce(func, delay = 40) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        function evaluateInputFieldContentState(inputId, clearBtnId) {
+            const inputField = document.getElementById(inputId);
+            const clearBtn = document.getElementById(clearBtnId);
+            if(inputField && clearBtn) {
+                clearBtn.style.display = inputField.value ? 'block' : 'none';
+            }
+        }
+
+        function clearTargetedInputNodeField(inputId, clearBtnId) {
+            const inputField = document.getElementById(inputId);
+            const clearBtn = document.getElementById(clearBtnId);
+            if(inputField) {
+                inputField.value = '';
+                inputField.focus();
+            }
+            if(clearBtn) clearBtn.style.display = 'none';
+        }
+
+        function evaluateAllClearButtonVisualStates() {
+            evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
+            evaluateInputFieldContentState('field-amount', 'btn-clear-amount');
+            evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line');
+            evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
+        }
+
+        function initializeDefaultTimeframe() {
+            const dateObj = new Date();
+            if(!DOM.monthSelector.value) {
+                DOM.monthSelector.value = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+            }
+            synchronizeFormInputDay();
+            populateReportParameterDropdownYears();
+        }
+
+        function synchronizeFormInputDay() {
+            const activePeriodStr = DOM.monthSelector.value;
+            const today = new Date();
+            if(activePeriodStr === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`) {
+                DOM.fieldDate.value = today.toISOString().split('T')[0];
+            } else {
+                DOM.fieldDate.value = `${activePeriodStr}-01`;
+            }
+        }
+
+        function populateReportParameterDropdownYears() {
+            if(!DOM.rptYearSelect) return;
+            DOM.rptYearSelect.textContent = '';
+            const observedYears = new Set([new Date().getFullYear()]);
+            for(let i = 0; i < storageTransactionsDb.length; i++) {
+                const tx = storageTransactionsDb[i];
+                if(tx.recordMonth) {
+                    const extractedYear = parseInt(tx.recordMonth.split('-')[0], 10);
+                    if(!isNaN(extractedYear)) observedYears.add(extractedYear);
+                }
+            }
+            const sortedYears = Array.from(observedYears).sort((a,b)=>b-a);
+            sortedYears.forEach(yr => {
+                const nodeOption = document.createElement('option');
+                nodeOption.value = yr;
+                nodeOption.innerText = yr;
+                DOM.rptYearSelect.appendChild(nodeOption);
+            });
+        }
+
+        function persistDatabaseToDisk() {
+            localStorage.setItem('aura_tx_ledger_db', JSON.stringify(storageTransactionsDb));
+            localStorage.setItem('a_inc_binds', JSON.stringify(customIncomeRelations));
+            localStorage.setItem('a_exp_binds', JSON.stringify(customExpenseRelations));
+            localStorage.setItem('a_sav_binds', JSON.stringify(customSavingsRelations));
+            compileUserInterfaceMetrics();
+            populateReportParameterDropdownYears();
+        }
+
+        function toggleModalDisplayState(shouldShow) {
+            if (shouldShow) {
+                configModalInstance.show();
+                DOM.modalLineInput.value = '';
+                DOM.modalCatInput.value = '';
+            } else {
+                configModalInstance.hide();
+                DOM.configModalForm.reset();
+                clearModalAutocompletes();
+                evaluateAllClearButtonVisualStates();
+            }
+        }
+
+        function toggleLedgerModalDisplayState(shouldShow) {
+            if (shouldShow) {
+                ledgerModalInstance.show();
+                synchronizeFormInputDay();
+                DOM.searchLineInput.value = '';
+                DOM.boundCatDisplay.value = '';
+            } else {
+                ledgerModalInstance.hide();
+                DOM.ledgerModalForm.reset();
+                clearLiveSearchState();
+                evaluateAllClearButtonVisualStates();
+            }
+        }
+
+        function toggleReportsModalDisplayState(shouldShow) {
+            if(shouldShow) {
+                reportsModalInstance.show();
+                const workspaceMonthValue = DOM.monthSelector.value;
+                if(workspaceMonthValue) {
+                    const parts = workspaceMonthValue.split('-');
+                    DOM.rptYearSelect.value = parts[0];
+                    DOM.rptMonthSelect.value = parts[1];
+                }
+                synchronizeReportParameterFormViewState();
+                DOM.rptCanvas.style.display = 'none';
+            } else {
+                reportsModalInstance.hide();
+            }
+        }
+
+        function synchronizeReportParameterFormViewState() {
+            DOM.rptMonthWrapper.style.display = DOM.rptScaleSelect.value === 'yearly' ? 'none' : 'block';
+        }
+
+        function clearLiveSearchState() {
+            DOM.searchLineInput.value = '';
+            DOM.boundCatDisplay.value = '';
+            evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
+            closeAutocompleteSuggestionsTray();
+        }
+
+        function clearModalAutocompletes() {
+            DOM.modalLineTray.textContent = ''; DOM.modalLineTray.style.display = 'none';
+            DOM.modalCatTray.textContent = ''; DOM.modalCatTray.style.display = 'none';
+        }
+
+        function globallyCloseActiveSuggestionTrays(event) {
+            if (event.target.classList.contains('prevent-global-dismiss')) return;
+            closeAutocompleteSuggestionsTray();
+            clearModalAutocompletes();
+        }
+
+        function getActiveBindingPool(typeValue) {
+            if(typeValue === 'income') return customIncomeRelations;
+            if(typeValue === 'expense') return customExpenseRelations;
+            return customSavingsRelations;
+        }
+
+        function commitNewModalMappingStructure(e) {
+            e.preventDefault();
+            const targetType = DOM.modalTypeSelect.value;
+            const targetItemText = DOM.modalLineInput.value.trim();
+            const targetCategoryText = DOM.modalCatInput.value.trim();
+
+            if(!targetItemText || !targetCategoryText) return;
+            const bindingPool = getActiveBindingPool(targetType);
+            
+            if (bindingPool.some(b => b.item.toLowerCase() === targetItemText.toLowerCase())) {
+                alert("Mapping rule already initialized.");
+                return;
+            }
+
+            bindingPool.push({ item: targetItemText, cat: targetCategoryText });
+            persistDatabaseToDisk();
+            
+            toggleModalDisplayState(false);
+            toggleLedgerModalDisplayState(true);
+            
+            document.getElementById(`r-${targetType.substring(0,3)}`).checked = true;
+            DOM.searchLineInput.value = targetItemText;
+            DOM.boundCatDisplay.value = targetCategoryText;
+            evaluateAllClearButtonVisualStates();
+        }
+
+        const cachedLiveSearchSuggestions = debounce(function(queryValue) {
+            const activeTypeSelection = document.querySelector('input[name="entry_type"]:checked').value;
+            const pool = getActiveBindingPool(activeTypeSelection);
+            const normalizedQuery = queryValue.toLowerCase().trim();
+            const filteredNodes = !normalizedQuery ? pool : pool.filter(b => b.item.toLowerCase().includes(normalizedQuery));
+
+            if (filteredNodes.length === 0) {
+                DOM.liveTray.textContent = ''; DOM.liveTray.style.display = 'none'; return;
+            }
+
+            const frag = document.createDocumentFragment();
+            filteredNodes.forEach(matchNode => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'suggestion-item border-bottom d-flex justify-content-between align-items-center small';
+                itemDiv.innerHTML = `<span class="fw-medium">${matchNode.item}</span><span class="badge bg-light text-secondary">${matchNode.cat}</span>`;
+                itemDiv.onclick = (ev) => {
+                    ev.stopPropagation();
+                    DOM.searchLineInput.value = matchNode.item;
+                    DOM.boundCatDisplay.value = matchNode.cat;
+                    DOM.liveTray.style.display = 'none';
+                    evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
+                };
+                frag.appendChild(itemDiv);
+            });
+            DOM.liveTray.textContent = ''; DOM.liveTray.appendChild(frag); DOM.liveTray.style.display = 'block';
+        }, 40);
+
+        function closeAutocompleteSuggestionsTray() {
+            DOM.liveTray.textContent = ''; DOM.liveTray.style.display = 'none';
+        }
+
+        const cachedModalLineSuggestions = debounce(function(queryValue) {
+            const targetType = DOM.modalTypeSelect.value;
+            const pool = getActiveBindingPool(targetType);
+            const normalizedQuery = queryValue.toLowerCase().trim();
+            const uniqueLines = !normalizedQuery ? Array.from(new Set(pool.map(b => b.item))) : Array.from(new Set(pool.map(b => b.item))).filter(item => item.toLowerCase().includes(normalizedQuery));
+
+            if(uniqueLines.length === 0) { DOM.modalLineTray.textContent = ''; DOM.modalLineTray.style.display = 'none'; return; }
+
+            const frag = document.createDocumentFragment();
+            uniqueLines.forEach(lineStr => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'suggestion-item small border-bottom';
+                itemDiv.innerText = lineStr;
+                itemDiv.onclick = (ev) => {
+                    ev.stopPropagation();
+                    DOM.modalLineInput.value = lineStr;
+                    DOM.modalLineTray.style.display = 'none';
+                    evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line');
+                    const match = pool.find(b => b.item === lineStr);
+                    if(match) {
+                        DOM.modalCatInput.value = match.cat;
+                        evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
+                    }
+                };
+                frag.appendChild(itemDiv);
+            });
+            DOM.modalLineTray.textContent = ''; DOM.modalLineTray.appendChild(frag); DOM.modalLineTray.style.display = 'block';
+        }, 40);
+
+        const cachedModalCategorySuggestions = debounce(function(queryValue) {
+            const targetType = DOM.modalTypeSelect.value;
+            const pool = getActiveBindingPool(targetType);
+            const normalizedQuery = queryValue.toLowerCase().trim();
+            const uniqueCats = !normalizedQuery ? Array.from(new Set(pool.map(b => b.cat))) : Array.from(new Set(pool.map(b => b.cat))).filter(cat => cat.toLowerCase().includes(normalizedQuery));
+
+            if(uniqueCats.length === 0) { DOM.modalCatTray.textContent = ''; DOM.modalCatTray.style.display = 'none'; return; }
+
+            const frag = document.createDocumentFragment();
+            uniqueCats.forEach(catStr => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'suggestion-item small border-bottom';
+                itemDiv.innerText = catStr;
+                itemDiv.onclick = (ev) => {
+                    ev.stopPropagation();
+                    DOM.modalCatInput.value = catStr;
+                    DOM.modalCatTray.style.display = 'none';
+                    evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
+                };
+                frag.appendChild(itemDiv);
+            });
+            DOM.modalCatTray.textContent = ''; DOM.modalCatTray.appendChild(frag); DOM.modalCatTray.style.display = 'block';
+        }, 40);
+
+        function commitNewFormStatement(e) {
+            e.preventDefault();
+            const typeStr = document.querySelector('input[name="entry_type"]:checked').value;
+            const labelStr = DOM.searchLineInput.value.trim();
+            let catStr = DOM.boundCatDisplay.value.trim();
+            const amountVal = parseFloat(DOM.fieldAmount.value);
+            const dateStr = DOM.fieldDate.value;
+
+            if(!labelStr || isNaN(amountVal) || !dateStr) return;
+
+            if(!catStr) {
+                const bindingPool = getActiveBindingPool(typeStr);
+                const matchedBinding = bindingPool.find(b => b.item.toLowerCase() === labelStr.toLowerCase());
+                catStr = matchedBinding ? matchedBinding.cat : "Unassigned Matrix Flow";
+                if(!matchedBinding) bindingPool.push({ item: labelStr, cat: catStr });
+            }
+
+            const calculatedMonth = dateStr.substring(0, 7);
+
+            if(globalEditTargetRowId !== null) {
+                const index = storageTransactionsDb.findIndex(tx => tx.id === globalEditTargetRowId);
+                if(index !== -1) {
+                    storageTransactionsDb[index] = { id: globalEditTargetRowId, type: typeStr, item: labelStr, cat: catStr, amount: amountVal, date: dateStr, recordMonth: calculatedMonth };
+                }
+                globalEditTargetRowId = null;
+            } else {
+                storageTransactionsDb.push({
+                    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    type: typeStr, item: labelStr, cat: catStr, amount: amountVal, date: dateStr, recordMonth: calculatedMonth
+                });
+            }
+            persistDatabaseToDisk();
+            toggleLedgerModalDisplayState(false);
+        }
+
+        function triggerRowEditTargetMode(uuid) {
+            const targetTx = storageTransactionsDb.find(tx => tx.id === uuid);
+            if(!targetTx) return;
+
+            globalEditTargetRowId = uuid;
+            toggleLedgerModalDisplayState(true);
+
+            document.getElementById(`r-${targetTx.type.substring(0,3)}`).checked = true;
+            DOM.searchLineInput.value = targetTx.item;
+            DOM.boundCatDisplay.value = targetTx.cat;
+            DOM.fieldAmount.value = targetTx.amount;
+            DOM.fieldDate.value = targetTx.date;
+
+            evaluateAllClearButtonVisualStates();
+        }
+
+        function triggerRowPurgeOperation(uuid) {
+            if(confirm("Confirm structural deletion of row statement?")) {
+                storageTransactionsDb = storageTransactionsDb.filter(tx => tx.id !== uuid);
+                persistDatabaseToDisk();
+            }
+        }
+
+        function switchWorkspaceMonthContext() {
+            compileUserInterfaceMetrics();
+        }
+
+        function executePreviousMonthRollover() {
+            const activePeriodStr = DOM.monthSelector.value;
+            if(!activePeriodStr) return;
+
+            const parts = activePeriodStr.split('-');
+            let year = parseInt(parts[0], 10);
+            let month = parseInt(parts[1], 10) - 1;
+            if(month === 0) { month = 12; year -= 1; }
+            const priorPeriodStr = `${year}-${String(month).padStart(2, '0')}`;
+
+            const templateRecords = storageTransactionsDb.filter(tx => tx.recordMonth === priorPeriodStr);
+            if(templateRecords.length === 0) {
+                alert("No prior historic templates found.");
+                return;
+            }
+
+            const appendBatch = [];
+            const uniqueSignature = Date.now();
+            templateRecords.forEach((tpl, idx) => {
+                appendBatch.push({
+                    id: 'tx_' + uniqueSignature + '_' + idx,
+                    type: tpl.type, item: tpl.item, cat: tpl.cat, amount: tpl.amount, date: `${activePeriodStr}-${tpl.date.split('-')[2]}`, recordMonth: activePeriodStr
+                });
+            });
+
+            storageTransactionsDb.push(...appendBatch);
+            persistDatabaseToDisk();
+        }
+
+        function exportDataToCSV() {
+            if(storageTransactionsDb.length === 0) { alert("Matrix stream empty."); return; }
+            let contents = "Date,Line Item,Category,Type,Amount\r\n";
+            storageTransactionsDb.forEach(tx => {
+                contents += `${tx.date},"${tx.item.replace(/"/g, '""')}","${tx.cat.replace(/"/g, '""')}",${tx.type},${tx.amount}\r\n`;
+            });
+            const blob = new Blob([contents], { type: 'text/csv;charset=utf-8;' });
+            const anchor = document.createElement('a');
+            anchor.href = URL.createObjectURL(blob);
+            anchor.setAttribute('download', `FEM_Data_${DOM.monthSelector.value}.csv`);
+            document.body.appendChild(anchor); anchor.click(); document.body.removeChild(anchor);
+        }
+
+        function importDataViaCSV(event) {
+            const fileRef = event.target.files[0];
+            if(!fileRef) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const rows = e.target.result.split(/\r?\n/);
+                if(rows.length <= 1) return;
+
+                let incomingCount = 0;
+                const batch = [];
+                const stamp = Date.now();
+                for(let i = 1; i < rows.length; i++) {
+                    const rowText = rows[i].trim();
+                    if(!rowText) continue;
+
+                    const tokens = rowText.split(',');
+                    if(tokens.length < 5) continue;
+
+                    let cellDate = tokens[0].trim();
+                    let cellItem = tokens[1].trim().replace(/^"|"$/g, '').replace(/""/g, '"');
+                    let cellCat = tokens[2].trim().replace(/^"|"$/g, '').replace(/""/g, '"');
+                    let cellType = tokens[3].trim().toLowerCase();
+                    let cellAmount = parseFloat(tokens[4].trim().replace(/[^0-9.-]/g, ''));
+
+                    if(!cellDate || !cellItem || isNaN(cellAmount)) continue;
+                    if(cellType !== 'income' && cellType !== 'expense' && cellType !== 'savings') cellType = 'expense';
+
+                    batch.push({
+                        id: 'tx_' + stamp + '_' + i,
+                        type: cellType, item: cellItem, cat: cellCat || "Imported Matrix", amount: cellAmount, date: cellDate, recordMonth: cellDate.substring(0, 7)
+                    });
+                    incomingCount++;
+                }
+
+                if(incomingCount > 0) {
+                    storageTransactionsDb.push(...batch);
+                    persistDatabaseToDisk();
+                    alert(`Imported ${incomingCount} items successfully.`);
+                }
+                document.getElementById('csv-upload-ghost').value = '';
+            };
+            reader.readAsText(fileRef);
+        }
+
+        function executeFinancialHTMLReportCompilation(e) {
+            e.preventDefault();
+            const rptType = DOM.rptTypeSelect.value;
+            const rptScale = DOM.rptScaleSelect.value;
+            const targetYear = DOM.rptYearSelect.value;
+            const targetMonth = DOM.rptMonthSelect.value;
+
+            const isMonthly = rptScale === 'monthly';
+            const targetMatcher = isMonthly ? `${targetYear}-${targetMonth}` : targetYear;
+            
+            const filteredPool = storageTransactionsDb.filter(tx => 
+                tx.recordMonth && (isMonthly ? tx.recordMonth === targetMatcher : tx.recordMonth.startsWith(targetMatcher))
+            );
+
+            DOM.rptCanvas.style.display = 'block';
+            if(filteredPool.length === 0) {
+                DOM.rptCanvas.innerHTML = `<div class="alert alert-warning text-center small my-2">No matching structural ledger targets.</div>`; return;
+            }
+
+            let html = `<div class="table-responsive"><table class="table table-sm table-bordered align-middle text-nowrap mt-3 small">`;
+
+            if(rptType === 'line-item') {
+                html += `<thead class="table-light"><tr><th>Line Item</th><th>Category</th><th>Type</th><th class="text-end">Amount</th></tr></thead><tbody>`;
+                const matrixGroupMap = {};
+                filteredPool.forEach(tx => {
+                    const signatureKey = `${tx.item}__${tx.type}__${tx.cat}`;
+                    if(!matrixGroupMap[signatureKey]) {
+                        matrixGroupMap[signatureKey] = { itemName: tx.item, type: tx.type, category: tx.cat, totalVolume: 0, occurrences: 0 };
+                    }
+                    matrixGroupMap[signatureKey].totalVolume += tx.amount;
+                    matrixGroupMap[signatureKey].occurrences += 1;
+                });
+
+                let grandTotalSurplusNet = 0;
+                Object.keys(matrixGroupMap).sort().forEach(key => {
+                    const aggregatedRow = matrixGroupMap[key];
+                    grandTotalSurplusNet += (aggregatedRow.totalVolume * (aggregatedRow.type === 'income' ? 1 : -1));
+                    const badgeClass = aggregatedRow.type === 'income' ? 'bg-success' : aggregatedRow.type === 'expense' ? 'bg-danger' : 'bg-primary';
+                    html += `<tr>
+                        <td><strong>${aggregatedRow.itemName}</strong><br><small class="text-muted">Records Count: ${aggregatedRow.occurrences}</small></td>
+                        <td>${aggregatedRow.category}</td>
+                        <td><span class="badge ${badgeClass} text-uppercase" style="font-size:9px;">${aggregatedRow.type}</span></td>
+                        <td class="text-end fw-bold">BDT ${aggregatedRow.totalVolume.toFixed(2)}</td>
+                    </tr>`;
+                });
+                html += `<tr class="table-dark"><td colspan="3">Aggregated Net Timeline Surplus</td><td class="text-end fw-bold">BDT ${grandTotalSurplusNet.toFixed(2)}</td></tr>`;
+            
+            } else if(rptType === 'group-wise') {
+                html += `<thead class="table-light"><tr><th>Category Pipeline</th><th>Type</th><th class="text-end">Volume</th></tr></thead><tbody>`;
+                const map = {};
+                filteredPool.forEach(tx => { const k = `${tx.cat}__${tx.type}`; map[k] = (map[k] || 0) + tx.amount; });
+                Object.keys(map).sort().forEach(k => {
+                    const [cName, cType] = k.split('__');
+                    const badgeClass = cType === 'income' ? 'bg-success' : cType === 'expense' ? 'bg-danger' : 'bg-primary';
+                    html += `<tr><td><strong>${cName}</strong></td><td><span class="badge ${badgeClass} text-uppercase" style="font-size:9px;">${cType}</span></td><td class="text-end fw-bold">BDT ${map[k].toFixed(2)}</td></tr>`;
+                });
+            } else if(rptType === 'p-and-l') {
+                let inc = 0, exp = 0, sav = 0;
+                filteredPool.forEach(tx => { if(tx.type==='income') inc+=tx.amount; else if(tx.type==='expense') exp+=tx.amount; else sav+=tx.amount; });
+                html += `
+                    <tr class="table-secondary fw-bold"><td colspan="2">1. Operating Revenues</td></tr>
+                    <tr><td>Gross Capital Inflows</td><td class="text-end text-success fw-bold">BDT ${inc.toFixed(2)}</td></tr>
+                    <tr class="table-secondary fw-bold"><td colspan="2">2. Operating Expenses</td></tr>
+                    <tr><td>Structural Spending Discharges</td><td class="text-end text-danger fw-bold">BDT ${exp.toFixed(2)}</td></tr>
+                    <tr class="table-secondary fw-bold"><td colspan="2">3. Capital Reserve Provisions</td></tr>
+                    <tr><td>Sinking Reserves Adjustments</td><td class="text-end text-primary fw-bold">BDT ${sav.toFixed(2)}</td></tr>
+                    <tr class="table-dark fw-bold"><td>Net Retained Operational Surplus</td><td class="text-end">BDT ${(inc - exp - sav).toFixed(2)}</td></tr>`;
+            }
+            html += `</tbody></table></div>`;
+            DOM.rptCanvas.innerHTML = html;
+        }
+
+        function compileUserInterfaceMetrics() {
+            const activePeriodStr = DOM.monthSelector.value;
+            const filteredArray = [];
+            let incSum = 0, expSum = 0, savSum = 0, hasPriorRecords = false;
+
+            storageTransactionsDb.forEach(tx => {
+                if (tx.recordMonth === activePeriodStr) {
+                    filteredArray.push(tx);
+                    if (tx.type === 'income') incSum += tx.amount;
+                    else if (tx.type === 'expense') expSum += tx.amount;
+                    else if (tx.type === 'savings') savSum += tx.amount;
+                } else if (tx.recordMonth && tx.recordMonth < activePeriodStr) {
+                    hasPriorRecords = true;
+                }
+            });
+
+            DOM.ledgerTarget.textContent = '';
+            if (filteredArray.length === 0) {
+                DOM.emptyNotice.style.display = 'block';
+                DOM.prevImportBox.style.display = hasPriorRecords ? 'block' : 'none';
+            } else {
+                DOM.emptyNotice.style.display = 'none';
+                const frag = document.createDocumentFragment();
+                filteredArray.sort((a,b) => b.date.localeCompare(a.date));
+
+                filteredArray.forEach(tx => {
+                    const tr = document.createElement('tr');
+                    const badgeClass = tx.type === 'income' ? 'bg-success' : tx.type === 'expense' ? 'bg-danger' : 'bg-primary';
+                    const amountColor = tx.type === 'expense' ? 'text-danger' : 'text-dark';
+                    tr.innerHTML = `
+                        <td data-label="Date" class="ps-4 text-secondary small fw-medium">${parseAndFormatDateString(tx.date)}</td>
+                        <td data-label="Description" class="fw-bold text-dark">${tx.item}</td>
+                        <td data-label="Group"><span class="text-secondary">${tx.cat}</span></td>
+                        <td data-label="Type"><span class="badge ${badgeClass} text-uppercase" style="font-size:10px; padding: 4px 8px;">${tx.type}</span></td>
+                        <td data-label="Amount" class="text-end fw-bold ${amountColor}">BDT ${tx.amount.toFixed(2)}</td>
+                        <td data-label="Actions" class="text-end pe-4">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <button type="button" class="btn btn-xs btn-light text-dark border btn-sm py-1 px-2" onclick="triggerRowEditTargetMode('${tx.id}')"><i class="bi bi-pencil-square"></i></button>
+                                <button type="button" class="btn id-purge btn-xs btn-outline-danger btn-sm py-1 px-2" onclick="triggerRowPurgeOperation('${tx.id}')"><i class="bi bi-trash3"></i></button>
+                            </div>
+                        </td>`;
+                    frag.appendChild(tr);
+                });
+                DOM.ledgerTarget.appendChild(frag);
+            }
+
+            DOM.statIncome.innerText = `BDT ${incSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            DOM.statExpenses.innerText = `BDT ${expSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            DOM.statSavings.innerText = `BDT ${savSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const netSurplus = incSum - expSum - savSum;
+            DOM.statBalance.innerText = `BDT ${netSurplus.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            DOM.statBalance.className = netSurplus < 0 ? 'fw-bold m-0 mt-1 text-danger' : 'fw-bold m-0 mt-1 text-dark';
+        }
+
+        window.onload = function() {
+            // Instantiate Bootstrap Native Modal Elements
+            configModalInstance = new bootstrap.Modal(document.getElementById('configurationModal'));
+            ledgerModalInstance = new bootstrap.Modal(document.getElementById('ledgerEntryModal'));
+            reportsModalInstance = new bootstrap.Modal(document.getElementById('reportsParameterModal'));
+
+            initializeDefaultTimeframe();
+            compileUserInterfaceMetrics();
+            evaluateAllClearButtonVisualStates();
+        };
+    </script>
+</body>
+</html>

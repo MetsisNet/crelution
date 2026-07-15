@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metsis Vault</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --bs-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bs-font-monospace: 'JetBrains Mono', monospace;
+            
+            --zx-bg: #f4f5f8;
+            --zx-sidebar: #ffffff;
+            --zx-card: #ffffff;
+            --zx-border: #e2e8f0;
+            --zx-border-focus: rgba(99, 102, 241, 0.4);
+            
+            --zx-primary: #4f46e5;
+            --zx-primary-rgb: 79, 70, 229;
+            --zx-gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --zx-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --zx-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --zx-gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            
+            --zx-text-main: #1e293b;
+            --zx-text-muted: #64748b;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--zx-bg);
+            color: var(--zx-text-main);
+            font-family: var(--bs-font-sans-serif);
+            overflow-x: hidden;
+        }
+
+        #auth-screen {
+            min-height: 100vh;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%), var(--zx-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--zx-border);
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .zx-wrapper {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+        
+        .zx-sidebar {
+            width: 260px;
+            background-color: var(--zx-sidebar);
+            border-right: 1px solid var(--zx-border);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1040;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .zx-content-page {
+            flex-grow: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--zx-bg);
+        }
+
+        .zx-navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--zx-border);
+            height: 70px;
+            padding: 0 1.5rem;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1.25rem;
+            color: var(--zx-text-muted);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            margin: 0.2rem 0.75rem;
+        }
+        .sidebar-nav-link:hover, .sidebar-nav-link.active {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--zx-primary);
+        }
+
+        .zx-card {
+            background-color: var(--zx-card);
+            border: 1px solid var(--zx-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+        }
+        .zx-card:hover {
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+        }
+        
+        .widget-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: #fff;
+        }
+
+        .form-control, .form-select {
+            background-color: #f8fafc;
+            border: 1px solid var(--zx-border);
+            color: var(--zx-text-main);
+            border-radius: 0.5rem;
+            padding: 0.6rem 1rem;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: var(--zx-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .field-suggest-box, .google-suggest-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--zx-border);
+            border-radius: 0.5rem;
+            z-index: 2500;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            display: none;
+        }
+        .field-suggest-item, .google-suggest-item {
+            padding: 0.75rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--zx-text-main);
+        }
+        .field-suggest-item:hover, .google-suggest-item:hover {
+            background: #f1f5f9;
+        }
+
+        .grid-rows-container { contain: content; }
+        .grid-header-strip {
+            display: grid;
+            grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
+            gap: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid var(--zx-border);
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--zx-text-muted);
+        }
+        .grid-row-item {
+            display: grid;
+            grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
+            gap: 0.75rem;
+            background: var(--zx-card);
+            border: 1px solid var(--zx-border);
+            border-top: none;
+            align-items: center;
+        }
+        .grid-row-item:hover { background-color: #f8fafc; }
+        .grid-cell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cell-label { display: none; }
+
+        .modal-content {
+            background-color: #ffffff !important;
+            color: var(--zx-text-main) !important;
+            border: 1px solid var(--zx-border) !important;
+        }
+        .view-row-detail { background-color: #f8fafc; border: 1px solid var(--zx-border); }
+        .btn-primary { background: var(--zx-gradient-primary); border: none; }
+        .btn-success { background: var(--zx-gradient-success); border: none; }
+        .btn-warning { background: var(--zx-gradient-warning); border: none; color: #fff; }
+        .btn-danger { background: var(--zx-gradient-danger); border: none; }
+
+        .toast-container-custom {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 100%;
+        }
+        .custom-toast {
+            background: #ffffff;
+            border-left: 4px solid var(--zx-primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 6px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .custom-toast.show { transform: translateX(0); }
+        .custom-toast.toast-success { border-left-color: #10b981; }
+        .custom-toast.toast-danger { border-left-color: #ef4444; }
+        .custom-toast.toast-warning { border-left-color: #f59e0b; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--zx-bg); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        @media (max-width: 1400px) {
+            .grid-header-strip { display: none; }
+            .grid-rows-container { display: flex; flex-direction: column; gap: 1rem; }
+            .grid-row-item {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid var(--zx-border) !important;
+                border-radius: 0.5rem;
+                padding: 1.25rem !important;
+            }
+            .grid-cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.4rem 0;
+                border-bottom: 1px solid #f1f5f9;
+                width: 100%;
+            }
+            .grid-cell:last-of-type { border-bottom: none; }
+            .cell-label {
+                display: block;
+                font-weight: 600;
+                font-size: 0.75rem;
+                color: var(--zx-text-muted);
+                text-transform: uppercase;
+            }
+            .grid-action-cell { justify-content: flex-end; padding-top: 0.75rem; }
+            .zx-sidebar { transform: translateX(-260px); position: absolute; height: 100%; }
+            .zx-sidebar.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast-container-custom" id="toast-container"></div>
+
+<div id="auth-screen">
+    <div class="card auth-card w-100 mx-3 p-2" style="max-width: 460px;">
+        <div class="card-body p-4 p-sm-5">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: rgba(79, 70, 229, 0.08); border-radius: 12px; border: 1px solid rgba(79, 70, 229, 0.15);">
+                    <i class="bi bi-shield-lock text-primary fs-2"></i>
+                </div>
+                <h3 class="fw-bold mb-1 text-dark">Metsis <span style="color: var(--zx-primary);">Vault</span></h3>
+                <p class="text-muted small">Client Encrypted Node Registry</p>
+            </div>
+            <div class="mb-3">
+                <label for="master-username" class="form-label small fw-semibold text-secondary">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
+                    <input type="text" id="master-username" class="form-control" placeholder="Operator Identity">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="master-password" class="form-label small fw-semibold text-secondary">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-key text-muted"></i></span>
+                    <input type="password" id="master-password" class="form-control" placeholder="••••••••••••">
+                </div>
+            </div>
+            <button id="btn-unlock" class="btn btn-primary w-100 fw-semibold py-2.5"><i class="bi bi-shield-lock-fill me-2"></i>Unlock Repository</button>
+        </div>
+    </div>
+</div>
+
+<div id="app-screen" class="d-none zx-wrapper">
+    <aside class="zx-sidebar" id="appSidebar">
+        <div class="d-flex align-items-center px-4 justify-content-between header-logo" style="height: 70px; border-bottom: 1px solid var(--zx-border)">
+            <a class="navbar-brand fw-bold fs-4 text-dark d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-safe2 text-primary"></i> Metsis <span style="color: var(--zx-primary); font-weight: 300;">Vault</span>
+            </a>
+        </div>
+        
+        <div class="d-flex flex-column flex-grow-1 py-3 overflow-y-auto">
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mb-2 d-block opacity-70">Operational Core</span>
+            <a href="#" class="sidebar-nav-link active"><i class="bi bi-grid-1x2-fill"></i> Node Registry</a>
+            
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Data Actions</span>
+            <a href="#" id="btn-sidebar-add" class="sidebar-nav-link"><i class="bi bi-plus-circle"></i> Add Asset Node</a>
+            <a href="#" id="btn-sidebar-rotate" class="sidebar-nav-link"><i class="bi bi-arrow-left-right"></i> Key Rotation</a>
+            
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Backups & Exports</span>
+            <a href="#" id="btn-sidebar-export-json" class="sidebar-nav-link"><i class="bi bi-file-earmark-code"></i> Export JSON</a>
+            <a href="#" id="btn-sidebar-export-csv" class="sidebar-nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</a>
+
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Data Ingestion</span>
+            <a href="#" id="btn-import" class="sidebar-nav-link text-secondary"><i class="bi bi-upload text-secondary"></i> Import JSON</a>
+            <a href="#" id="btn-import-csv" class="sidebar-nav-link text-success"><i class="bi bi-box-arrow-in-down-left text-success"></i> Import CSV</a>
+            
+            <input type="file" id="import-file-input" class="d-none" accept=".json">
+            <input type="file" id="import-csv-input" class="d-none" accept=".csv">
+        </div>
+        
+        <div class="p-3 border-top" style="border-color: var(--zx-border) !important;">
+            <button id="btn-lock" class="btn btn-danger w-100 fw-semibold"><i class="bi bi-power me-2"></i>Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="zx-content-page">
+        <header class="zx-navbar d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-light d-xl-none border" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                <span class="badge px-3 py-2" style="background: rgba(79, 70, 229, 0.08); color: var(--zx-primary); border: 1px solid rgba(79, 70, 229, 0.15);" id="display-tenant">Scope: Inactive</span>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 d-flex flex-column gap-4">
+            <div class="row g-3">
+                <div class="col-sm-6 col-md-4">
+                    <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Total Encrypted Registry</span>
+                            <h3 class="fw-bold mt-1 mb-0 text-dark" id="count-total">0</h3>
+                        </div>
+                        <div class="widget-stat-icon" style="background: var(--zx-gradient-primary)"><i class="bi bi-database-lock"></i></div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Filtered Registry</span>
+                            <h3 class="fw-bold mt-1 mb-0 text-dark" id="count-matched">0</h3>
+                        </div>
+                        <div class="widget-stat-icon" style="background: var(--zx-gradient-success)"><i class="bi bi-filter-square"></i></div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Session Status</span>
+                            <h6 class="fw-semibold mt-2 mb-0 text-success"><i class="bi bi-shield-check me-1"></i> Fully Encrypted</h6>
+                        </div>
+                        <div class="widget-stat-icon" style="background: var(--zx-gradient-warning)"><i class="bi bi-fingerprint"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card zx-card">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="chk-filter-site">
+                                <label class="form-check-label small text-muted" for="chk-filter-site">Site Name</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="chk-filter-url" checked>
+                                <label class="form-check-label small text-muted" for="chk-filter-url">URL</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="chk-filter-user">
+                                <label class="form-check-label small text-muted" for="chk-filter-user">Username</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-container position-relative">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="google-search-input" class="form-control form-control-lg fs-6" placeholder="Search operational metadata components dynamically..." autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="visibility: hidden;"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <div id="google-suggest-dropdown" class="google-suggest-dropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-dark fw-semibold mb-0"><i class="bi bi-hdd-stack text-primary me-2"></i>Node Data</h5>
+                    <button id="btn-open-entry" class="btn btn-primary btn-sm fw-semibold"><i class="bi bi-plus-lg me-1"></i>Add Registry Node</button>
+                </div>
+                
+                <div class="grid-header-strip p-3 align-items-center">
+                    <div>S.No.</div><div>Site Name</div><div>URL</div><div>Username</div><div>Password</div><div>PIN 1</div><div>PIN 2</div><div>PIN 3</div><div>Comments</div><div>Others</div><div class="text-end">Actions</div>
+                </div>
+                <div id="workspace-grid-rows" class="grid-rows-container"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="entryModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold"><i class="bi bi-hdd-network text-primary me-2"></i>Registry Asset Node Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="vault-form">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label small fw-semibold text-muted">Site Name</label>
+                            <input type="text" id="site-name" class="form-control" required autocomplete="off">
+                            <div class="field-suggest-box" id="suggest-site-name"></div>
+                        </div>
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label small fw-semibold text-muted">Destination URL</label>
+                            <input type="url" id="site-url" class="form-control" autocomplete="off" placeholder="https://">
+                            <div class="field-suggest-box" id="suggest-site-url"></div>
+                        </div>
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label small fw-semibold text-muted">Username</label>
+                            <input type="text" id="username" class="form-control" required autocomplete="off">
+                            <div class="field-suggest-box" id="suggest-username"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-muted">Password</label>
+                            <div class="input-group">
+                                <input type="text" id="password" class="form-control monospace" required autocomplete="off">
+                                <button type="button" class="btn btn-secondary px-3" id="btn-generate">Gen</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 position-relative">
+                            <label class="form-label small fw-semibold text-muted">PIN 1</label>
+                            <input type="text" id="pin-number" class="form-control" autocomplete="off">
+                            <div class="field-suggest-box" id="suggest-pin-number"></div>
+                        </div>
+                        <div class="col-md-4 position-relative">
+                            <label class="form-label small fw-semibold text-muted">PIN 2</label>
+                            <input type="text" id="pin2" class="form-control" autocomplete="off">
+                            <div class="field-suggest-box" id="suggest-pin2"></div>
+                        </div>
+                        <div class="col-md-4 position-relative">
+                            <label class="form-label small fw-semibold text-muted">PIN 3</label>
+                            <input type="text" id="pin3" class="form-control" autocomplete="off">
+                            <div class="field-suggest-box" id="suggest-pin3"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted">Comments</label>
+                            <textarea id="comments" class="form-control" style="height: 80px; resize: none;"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted">Others</label>
+                            <textarea id="others" class="form-control" placeholder="Additional parameters..." style="height: 80px; resize: none;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">Save Registry Node</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="securityModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold text-warning"><i class="bi bi-shield-fill-exclamation me-2"></i>Administrative Key Rotation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="master-reset-form">
+                <div class="modal-body p-4">
+                    <div class="alert bg-light text-dark border-start border-warning border-4 small mb-4 py-2">
+                        Modifying the operational master password configuration forces client-side re-encryption.
+                    </div>
+                    <div class="mb-3">
+                        <label for="reset-old-pass" class="form-label small fw-semibold text-muted">Current Master Password</label>
+                        <input type="password" id="reset-old-pass" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reset-new-pass" class="form-label small fw-semibold text-muted">New Replacement Master Password</label>
+                        <input type="password" id="reset-new-pass" class="form-control" required>
+                    </div>
+                    <div id="rotation-confirm-block" class="d-none border p-3 rounded bg-light">
+                        <p class="small text-danger fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Master Overwrite Action?</p>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="btn-confirm-rotation-yes" class="btn btn-danger btn-sm px-3">Execute Overwrite</button>
+                            <button type="button" id="btn-confirm-rotation-no" class="btn btn-light btn-sm border">Abort</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="rotation-modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Dismiss</button>
+                    <button type="submit" class="btn btn-warning fw-semibold">Initiate Rotation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold"><i class="bi bi-eye text-primary me-2"></i>View Registry Item Mapping</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-2 p-4" id="view-modal-body">
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Site Name</span><span id="mv-site-name" class="fw-bold text-primary d-block text-truncate">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteName">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">URL</span><span id="mv-url" class="monospace text-wrap d-block text-truncate text-info">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteUrl">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Username</span><span id="mv-username" class="d-block text-truncate text-dark">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="username">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Password</span><span id="mv-password" class="monospace text-danger fw-bold d-block text-truncate">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="password">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">PIN 1</span><span id="mv-pin" class="monospace d-block text-truncate text-dark">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="pin">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">PIN 2</span><span id="mv-pin2" class="monospace d-block text-truncate text-dark">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="pin2">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">PIN 3</span><span id="mv-pin3" class="monospace d-block text-truncate text-dark">—</span></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="pin3">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="w-100 min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Comments</span><div id="mv-comments" class="text-wrap small text-dark overflow-y-auto" style="max-height:60px;">—</div></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0 align-self-start" data-copy="comments">Copy</button>
+                </div>
+                <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
+                    <div class="w-100 min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Others</span><div id="mv-others" class="text-wrap small text-dark overflow-y-auto" style="max-height:60px;">—</div></div>
+                    <button class="btn btn-sm btn-light border flex-shrink-0 align-self-start" data-copy="others">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const DB_NAME = "LockboxProCryptoDB", DB_VERSION = 1, STORE_NAME = "encrypted_vault";
+let db = null, derivedKey = null, activeSessionUser = "", activeSessionPass = "", localCacheRecords = [], uniqueRowFingerprints = new Set(), interfaceDebounceTimer = null;
+let activeSessionExportCounter = 1, activeModalRec = null;
+
+// Custom Notification Manager Engine (Bypasses UI-Blocking Alerts)
+const Toast = {
+    container: document.getElementById('toast-container'),
+    show(message, type = 'info') {
+        const t = document.createElement('div');
+        t.className = `custom-toast toast-${type}`;
+        let icon = 'info-circle text-primary';
+        if(type === 'success') icon = 'check-circle text-success';
+        if(type === 'danger') icon = 'exclamation-octagon text-danger';
+        if(type === 'warning') icon = 'exclamation-triangle text-warning';
+        
+        t.innerHTML = `<i class="bi bi-${icon} mt-0.5"></i><div class="flex-grow-1 small fw-medium text-dark">${message}</div>`;
+        this.container.appendChild(t);
+        requestAnimationFrame(() => t.classList.add('show'));
+        setTimeout(() => {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 300);
+        }, 3500);
+    }
+};
+
+let _instances = {};
+function getModalInstance(id) {
+    if (!_instances[id]) _instances[id] = new bootstrap.Modal(document.getElementById(id));
+    return _instances[id];
+}
+
+const DOM = {
+    workspaceGridRows: document.getElementById('workspace-grid-rows'),
+    countTotal: document.getElementById('count-total'),
+    countMatched: document.getElementById('count-matched'),
+    searchInput: document.getElementById('google-search-input'),
+    clearSearch: document.getElementById('btn-clear-search'),
+    gDropdown: document.getElementById('google-suggest-dropdown'),
+    tenantDisplay: document.getElementById('display-tenant'),
+    authScreen: document.getElementById('auth-screen'),
+    appScreen: document.getElementById('app-screen'),
+    chkSite: document.getElementById('chk-filter-site'),
+    chkUrl: document.getElementById('chk-filter-url'),
+    chkUser: document.getElementById('chk-filter-user')
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+    const sb = document.getElementById('appSidebar');
+    document.getElementById('sidebarToggle')?.addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        sb.classList.toggle('open'); 
+    });
+    document.addEventListener('click', (e) => { 
+        if(sb && !e.target.closest('#appSidebar') && sb.classList.contains('open')) sb.classList.remove('open'); 
+    });
+});
+
+async function initDB() {
+    if(db) return;
+    return new Promise((res) => {
+        const r = indexedDB.open(DB_NAME, DB_VERSION);
+        r.onupgradeneeded = (e) => { if(!e.target.result.objectStoreNames.contains(STORE_NAME)) e.target.result.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true }); };
+        r.onsuccess = (e) => { db = e.target.result; res(); };
+    });
+}
+
+async function deriveKey(u, p) {
+    const enc = new TextEncoder(), salt = enc.encode("LockboxEngineSalt2026SecureString");
+    const base = await crypto.subtle.importKey("raw", enc.encode(u.trim().toLowerCase() + "::" + p), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 120000, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+
+function bufToB64(b) { return btoa(String.fromCharCode(...new Uint8Array(b))); }
+function b64ToBuf(b) { return Uint8Array.from(atob(b), c => c.charCodeAt(0)); }
+
+async function encrypt(txt, k) {
+    const enc = new TextEncoder(), iv = crypto.getRandomValues(new Uint8Array(12));
+    return { cipher: bufToB64(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, k, enc.encode(txt))), iv: bufToB64(iv) };
+}
+async function decrypt(c, iv, k) { return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBuf(iv) }, k, b64ToBuf(c))); }
+
+document.getElementById('btn-open-entry').addEventListener('click', () => { document.getElementById('vault-form').reset(); getModalInstance('entryModal').show(); });
+document.getElementById('btn-sidebar-add').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('vault-form').reset(); getModalInstance('entryModal').show(); });
+document.getElementById('btn-sidebar-rotate').addEventListener('click', (e) => { 
+    e.preventDefault(); 
+    document.getElementById('master-reset-form').reset();
+    document.getElementById('rotation-confirm-block').classList.add('d-none');
+    document.getElementById('rotation-modal-footer').classList.remove('d-none');
+    getModalInstance('securityModal').show(); 
+});
+
+document.getElementById('btn-generate').addEventListener('click', () => {
+    const c = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^*()", r = new Uint32Array(14);
+    crypto.getRandomValues(r); let p = ""; for(let i=0; i<14; i++) p += c[r[i] % c.length];
+    document.getElementById('password').value = p;
+});
+
+document.getElementById('btn-unlock').addEventListener('click', async () => {
+    const u = document.getElementById('master-username').value, p = document.getElementById('master-password').value;
+    if(!u || !p) return Toast.show("Operational credentials missing.", "danger");
+    await initDB(); derivedKey = await deriveKey(u, p); activeSessionUser = u; activeSessionPass = p;
+    sessionStorage.setItem("sap_light_user", u); sessionStorage.setItem("sap_light_pass", p);
+    launchSystemCore();
+});
+
+function launchSystemCore() {
+    DOM.tenantDisplay.innerText = `Operator: ${activeSessionUser}`;
+    DOM.authScreen.classList.add('d-none');
+    DOM.appScreen.classList.remove('d-none');
+    DOM.appScreen.classList.add('d-flex');
+    syncFetchAndRender();
+    Toast.show("Secure dynamic container loaded.", "success");
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const u = sessionStorage.getItem("sap_light_user"), p = sessionStorage.getItem("sap_light_pass");
+    if(u && p) { try { await initDB(); derivedKey = await deriveKey(u, p); activeSessionUser = u; activeSessionPass = p; launchSystemCore(); } catch(e){ sessionStorage.clear(); } }
+});
+
+// Inline Overwrite Action Routing (Replaces global confirm blocks)
+document.getElementById('master-reset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const oldPass = document.getElementById('reset-old-pass').value, newPass = document.getElementById('reset-new-pass').value;
+    if (oldPass !== activeSessionPass) return Toast.show("Current system key authentication failed.", "danger");
+    if (newPass.length < 4) return Toast.show("Key validation length metrics failed.", "warning");
+    
+    document.getElementById('rotation-confirm-block').classList.remove('d-none');
+    document.getElementById('rotation-modal-footer').classList.add('d-none');
+});
+
+document.getElementById('btn-confirm-rotation-no').addEventListener('click', () => {
+    document.getElementById('rotation-confirm-block').classList.add('d-none');
+    document.getElementById('rotation-modal-footer').classList.remove('d-none');
+});
+
+document.getElementById('btn-confirm-rotation-yes').addEventListener('click', async () => {
+    const newPass = document.getElementById('reset-new-pass').value;
+    try {
+        const targetNewKey = await deriveKey(activeSessionUser, newPass);
+        let updatedEncryptionPayloads = [];
+        for (let i = 0, len = localCacheRecords.length; i < len; i++) {
+            const clearRecordObj = { ...localCacheRecords[i] };
+            const databasePrimaryKeyID = clearRecordObj.id; delete clearRecordObj.id;
+            const freshlyEncryptedPack = await encrypt(JSON.stringify(clearRecordObj), targetNewKey);
+            updatedEncryptionPayloads.push({
+                id: databasePrimaryKeyID,
+                metaTitle: clearRecordObj.siteName.toLowerCase(),
+                envelopeCipher: freshlyEncryptedPack.cipher,
+                envelopeIv: freshlyEncryptedPack.iv
+            });
+        }
+        const trans = db.transaction(STORE_NAME, "readwrite"), objectStoreRef = trans.objectStore(STORE_NAME);
+        updatedEncryptionPayloads.forEach(reEncryptedRow => objectStoreRef.put(reEncryptedRow));
+        trans.oncomplete = () => {
+            derivedKey = targetNewKey; activeSessionPass = newPass;
+            sessionStorage.setItem("sap_light_pass", newPass);
+            getModalInstance('securityModal').hide();
+            Toast.show("Administrative database re-encryption successful.", "success");
+            syncFetchAndRender();
+        };
+    } catch (err) { Toast.show("Error occurred during row system migration routines.", "danger"); }
+});
+
+const targets = ['site-name', 'site-url', 'username', 'pin-number', 'pin2', 'pin3'];
+targets.forEach(t => {
+    const el = document.getElementById(t);
+    if(el) {
+        el.addEventListener('focus', () => populateFieldSuggestions(t));
+        el.addEventListener('input', () => populateFieldSuggestions(t));
+    }
+});
+document.addEventListener('click', (e) => { targets.forEach(t => { if(!e.target.closest(`#${t}`) && !e.target.closest(`#suggest-${t}`)) { const box = document.getElementById(`suggest-${t}`); if(box) box.style.display="none"; } }); });
+
+function populateFieldSuggestions(id) {
+    const el = document.getElementById(id), box = document.getElementById(`suggest-${id}`), val = el.value.toLowerCase().trim();
+    if(!box) return;
+    const map = { 'site-name': 'siteName', 'site-url': 'siteUrl', 'username': 'username', 'pin-number': 'pin', 'pin2': 'pin2', 'pin3': 'pin3' };
+    box.innerHTML = ""; let matches = [], tracking = new Set();
+    for(let i = localCacheRecords.length - 1; i >= 0; i--) {
+        const v = localCacheRecords[i][map[id]];
+        if(v && !tracking.has(v.toLowerCase()) && v.toLowerCase().includes(val)) { tracking.add(v.toLowerCase()); matches.push(v); if(matches.length >= 5) break; }
+    }
+    if(matches.length > 0) {
+        box.style.display = "block"; const f = document.createDocumentFragment();
+        matches.forEach(m => { const r = document.createElement('div'); r.className = "field-suggest-item"; r.innerText = m; r.addEventListener('click', () => { el.value = m; box.style.display = "none"; }); f.appendChild(r); });
+        box.appendChild(f);
+    } else box.style.display = "none";
+}
+
+function fp(r) { return `${r.siteName.toLowerCase()}||${r.siteUrl.toLowerCase()}||${r.username.toLowerCase()}||${r.password}||${r.pin.toLowerCase()}||${(r.pin2||'').toLowerCase()}||${(r.pin3||'').toLowerCase()}||${r.comments.toLowerCase()}||${(r.others||'').toLowerCase()}`; }
+
+document.getElementById('vault-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = { 
+        siteName: document.getElementById('site-name').value.trim(), 
+        siteUrl: document.getElementById('site-url').value.trim(), 
+        username: document.getElementById('username').value.trim(), 
+        password: document.getElementById('password').value, 
+        pin: document.getElementById('pin-number').value.trim(), 
+        pin2: document.getElementById('pin2').value.trim(), 
+        pin3: document.getElementById('pin3').value.trim(), 
+        comments: document.getElementById('comments').value,
+        others: document.getElementById('others').value
+    };
+    if(uniqueRowFingerprints.has(fp(payload))) return Toast.show("Identical row configuration metadata exists.", "warning");
+    const env = await encrypt(JSON.stringify(payload), derivedKey);
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).add({ metaTitle: payload.siteName.toLowerCase(), envelopeCipher: env.cipher, envelopeIv: env.iv });
+    tx.oncomplete = () => { 
+        getModalInstance('entryModal').hide(); 
+        Toast.show("Node saved successfully.", "success");
+        syncFetchAndRender(); 
+    };
+});
+
+async function syncFetchAndRender() {
+    db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll().onsuccess = async (e) => {
+        const raw = e.target.result; localCacheRecords = []; uniqueRowFingerprints.clear();
+        for(let i=0, len=raw.length; i<len; i++) {
+            try { const p = JSON.parse(await decrypt(raw[i].envelopeCipher, raw[i].envelopeIv, derivedKey)); p.id = raw[i].id; localCacheRecords.push(p); uniqueRowFingerprints.add(fp(p)); } catch(err){}
+        }
+        executeLiveInterfaceRefresh();
+    };
+}
+
+function queueRefresh() { 
+    clearTimeout(interfaceDebounceTimer); 
+    interfaceDebounceTimer = setTimeout(executeLiveInterfaceRefresh, 150); 
+}
+
+function executeLiveInterfaceRefresh() {
+    const term = DOM.searchInput.value.toLowerCase().trim();
+    const cSite = DOM.chkSite.checked, cUrl = DOM.chkUrl.checked, cUser = DOM.chkUser.checked;
+    DOM.clearSearch.style.visibility = term.length > 0 ? "visible" : "hidden";
+    
+    let matches = [];
+    if(term && (cSite || cUrl || cUser)) {
+        for(let i=0, len=localCacheRecords.length; i<len; i++) {
+            const r = localCacheRecords[i];
+            if((cSite && r.siteName?.toLowerCase().includes(term)) || (cUrl && r.siteUrl?.toLowerCase().includes(term)) || (cUser && r.username?.toLowerCase().includes(term))) matches.push(r);
+        }
+        renderGrid(matches);
+    } else { matches = localCacheRecords; renderGrid(localCacheRecords); }
+    DOM.countTotal.innerText = localCacheRecords.length;
+    DOM.countMatched.innerText = term ? matches.length : localCacheRecords.length;
+}
+
+function renderGrid(list) {
+    requestAnimationFrame(() => {
+        DOM.workspaceGridRows.innerHTML = "";
+        if(list.length === 0) { DOM.workspaceGridRows.innerHTML = `<p class="text-muted text-center py-5 small border-top mb-0">No asset rows match processing filters.</p>`; return; }
+        
+        const chunk = list.slice(-150), f = document.createDocumentFragment();
+        for(let i = chunk.length - 1; i >= 0; i--) {
+            const r = chunk[i], idx = localCacheRecords.indexOf(r) + 1, row = document.createElement('div');
+            row.className = "grid-row-item p-3 small text-muted";
+            row.innerHTML = `
+                <div class="grid-cell"><span class="cell-label">S.No.</span><span class="fw-bold text-dark">${idx}</span></div>
+                <div class="grid-cell"><span class="cell-label">Site Name</span><strong class="text-dark">${esc(r.siteName)}</strong></div>
+                <div class="grid-cell"><span class="cell-label">URL</span><span>${r.siteUrl ? `<a href="${esc(r.siteUrl)}" target="_blank" class="text-info text-decoration-underline">Link</a>` : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">Username</span><span class="text-dark">${esc(r.username)}</span></div>
+                <div class="grid-cell"><span class="cell-label">Password</span><span class="text-muted opacity-50 monospace">••••••••</span></div>
+                <div class="grid-cell"><span class="cell-label">PIN 1</span><span class="monospace text-dark">${r.pin ? esc(r.pin) : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">PIN 2</span><span class="monospace text-dark">${r.pin2 ? esc(r.pin2) : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">PIN 3</span><span class="monospace text-dark">${r.pin3 ? esc(r.pin3) : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">Comments</span><span class="text-muted text-truncate d-block">${r.comments ? esc(r.comments) : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">Others</span><span class="text-muted text-truncate d-block">${r.others ? esc(r.others) : '—'}</span></div>
+                <div class="grid-cell grid-action-cell gap-1"><button type="button" class="btn btn-sm btn-outline-info py-0 px-2 fs-7" data-view-id="${r.id}"><i class="bi bi-eye"></i></button><button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 fs-7" data-dup-id="${r.id}"><i class="bi bi-copy"></i></button></div>
+            `;
+            f.appendChild(row);
+        }
+        DOM.workspaceGridRows.appendChild(f);
+    });
+}
+
+DOM.workspaceGridRows.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if(!btn) return;
+    const v = btn.getAttribute('data-view-id'), d = btn.getAttribute('data-dup-id');
+    if(v) launchModal(parseInt(v, 10));
+    if(d) { 
+        const t = localCacheRecords.find(r => r.id === parseInt(d, 10)); 
+        if(t){ 
+            ['site-name','site-url','username','password','pin-number','pin2','pin3','comments','others'].forEach(f => {
+                const domEl = document.getElementById(f);
+                if(domEl) {
+                    const structuralKey = f==='pin-number'?'pin':f==='site-name'?'siteName':f==='site-url'?'siteUrl':f;
+                    domEl.value = t[structuralKey] || '';
+                }
+            }); 
+            getModalInstance('entryModal').show();
+            Toast.show("Node configuration cloned into editor workspace.", "info");
+        } 
+    }
+});
+
+DOM.clearSearch.addEventListener('click', () => { 
+    DOM.searchInput.value=""; 
+    DOM.gDropdown.style.display="none"; 
+    executeLiveInterfaceRefresh(); 
+    DOM.searchInput.focus(); 
+});
+
+function launchModal(id) {
+    const r = localCacheRecords.find(x => x.id === id); if(!r) return; activeModalRec = r;
+    ['site-name','url','username','password','pin','pin2','pin3','comments','others'].forEach(f => {
+        const domEl = document.getElementById(`mv-${f}`);
+        if(domEl) {
+            const structuralKey = f==='site-name'?'siteName':f==='url'?'siteUrl':f;
+            domEl.innerText = r[structuralKey] || '—';
+        }
+    });
+    document.querySelectorAll('#viewModal .btn').forEach(b => { b.innerText="Copy"; b.className="btn btn-sm btn-light border"; });
+    getModalInstance('viewModal').show();
+}
+
+document.getElementById('view-modal-body').addEventListener('click', function(e) {
+    const btn = e.target.closest('button[data-copy]'); if(!btn || !activeModalRec) return;
+    const key = btn.getAttribute('data-copy');
+    const textToCopy = activeModalRec[key];
+    if(!textToCopy) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(() => showCopySuccess(btn)).catch(() => fallbackCopyEngine(textToCopy, btn));
+    } else {
+        fallbackCopyEngine(textToCopy, btn);
+    }
+});
+
+function fallbackCopyEngine(text, buttonElement) {
+    const textArea = document.createElement("textarea"); textArea.value = text;
+    textArea.style.position = "fixed"; textArea.style.opacity = "0";
+    document.body.appendChild(textArea); textArea.focus(); textArea.select();
+    try { if (document.execCommand('copy')) showCopySuccess(buttonElement); } catch (err) { Toast.show("Clipboard permissions denied.", "danger"); }
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess(el) {
+    el.innerText = "✓"; el.className = "btn btn-sm btn-success";
+    Toast.show("Copied parameter directly to host clipboard.", "success");
+    setTimeout(() => { el.innerText = "Copy"; el.className = "btn btn-sm btn-light border"; }, 1000);
+}
+
+DOM.searchInput.addEventListener('focus', buildSuggestions); 
+DOM.searchInput.addEventListener('click', buildSuggestions);
+DOM.searchInput.addEventListener('input', () => { queueRefresh(); buildSuggestions(); });
+
+['chk-filter-site', 'chk-filter-url', 'chk-filter-user'].forEach(id => 
+    document.getElementById(id).addEventListener('change', () => { executeLiveInterfaceRefresh(); buildSuggestions(); })
+);
+
+function buildSuggestions() {
+    const term = DOM.searchInput.value.toLowerCase().trim();
+    const cSite = DOM.chkSite.checked, cUrl = DOM.chkUrl.checked, cUser = DOM.chkUser.checked;
+    DOM.gDropdown.innerHTML = ""; 
+    if(!cSite && !cUrl && !cUser) { DOM.gDropdown.style.display="none"; return; }
+    
+    let tracking = new Set(), f = document.createDocumentFragment(), count = 0;
+    for(let i = localCacheRecords.length - 1; i >= 0; i--) {
+        if(count >= 6) break; const r = localCacheRecords[i];
+        if(cSite && r.siteName && (!term || r.siteName.toLowerCase().includes(term))) {
+            const k = "s:" + r.siteName.toLowerCase();
+            if(!tracking.has(k)) { tracking.add(k); f.appendChild(createSugNode(r.siteName,"Site")); count++; }
+        }
+        if(cUrl && r.siteUrl && (!term || r.siteUrl.toLowerCase().includes(term)) && count < 6) {
+            const k = "u:" + r.siteUrl.toLowerCase();
+            if(!tracking.has(k)) { tracking.add(k); f.appendChild(createSugNode(r.siteUrl,"URL")); count++; }
+        }
+        if(cUser && r.username && (!term || r.username.toLowerCase().includes(term)) && count < 6) {
+            const k = "n:" + r.username.toLowerCase();
+            if(!tracking.has(k)) { tracking.add(k); f.appendChild(createSugNode(r.username,"User")); count++; }
+        }
+    }
+    if(count > 0) { DOM.gDropdown.style.display = "block"; DOM.gDropdown.appendChild(f); } else DOM.gDropdown.style.display = "none";
+}
+
+function createSugNode(v, t) {
+    const d = document.createElement('div'); d.className = "google-suggest-item d-flex justify-content-between align-items-center"; 
+    d.innerHTML = `<span class="text-truncate" style="max-width: 85%;">${esc(v)}</span><span class="badge bg-light border text-muted fs-8">${t}</span>`;
+    d.addEventListener('click', (e) => { 
+        e.stopPropagation(); DOM.searchInput.value = v; DOM.gDropdown.style.display="none"; executeLiveInterfaceRefresh(); 
+    }); 
+    return d;
+}
+
+document.addEventListener('click', (e) => { if(!e.target.closest('.search-container')) DOM.gDropdown.style.display="none"; });
+
+document.getElementById('btn-sidebar-export-json').addEventListener('click', (e) => {
+    e.preventDefault();
+    db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll().onsuccess = (ev) => {
+        const arr = ev.target.result; if(arr.length === 0) return Toast.show("Database structure is currently blank.", "warning");
+        
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+        
+        const blobInstance = new Blob([JSON.stringify(arr)], { type: "application/json" });
+        const triggerAnchor = document.createElement('a');
+        triggerAnchor.href = URL.createObjectURL(blobInstance); 
+        triggerAnchor.download = `metsis vault backup export ${timestamp}.json`; 
+        triggerAnchor.click();
+        activeSessionExportCounter++;
+        Toast.show("JSON file stream compiled completely.", "success");
+    };
+});
+
+document.getElementById('btn-sidebar-export-csv').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (localCacheRecords.length === 0) return Toast.show("Database matrix contains no record rows.", "warning");
+    const headers = ["Site Name", "Site URL", "Username", "Password", "PIN 1", "PIN 2", "PIN 3", "Comments", "Others"];
+    let csvContent = headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\r\n";
+    for (let i = 0, len = localCacheRecords.length; i < len; i++) {
+        const rec = localCacheRecords[i];
+        const rowData = [rec.siteName || '', rec.siteUrl || '', rec.username || '', rec.password || '', rec.pin || '', rec.pin2 || '', rec.pin3 || '', rec.comments || '', rec.others || ''];
+        csvContent += rowData.map(val => `"${val.toString().replace(/"/g, '""')}"`).join(",") + "\r\n";
+    }
+    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a"); 
+    link.href = URL.createObjectURL(blob); 
+    link.download = `metsis vault backup export ${timestamp}.csv`; 
+    link.click();
+    Toast.show("CSV document matrices emitted cleanly.", "success");
+});
+
+document.getElementById('btn-import').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('import-file-input').click(); });
+document.getElementById('import-file-input').addEventListener('change', (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+        try {
+            const rawItems = JSON.parse(evt.target.result.replace(/^\uFEFF/, '').trim());
+            if(!Array.isArray(rawItems)) return Toast.show("Invalid backup architecture profile.", "danger");
+            let writeQueue = [];
+            for(let i=0, len=rawItems.length; i<len; i++) {
+                const item = rawItems[i]; if(!item?.envelopeCipher || !item?.envelopeIv) continue;
+                try {
+                    const p = JSON.parse(await decrypt(item.envelopeCipher, item.envelopeIv, derivedKey));
+                    if(!uniqueRowFingerprints.has(fp(p))) { if(item.id) delete item.id; writeQueue.push(item); }
+                } catch(e) { if(item.id) delete item.id; writeQueue.push(item); }
+            }
+            if(writeQueue.length === 0) return Toast.show("No unique items mapping discovered inside ingestion payload.", "warning");
+            const tx = db.transaction(STORE_NAME, "readwrite"), store = tx.objectStore(STORE_NAME);
+            writeQueue.forEach(item => store.add(item));
+            tx.oncomplete = () => { 
+                Toast.show(`Ingested ${writeQueue.length} system container rows successfully.`, "success");
+                syncFetchAndRender(); 
+                document.getElementById('import-file-input').value=""; 
+            };
+        } catch(err) { Toast.show("Ingested package fails structural blueprint validation.", "danger"); }
+    };
+    reader.readAsText(file);
+});
+
+document.getElementById('btn-import-csv').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('import-csv-input').click(); });
+document.getElementById('import-csv-input').addEventListener('change', (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+        try {
+            const rawCSVText = evt.target.result.replace(/^\uFEFF/, '').trim();
+            if(!rawCSVText) return Toast.show("Selected data spreadsheet file is blank.", "warning");
+            const structuralLines = rawCSVText.split(/\r?\n/);
+            if(structuralLines.length <= 1) return Toast.show("No valid data entry matrix cells mapped.", "warning");
+            
+            const headerCells = parseCSVRowString(structuralLines[0]);
+            const indices = {
+                siteName: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('sitename') || h.toLowerCase().includes('site') || h.toLowerCase().includes('name')),
+                siteUrl: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('siteurl') || h.toLowerCase().includes('url') || h.toLowerCase().includes('link')),
+                username: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('username') || h.toLowerCase().includes('user') || h.toLowerCase().includes('email')),
+                password: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('password') || h.toLowerCase().includes('pass') || h.toLowerCase().includes('pwd')),
+                pin: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('pin1') || h.toLowerCase().replace(/[\s_-]/g, '').includes('pinnumber') || h.toLowerCase().includes('pin')),
+                pin2: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('pin2')),
+                pin3: headerCells.findIndex(h => h.toLowerCase().replace(/[\s_-]/g, '').includes('pin3')),
+                comments: headerCells.findIndex(h => h.toLowerCase().includes('comment') || h.toLowerCase().includes('note') || h.toLowerCase().includes('desc')),
+                others: headerCells.findIndex(h => h.toLowerCase().includes('other'))
+            };
+            
+            if(indices.siteName === -1 || indices.username === -1 || indices.password === -1) {
+                return Toast.show("Crucial standard columns mapping targets are missing.", "danger");
+            }
+            
+            let encryptedIngestBuffer = [], duplicateFiltersCounter = 0;
+            for(let i = 1, len=structuralLines.length; i < len; i++) {
+                const standardLineText = structuralLines[i].trim(); if(!standardLineText) continue;
+                const dataRowValues = parseCSVRowString(standardLineText);
+                const cleanPayload = {
+                    siteName: indices.siteName !== -1 ? (dataRowValues[indices.siteName] || '').trim() : '',
+                    siteUrl: indices.siteUrl !== -1 ? (dataRowValues[indices.siteUrl] || '').trim() : '',
+                    username: indices.username !== -1 ? (dataRowValues[indices.username] || '').trim() : '',
+                    password: indices.password !== -1 ? dataRowValues[indices.password] || '' : '',
+                    pin: indices.pin !== -1 ? (dataRowValues[indices.pin] || '').trim() : '',
+                    pin2: indices.pin2 !== -1 ? (dataRowValues[indices.pin2] || '').trim() : '',
+                    pin3: indices.pin3 !== -1 ? (dataRowValues[indices.pin3] || '').trim() : '',
+                    comments: indices.comments !== -1 ? dataRowValues[indices.comments] || '' : '',
+                    others: indices.others !== -1 ? dataRowValues[indices.others] || '' : ''
+                };
+                if(!cleanPayload.siteName || !cleanPayload.username || !cleanPayload.password) continue;
+                if(!uniqueRowFingerprints.has(fp(cleanPayload))) {
+                    const cryptoEnvelope = await encrypt(JSON.stringify(cleanPayload), derivedKey);
+                    encryptedIngestBuffer.push({ metaTitle: cleanPayload.siteName.toLowerCase(), envelopeCipher: cryptoEnvelope.cipher, envelopeIv: cryptoEnvelope.iv });
+                } else duplicateFiltersCounter++;
+            }
+            if(encryptedIngestBuffer.length === 0) { 
+                Toast.show(`0 items imported. ${duplicateFiltersCounter} duplicate entries bypassed.`, "warning"); 
+                document.getElementById('import-csv-input').value = ""; 
+                return; 
+            }
+            const transactionInstance = db.transaction(STORE_NAME, "readwrite");
+            encryptedIngestBuffer.forEach(encryptedPack => transactionInstance.objectStore(STORE_NAME).add(encryptedPack));
+            transactionInstance.oncomplete = () => { 
+                Toast.show(`Ingested ${encryptedIngestBuffer.length} records from CSV mapping.`, "success");
+                syncFetchAndRender(); 
+                document.getElementById('import-csv-input').value = ""; 
+            };
+        } catch(err) { Toast.show("CSV layout dynamic structural extraction failure.", "danger"); }
+    };
+    reader.readAsText(file);
+});
+
+function parseCSVRowString(rowTextLine) {
+    let internalArray = [], stateValueString = "", insideQuoteBlockFlag = false;
+    for (let index = 0, len=rowTextLine.length; index < len; index++) {
+        let alphaChar = rowTextLine[index];
+        if (alphaChar === '"') {
+            if (insideQuoteBlockFlag && rowTextLine[index + 1] === '"') { stateValueString += '"'; index++; } else insideQuoteBlockFlag = !insideQuoteBlockFlag;
+        } else if (alphaChar === ',' && !insideQuoteBlockFlag) { internalArray.push(stateValueString); stateValueString = ""; } else stateValueString += alphaChar;
+    }
+    internalArray.push(stateValueString); return internalArray;
+}
+
+document.getElementById('btn-lock').addEventListener('click', () => {
+    derivedKey = null; activeSessionUser = ""; activeSessionPass = ""; localCacheRecords = []; uniqueRowFingerprints.clear(); sessionStorage.clear();
+    document.getElementById('master-password').value = ""; DOM.searchInput.value = ""; DOM.workspaceGridRows.innerHTML = "";
+    document.getElementById('vault-form').reset(); document.getElementById('master-reset-form').reset();
+    
+    for(let key in _instances) { _instances[key].hide(); delete _instances[key]; }
+    
+    DOM.appScreen.classList.remove('d-flex'); DOM.appScreen.classList.add('d-none'); DOM.authScreen.classList.remove('d-none');
+    Toast.show("Secure session terminated cleanly.", "info");
+});
+function esc(s) { if(!s) return ''; return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+</script>
+</body>
+</html>
