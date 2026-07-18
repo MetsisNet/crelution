@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MetsisPad</title>
     
-    <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
         body, html { height: 100%; margin: 0; display: flex; flex-direction: column; overflow: hidden; background-color: #282a36; }
 
-        /* Menu Bar Styling */
         .editor-menubar { background-color: #1e1f29; border-bottom: 1px solid #44475a; padding: 0.2rem 0.5rem; }
         .navbar-brand { font-weight: 800; color: #bd93f9 !important; font-size: 1.1rem; margin-left: 0.5rem; }
         .nav-link { font-size: 0.85rem; color: #f8f8f2 !important; padding: 0.4rem 0.8rem !important; }
@@ -21,11 +19,9 @@
         .dropdown-item { color: #f8f8f2; }
         .dropdown-item:hover { background-color: #44475a; color: #fff; }
         
-        /* Editor */
         #editor-container { flex-grow: 1; position: relative; }
         #editor { position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: 15px; }
 
-        /* Toast */
         #toast { position: fixed; bottom: 20px; right: 20px; background: #44475a; color: #f8f8f2; padding: 10px 20px; border-radius: 6px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; }
         #toast.show { opacity: 1; }
     </style>
@@ -62,22 +58,16 @@
                 </ul>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Theme</a>
+                <a class="nav-link dropdown-toggle text-success" href="#" data-bs-toggle="dropdown">Run</a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="editor.setTheme('ace/theme/github')">GitHub</a></li>
-                    <li><a class="dropdown-item" onclick="editor.setTheme('ace/theme/monokai')">Monokai</a></li>
-                    <li><a class="dropdown-item" onclick="editor.setTheme('ace/theme/dracula')">Dracula</a></li>
+                    <li><a class="dropdown-item text-success" onclick="runCode()">Execute in Browser</a></li>
                 </ul>
             </li>
-        </ul>
-
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link text-success fw-bold" onclick="runCode()"><i class="bi bi-play-fill"></i> Run</a></li>
         </ul>
         <input type="file" id="fileInput" class="d-none" onchange="openFile(event)">
     </nav>
 
-    <div id="editor-container"><div id="editor">console.log("Welcome to MetsisPad - Dracula Enabled");</div></div>
+    <div id="editor-container"><div id="editor">console.log("Welcome to MetsisPad");</div></div>
     <div id="toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -88,15 +78,9 @@
         let currentLang = 'javascript';
         const langNames = { 'javascript': 'JavaScript', 'html': 'HTML', 'css': 'CSS', 'python': 'Python', 'java': 'Java' };
 
-        // Set Default Theme to Dracula
-        editor.setOptions({ theme: "ace/theme/dracula", fontSize: '15px', showPrintMargin: false, enableBasicAutocompletion: true });
+        editor.setOptions({ theme: "ace/theme/dracula", fontSize: '15px', showPrintMargin: false });
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            editor.session.setMode("ace/mode/" + lang);
-            document.getElementById('languageLabel').innerText = "Lang: " + langNames[lang];
-        }
-
+        // Detection Logic
         function analyze(code) {
             if (/<!DOCTYPE html>/i.test(code)) return 'html';
             if (/\b(public|class|void|static)\b/i.test(code)) return 'java';
@@ -105,6 +89,7 @@
             return 'javascript';
         }
 
+        // Auto-detection event listener
         editor.on('change', () => {
             clearTimeout(window.det);
             window.det = setTimeout(() => {
@@ -113,27 +98,20 @@
             }, 800);
         });
 
-        function copyText() { navigator.clipboard.writeText(editor.getSelectedText() || editor.getValue()).then(() => showToast("Copied!")); }
-        async function pasteText() { editor.insert(await navigator.clipboard.readText()); }
-        
-        function openFile(e) {
-            const r = new FileReader();
-            r.onload = (ev) => editor.setValue(ev.target.result, -1);
-            r.readAsText(e.target.files[0]);
-        }
-
-        function saveFile() {
-            const blob = new Blob([editor.getValue()], {type: "text/plain"});
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = `MetsisCode.${currentLang === 'javascript' ? 'js' : currentLang}`;
-            a.click();
+        function setLanguage(lang) {
+            currentLang = lang;
+            editor.session.setMode("ace/mode/" + lang);
+            document.getElementById('languageLabel').innerText = "Lang: " + langNames[lang];
         }
 
         function runCode() {
-            if (currentLang === "javascript") eval(editor.getValue());
-            else if (currentLang === "html") { const w = window.open(); w.document.write(editor.getValue()); w.document.close(); }
-            else showToast("Run only available for JS and HTML.");
+            if (currentLang === "javascript") {
+                try { eval(editor.getValue()); } catch(e) { alert("Error: " + e.message); }
+            } else if (currentLang === "html") {
+                const w = window.open(); w.document.write(editor.getValue()); w.document.close();
+            } else {
+                showToast("Run only available for JS and HTML.");
+            }
         }
 
         function showToast(msg) {
@@ -141,6 +119,22 @@
             t.innerText = msg; t.classList.add("show");
             setTimeout(() => t.classList.remove("show"), 2000);
         }
+
+        // Helpers
+        function saveFile() {
+            const blob = new Blob([editor.getValue()], {type: "text/plain"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `MetsisCode.${currentLang === 'javascript' ? 'js' : currentLang}`;
+            a.click();
+        }
+        function openFile(e) {
+            const r = new FileReader();
+            r.onload = (ev) => editor.setValue(ev.target.result, -1);
+            r.readAsText(e.target.files[0]);
+        }
+        function copyText() { navigator.clipboard.writeText(editor.getValue()); showToast("Copied!"); }
+        async function pasteText() { editor.insert(await navigator.clipboard.readText()); }
     </script>
 </body>
 </html>
