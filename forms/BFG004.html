@@ -3,1192 +3,1233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRMS Ledger — Preadmin Edition</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <title>METSIS FEM</title>
+    
+    <!-- Google Fonts & FontAwesome UI Elements -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Circular+Std:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --preadmin-sidebar-width: 230px;
-            --preadmin-header-height: 60px;
-            --preadmin-bg: #f7f7f7;
-            --preadmin-primary: #ff9b44;
-            --preadmin-gradient: linear-gradient(to right, #ff9b44 0%, #fc6075 100%);
-            --preadmin-dark: #1f1f1f;
-            --preadmin-sidebar-bg: #343a40;
-            --preadmin-text: #333333;
-            --preadmin-muted: #8e8e8e;
-            --preadmin-border: #eee;
-            --preadmin-radius: 4px;
+            --bs-body-font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --brand-primary: #4f46e5;
+            --brand-primary-light: rgba(79, 70, 229, 0.08);
+            --brand-success: #10b981;
+            --brand-danger: #ef4444;
+            --surface-card: #ffffff;
+            --surface-bg: #f8fafc;
+            --border-color: #e2e8f0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--preadmin-bg);
-            color: var(--preadmin-text);
-            font-size: 14px;
-            overflow-x: hidden;
+            background-color: var(--surface-bg);
+            color: #0f172a;
+            min-height: 100vh;
+            letter-spacing: -0.01em;
         }
 
-        /* Top Header Navigation Styling */
-        .preadmin-header {
-            height: var(--preadmin-header-height);
-            background: var(--preadmin-gradient);
-            position: sticky;
-            top: 0;
-            z-index: 1025;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.09);
-        }
-        .header-left {
-            width: var(--preadmin-sidebar-width);
-            height: 100%;
-            background: rgba(0, 0, 0, 0.09);
-            padding-left: 15px;
-        }
-        .header-brand-logo {
-            font-size: 20px;
-            color: #ffffff !important;
-            font-weight: 700;
+        h1, h2, h3, h4, h5, h6 {
+            letter-spacing: -0.02em;
         }
 
-        /* Structural Framework Setup */
-        .preadmin-wrapper {
-            display: flex;
-            min-height: calc(100vh - var(--preadmin-header-height));
-        }
-
-        /* Preadmin Dark Sidebar Design UI */
-        .preadmin-sidebar {
-            width: var(--preadmin-sidebar-width);
-            background: var(--preadmin-sidebar-bg);
-            flex-shrink: 0;
-            position: sticky;
-            top: var(--preadmin-header-height);
-            height: calc(100vh - var(--preadmin-header-height));
-            overflow-y: auto;
-        }
-        .sidebar-menu-section {
-            padding: 10px 0;
-        }
-        .sidebar-menu-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #afbbca;
-            text-transform: uppercase;
-            padding: 12px 20px 6px 20px;
-        }
-        .sidebar-menu-section ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .sidebar-menu-section ul li button {
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            border: none;
-            padding: 10px 20px;
-            color: #98a6ad;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-        }
-        .sidebar-menu-section ul li button:hover {
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.15);
-        }
-        .sidebar-menu-section ul li button.active {
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.25);
-            font-weight: 500;
-        }
-
-        /* Workspace Core Component Main Area */
-        .preadmin-main-content {
-            flex-grow: 1;
-            padding: 30px;
-            max-width: calc(100% - var(--preadmin-sidebar-width));
-        }
-
-        /* Premium Minimal Accent Card Framework */
-        .card {
-            background: #ffffff;
-            border: 1px solid var(--preadmin-border);
-            border-radius: var(--preadmin-radius);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #ffffff;
-            border-bottom: 1px solid var(--preadmin-border);
-            padding: 15px 20px;
-        }
-        .card-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #1f1f1f;
-            margin: 0;
-        }
-
-        /* Preadmin Metric Status Counter Boards */
-        .dash-widget {
-            background-color: #fff;
-            border: 1px solid var(--preadmin-border);
-            border-radius: var(--preadmin-radius);
-            padding: 20px;
+        .dashboard-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
             position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .premium-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .analytics-card {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--surface-card);
+            padding: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .dash-widget-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+
+        .analytics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+        }
+
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            background-color: #f7f7f7;
-        }
-        .dash-widget-info h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            color: #333;
-        }
-        .dash-widget-info span {
-            color: var(--preadmin-muted);
-            font-size: 13px;
-            font-weight: 500;
-            text-transform: uppercase;
         }
 
-        /* Standard Buttons */
-        .btn-preadmin-primary {
-            background: var(--preadmin-gradient);
-            border: none;
-            color: #ffffff;
-            font-weight: 500;
-            border-radius: 50px;
-            padding: 6px 18px;
-            transition: opacity 0.2s ease;
-        }
-        .btn-preadmin-primary:hover {
-            opacity: 0.9;
-            color: #ffffff;
-        }
-        .btn-add {
-            border-radius: 50px;
-        }
-
-        /* Custom Structured Table Grid Accents */
-        .table th {
-            color: #1f1f1f;
-            font-weight: 600;
-            background-color: #f8f9fa !important;
-            border-bottom: 2px solid var(--preadmin-border);
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.3px;
-        }
-        .table td {
-            color: #4f4f4f;
-            padding: 12px 8px;
-            border-bottom: 1px solid var(--preadmin-border);
-        }
-
-        /* Pop-up Modals Styling */
-        .modal-content {
-            border-radius: var(--preadmin-radius);
-            border: none;
-        }
-        .modal-header {
-            border-bottom: 1px solid var(--preadmin-border);
-            padding: 20px;
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f1f1f;
-        }
-
-        /* Dropdown Autocomplete Layout Trays */
-        .suggestion-tray {
-            position: absolute;
-            top: 100%; left: 0; right: 0;
+        .premium-tag-box {
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
             background: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: var(--preadmin-radius);
+            padding: 10px 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            min-height: 54px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .premium-tag-box:focus-within {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .badge-clickable-tag {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .badge-income {
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+            border: 1px solid #dcfce7;
+        }
+
+        .badge-income:hover { background-color: #dcfce7 !important; }
+
+        .badge-expense {
+            background-color: #fdf2f2 !important;
+            color: #991b1b !important;
+            border: 1px solid #fee2e2;
+        }
+
+        .badge-expense:hover { background-color: #fee2e2 !important; }
+
+        .remove-tag-btn {
+            margin-left: 8px;
+            opacity: 0.5;
+            transition: opacity 0.15s;
+        }
+        .remove-tag-btn:hover { opacity: 1; }
+
+        .tag-core-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 150px;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: calc(100% + 6px); left: 0; right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             max-height: 200px;
             overflow-y: auto;
-            z-index: 1100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-top: 2px;
+            z-index: 1050;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        .suggestion-item {
-            padding: 10px 15px;
+
+        .suggestion-row {
+            padding: 10px 16px;
             cursor: pointer;
-            transition: background 0.15s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s;
         }
-        .suggestion-item:hover { background-color: #f7f7f7; }
+        .suggestion-row:hover { background: #f8fafc; }
 
-        @media (max-width: 991.98px) {
-            .preadmin-sidebar { display: none; }
-            .preadmin-main-content { max-width: 100%; }
-            .header-left { width: auto; background: transparent; }
+        .config-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.97);
+            z-index: 1060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            border-radius: 24px;
+        }
+        .config-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        .btn-check:checked + .btn-outline-success { background-color: #55ce63; color: white; border-color: #55ce63; }
-        .btn-check:checked + .btn-outline-danger { background-color: #f62d51; color: white; border-color: #f62d51; }
-        .btn-check:checked + .btn-outline-primary { background-color: #009efb; color: white; border-color: #009efb; }
+        .order-summary-box {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .comma-item {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            border: 1px solid #e2e8f0;
+        }
+
+        .font-mono {
+            font-family: var(--font-mono);
+        }
+
+        .table > :not(caption) > * > * {
+            padding: 1rem 1rem;
+        }
+
+        /* Custom Notification Toast Wrapper */
+        .toast-container-custom {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        .custom-toast {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--brand-primary);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .custom-toast.show {
+            transform: translateX(0);
+        }
+
+        .custom-toast.toast-danger { border-left-color: var(--brand-danger); }
+        .custom-toast.toast-success { border-left-color: var(--brand-success); }
+
+        @media (max-width: 768px) {
+            .dashboard-header { padding: 1.5rem; }
+            .analytics-card { padding: 1.25rem; }
+            .toast-container-custom { top: 12px; right: 12px; left: 12px; max-width: none; }
+        }
     </style>
 </head>
-<body onclick="globallyCloseActiveSuggestionTrays(event)">
+<body>
 
-    <!-- Top Preadmin Application Header Layer -->
-    <header class="preadmin-header d-flex align-items-center justify-content-between pe-3">
-        <div class="header-left d-flex align-items-center">
-            <a class="header-brand-logo text-decoration-none" href="#">
-                <span>Preadmin <span class="fw-light text-white-50">Ledger</span></span>
-            </a>
+<!-- Dynamic UI Layer: Custom Floating Popups Container -->
+<div class="toast-container-custom" id="customToastContainer"></div>
+
+<!-- Hidden File Input for JSON Imports -->
+<input type="file" id="importJsonFileInput" accept=".json" style="display: none;" onchange="executeJsonDataImport(this)">
+
+<div class="container py-4 py-md-5" style="max-width: 1340px;">
+    
+    <!-- Modern Dark Header Module -->
+    <div class="dashboard-header text-white mb-4 shadow-sm d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-white bg-opacity-10 text-white-50 px-2.5 py-1 rounded-pill small font-mono">v10.0 Pro Architecture</span>
+                <span class="badge bg-success bg-opacity-20 text-success px-2.5 py-1 rounded-pill small"><i class="fa-solid fa-circle-nodes me-1"></i>Continuous Pipeline Active</span>
+            </div>
+            <h1 class="fw-extrabold m-0 tracking-tight text-white fs-2">METSIS FEM</h1>
+            <p class="text-white-50 m-0 mt-1 small">Continuous previous month closing balance roll forward system.</p>
         </div>
-        
-        <div class="d-flex align-items-center gap-3">
-            <div class="d-flex align-items-center gap-2">
-                <input type="month" id="workspace-month" class="form-control form-control-sm border-0 text-dark" onchange="switchWorkspaceMonthContext()" style="width: auto; font-weight: 500;">
-            </div>
-            <div class="d-flex align-items-center gap-2 border-start ps-3 border-white-50">
-                <span class="small fw-medium text-white"><i class="bi bi-person-circle me-1"></i> Admin</span>
-            </div>
+        <div class="d-flex flex-column flex-sm-row gap-2.5">
+            <button class="btn btn-outline-light px-3 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="triggerJsonDataExport()">
+                <i class="fa-solid fa-download"></i> Export JSON
+            </button>
+            <button class="btn btn-outline-light px-3 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('importJsonFileInput').click()">
+                <i class="fa-solid fa-upload"></i> Import JSON
+            </button>
+            <button class="btn btn-light px-4 py-2.5 rounded-3 fw-bold text-dark shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="initiateNewOrderCreation()">
+                <i class="fa-solid fa-square-plus text-primary fs-5"></i> Create New Entry
+            </button>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Workspace Area Wrapper -->
-    <div class="preadmin-wrapper">
-        
-        <!-- Sidebar Navigation Panel Component -->
-        <aside class="preadmin-sidebar">
-            <div class="sidebar-menu-section">
-                <div class="sidebar-menu-title">Main Menu</div>
-                <ul>
-                    <li><button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="active"><i class="bi bi-speedometer2"></i> Dashboard</button></li>
-                </ul>
-            </div>
-            <div class="sidebar-menu-section">
-                <div class="sidebar-menu-title">Ledger Controls</div>
-                <ul>
-                    <li><button onclick="toggleLedgerModalDisplayState(true)"><i class="bi bi-plus-circle"></i> Log Entry Form</button></li>
-                    <li><button onclick="toggleMappingModalDisplayState(true)"><i class="bi bi-sliders"></i> Rules Mapping</button></li>
-                    <li><button onclick="toggleReportsModalDisplayState(true)"><i class="bi bi-pie-chart"></i> Reports Matrix</button></li>
-                </ul>
-            </div>
-            <div class="sidebar-menu-section">
-                <div class="sidebar-menu-title">Data Actions</div>
-                <ul>
-                    <li><button onclick="document.getElementById('csv-upload-ghost').click()"><i class="bi bi-upload"></i> Import CSV</button></li>
-                    <li><button onclick="exportDataToCSV()"><i class="bi bi-download"></i> Export CSV</button></li>
-                </ul>
-            </div>
-        </aside>
-
-        <!-- Primary Main Workspace Panel Layout Area -->
-        <main class="preadmin-main-content">
-            
-            <!-- Breadcrumbs Header Block -->
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+    <!-- Live Analytics Dashboard Cards Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="analytics-card">
                 <div>
-                    <h4 class="mb-1 text-dark fw-bold" style="font-size: 22px;">Operational Summary</h4>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 small">
-                            <li class="breadcrumb-item"><a href="#" class="text-muted text-decoration-none">Dashboard</a></li>
-                            <li class="breadcrumb-item active text-dark" aria-current="page">Ledger Statements</li>
-                        </ol>
-                    </nav>
+                    <div class="small fw-bold text-uppercase text-muted tracking-wider mb-1" id="incomePanelLabel">Period Revenue</div>
+                    <h2 class="fw-extrabold m-0 text-success font-mono" id="lblGlobalIncome">$0.00</h2>
                 </div>
-                <div class="d-flex gap-2">
-                    <button type="button" onclick="toggleMappingModalDisplayState(true)" class="btn btn-sm btn-white border px-3 text-secondary d-flex align-items-center gap-1 bg-white shadow-sm"><i class="bi bi-sliders text-warning"></i> Rules Mapping</button>
-                    <button type="button" onclick="toggleLedgerModalDisplayState(true)" class="btn btn-sm btn-preadmin-primary btn-add px-3 d-flex align-items-center gap-1 shadow-sm"><i class="bi bi-plus-lg"></i> Add Entry</button>
-                    <input type="file" id="csv-upload-ghost" style="display:none;" accept=".csv" onchange="importDataViaCSV(event)">
+                <div class="icon-shape bg-success-subtle text-success">
+                    <i class="fa-solid fa-turn-up fs-4"></i>
                 </div>
             </div>
-
-            <!-- Preadmin Metric Counter Row Widgets -->
-            <section class="row g-4 mb-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="dash-widget">
-                        <div class="dash-widget-info">
-                            <h3 id="stat-income">BDT 0.00</h3>
-                            <span>Gross Inflows</span>
-                        </div>
-                        <div class="dash-widget-icon text-success"><i class="bi bi-graph-up"></i></div>
-                    </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="analytics-card">
+                <div>
+                    <div class="small fw-bold text-uppercase text-muted tracking-wider mb-1" id="expensePanelLabel">Period Expenses</div>
+                    <h2 class="fw-extrabold m-0 text-danger font-mono" id="lblGlobalExpenses">$0.00</h2>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="dash-widget">
-                        <div class="dash-widget-info">
-                            <h3 id="stat-expenses">BDT 0.00</h3>
-                            <span>Capital Outflows</span>
-                        </div>
-                        <div class="dash-widget-icon text-danger"><i class="bi bi-graph-down"></i></div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="dash-widget">
-                        <div class="dash-widget-info">
-                            <h3 id="stat-savings">BDT 0.00</h3>
-                            <span>Cash Reserves</span>
-                        </div>
-                        <div class="dash-widget-icon text-primary"><i class="bi bi-shield-check"></i></div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="dash-widget">
-                        <div class="dash-widget-info">
-                            <h3 id="stat-balance">BDT 0.00</h3>
-                            <span>Cumulative Net</span>
-                        </div>
-                        <div class="dash-widget-icon text-warning"><i class="bi bi-wallet2"></i></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Statement Ledger Table Layout Container -->
-            <div class="row g-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <h3 class="card-title text-uppercase fw-semibold" style="font-size: 14px; letter-spacing: 0.5px;">Record Ledger Stream</h3>
-                            <button type="button" onclick="exportDataToCSV()" class="btn btn-sm btn-light border py-1 px-3 text-secondary"><i class="bi bi-download me-1"></i> Export Data Dump</button>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0 text-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th class="ps-4">Date</th>
-                                        <th>Description</th>
-                                        <th>Group Allocation Pipeline</th>
-                                        <th>Type</th>
-                                        <th class="text-end">Volume Amount</th>
-                                        <th class="text-end pe-4">Action Control</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ledger-rows-target"></tbody>
-                            </table>
-                        </div>
-
-                        <div id="ledger-empty-notice" class="text-center py-5 px-4 bg-light border-top" style="display: none;">
-                            <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
-                            <p class="fw-semibold text-secondary mb-3 small text-uppercase">No data targets found for this timeline scope.</p>
-                            <div id="prev-month-import-container" style="display: none;">
-                                <button type="button" onclick="executePreviousMonthRollover()" class="btn btn-sm btn-warning shadow-sm text-white fw-medium px-3 py-2" style="border-radius: 50px;">
-                                    <i class="bi bi-lightning-charge-fill me-1"></i> Mirror Historic Template Layout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="icon-shape bg-danger-subtle text-danger">
+                    <i class="fa-solid fa-turn-down fs-4"></i>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <!-- POP-UP MODAL: Rules Mapping Configuration Form Framework -->
-    <div class="modal fade" id="rulesMappingModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-sliders text-warning me-2"></i>Configure Rules Mapping</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="toggleMappingModalDisplayState(false)"></button>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="analytics-card bg-dark text-white border-0 shadow">
+                <div>
+                    <div class="small fw-bold text-uppercase text-white-50 tracking-wider mb-1" id="balancePanelLabel">Carried Forward Balance (C/F)</div>
+                    <h2 class="fw-extrabold m-0 text-white font-mono" id="lblGlobalClosing">$0.00</h2>
                 </div>
-                <div class="modal-body p-4">
-                    <form id="dashboard-configuration-form" onsubmit="commitNewDashboardMappingStructure(event)" autocomplete="off">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-secondary small">Allocation Type Target Pool</label>
-                            <select id="modal-type-selection" class="form-select form-select-sm" onchange="clearModalAutocompletes()">
-                                <option value="income">Inflow Channels Matrix</option>
-                                <option value="expense">Outflow Spending Channels</option>
-                                <option value="savings">Reserves Savings Channels</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 position-relative">
-                            <label class="form-label fw-semibold text-secondary small">New Unique Line Item</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" id="modal-input-line-item" class="form-control prevent-global-dismiss" required placeholder="e.g. Cloud Infrastructure Server Hosting" oninput="evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line'); cachedModalLineSuggestions(this.value);" onfocus="evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line'); cachedModalLineSuggestions(this.value);">
-                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-m-line" style="display:none;" onclick="clearTargetedInputNodeField('modal-input-line-item', 'btn-clear-m-line'); clearModalAutocompletes();">✕</button>
-                            </div>
-                            <div id="modal-line-autocomplete-tray" class="suggestion-tray" style="display:none;"></div>
-                        </div>
-                        <div class="mb-4 position-relative">
-                            <label class="form-label fw-semibold text-secondary small">Target Group Category Pipeline</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" id="modal-input-category-group" class="form-control prevent-global-dismiss" required placeholder="e.g. Technical Overheads" oninput="evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat'); cachedModalCategorySuggestions(this.value);" onfocus="evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat'); cachedModalCategorySuggestions(this.value);">
-                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-m-cat" style="display:none;" onclick="clearTargetedInputNodeField('modal-input-category-group', 'btn-clear-m-cat'); clearModalAutocompletes();">✕</button>
-                            </div>
-                            <div id="modal-cat-autocomplete-tray" class="suggestion-tray" style="display:none;"></div>
-                        </div>
-                        <div class="d-flex justify-content-end gap-2 border-top pt-3">
-                            <button type="button" class="btn btn-sm btn-light border px-3" data-bs-dismiss="modal" onclick="toggleMappingModalDisplayState(false)">Close</button>
-                            <button type="submit" class="btn btn-sm btn-preadmin-primary px-4 shadow-sm">Save Mapping Rule</button>
-                        </div>
-                    </form>
+                <div class="icon-shape bg-white bg-opacity-10 text-white">
+                    <i class="fa-solid fa-vault fs-4"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- POP-UP MODAL: Ledger Entry Input Form Framework -->
-    <div class="modal fade" id="ledgerEntryModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header">
-                    <h5 class="modal-title">Financial Statement Data Entry</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="toggleLedgerModalDisplayState(false)"></button>
+    <!-- Context & Pipeline Filter Controls -->
+    <div class="premium-card p-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-2.5">
+            <div class="icon-shape bg-light text-primary" style="width:36px; height:36px;">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            <div>
+                <label for="globalPeriodFilter" class="fw-bold text-dark small m-0 d-block">Temporal Matrix Scope</label>
+                <span class="text-muted small">Change month to verify continuous balance flows.</span>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto">
+            <select id="globalPeriodFilterMode" class="form-select form-select-md rounded-3 fw-medium text-secondary" style="width: 160px; height: 44px;" onchange="handleGlobalFilterChange()">
+                <option value="SELECTED">Selected Month</option>
+                <option value="ALL">All History Ledger</option>
+            </select>
+            <input type="month" id="globalPeriodFilter" class="form-control form-control-md rounded-3 fw-bold text-dark border-secondary-subtle" style="flex:1; max-width: 220px; height: 44px;" onchange="handleGlobalFilterChange()">
+        </div>
+    </div>
+
+    <!-- Main Content Ledger Grid -->
+    <div class="premium-card p-0 overflow-hidden">
+        <div class="p-4 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 bg-light bg-opacity-50">
+            <div>
+                <h5 class="fw-extrabold m-0 text-dark" id="gridTitleContext">Chronological Master Ledger Matrix</h5>
+                <p class="text-muted small m-0 mt-0.5">Validated chronological account flow states mapping inputs to rolling targets.</p>
+            </div>
+            <div>
+                <span id="ledgerCounter" class="badge bg-dark px-3 py-2 rounded-pill font-mono fw-medium">0 Record Blocks</span>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted fs-7 text-uppercase tracking-wider border-bottom">
+                    <tr>
+                        <th style="width: 15%">Period Scope</th>
+                        <th style="width: 12%">ID Token</th>
+                        <th style="width: 38%">Mapped Component Matrix</th>
+                        <th style="width: 23%">Financial Run Summary</th>
+                        <th style="width: 12%" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="masterGridBody" class="border-0">
+                    <!-- Dynamic Component Render Mount -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Core Entry Editor Modal Frame -->
+<div class="modal fade" id="unifiedOrderModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 position-relative shadow-lg" style="border-radius: 24px; overflow: hidden; min-height: 520px;">
+            
+            <!-- Dynamic Inline Config Panel Overlay -->
+            <div id="configOverlayPanel" class="config-overlay">
+                <div class="p-4 w-100 text-center" style="max-width: 440px;">
+                    <div class="mb-3">
+                        <span class="p-3 bg-primary bg-opacity-10 rounded-circle d-inline-flex justify-content-center align-items-center">
+                            <i class="fa-solid fa-focus text-primary fa-xl"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-extrabold mb-1" id="configModalTitle">Configure Parameters</h5>
+                    <p class="text-muted small mb-4">Assign flow data identities for: <strong id="lblTargetItem" class="text-dark"></strong></p>
+                    
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase d-block mb-2 text-start text-muted">Flow Allocation Type</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="optFlowType" id="flowIncome" value="Income" autocomplete="off" onchange="validateTypeRequirement()">
+                            <label class="btn btn-outline-success py-2.5 rounded-start-3 fw-bold" for="flowIncome"><i class="fa-solid fa-circle-chevron-up me-2"></i>Income</label>
+                            
+                            <input type="radio" class="btn-check" name="optFlowType" id="flowExpense" value="Expense" autocomplete="off" onchange="validateTypeRequirement()">
+                            <label class="btn btn-outline-danger py-2.5 rounded-end-3 fw-bold" for="flowExpense"><i class="fa-solid fa-circle-chevron-down me-2"></i>Expense</label>
+                        </div>
+                        <div id="typeFeedbackMsg" class="text-danger small text-start mt-1.5 fw-medium"><i class="fa-solid fa-circle-exclamation me-1"></i>Please configure a mapping behavior state.</div>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="number" id="txtSubrecordAmount" class="form-control rounded-3 font-mono fw-bold text-dark fs-5" placeholder="0.00" step="0.01" style="height:62px;">
+                        <label for="txtSubrecordAmount" class="fw-medium text-secondary">Component Allocation Value ($)</label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light w-50 py-2.5 rounded-3 fw-bold text-secondary" onclick="document.getElementById('configOverlayPanel').classList.remove('active')">Cancel</button>
+                        <button type="button" id="btnOverlayConfirm" class="btn btn-primary w-50 py-2.5 rounded-3 fw-bold shadow-sm" disabled onclick="commitConfiguredRecordItem()">
+                            Save Item <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="modal-body p-4">
-                    <form id="ledger-entry-form" onsubmit="commitNewFormStatement(event)" autocomplete="off">
-                        <div class="d-flex justify-content-center mb-3">
-                            <div class="btn-group btn-group-sm w-100" role="group">
-                                <input type="radio" name="entry_type" id="r-inc" value="income" class="btn-check" checked onchange="clearLiveSearchState()">
-                                <label for="r-inc" class="btn btn-outline-success fw-semibold text-uppercase" style="font-size:12px;">Inflow</label>
-                                <input type="radio" name="entry_type" id="r-exp" value="expense" class="btn-check" onchange="clearLiveSearchState()">
-                                <label for="r-exp" class="btn btn-outline-danger fw-semibold text-uppercase" style="font-size:12px;">Outflow</label>
-                                <input type="radio" name="entry_type" id="r-sav" value="savings" class="btn-check" onchange="clearLiveSearchState()">
-                                <label for="r-sav" class="btn btn-outline-primary fw-semibold text-uppercase" style="font-size:12px;">Reserves</label>
+            </div>
+
+            <!-- Main Form Structural Elements -->
+            <div class="modal-header border-0 pt-4 px-4 pb-2">
+                <div>
+                    <h5 class="modal-title fw-extrabold fs-4 text-dark"><i class="fa-solid fa-wallet text-primary me-2"></i>Ledger Processing Node</h5>
+                    <p class="text-muted small m-0">Setup dates, base calculations, and dynamic metadata mappings.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body px-4 pb-4 pt-2">
+                <form id="frmMasterOrder" onsubmit="event.preventDefault();">
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Target Month/Year Context</label>
+                            <input type="month" id="inpOrderPeriod" class="form-control p-2.5 rounded-3 fw-bold text-dark border-secondary-subtle" style="height:48px;" onchange="handleModalPeriodChange()" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Generated Token Reference</label>
+                            <input type="text" id="inpOrderNum" class="form-control p-2.5 rounded-3 bg-light fw-bold text-center font-mono text-primary border-0" readonly style="height:48px; letter-spacing: 0.5px;">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-success text-uppercase">Baseline Base Income</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-success-subtle text-success border-end-0 font-mono fw-bold">$</span>
+                                <input type="number" id="inpBulkIncome" class="form-control p-2.5 font-mono fw-bold text-dark border-start-0" placeholder="0.00" step="0.01" style="height:48px;">
                             </div>
                         </div>
-                        <div class="mb-3 position-relative">
-                            <label class="form-label fw-semibold text-secondary small">Line Item Target</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" id="search-line-item" class="form-control prevent-global-dismiss" placeholder="Query registered mapping targets..." oninput="evaluateInputFieldContentState('search-line-item', 'btn-clear-search'); cachedLiveSearchSuggestions(this.value);" onfocus="evaluateInputFieldContentState('search-line-item', 'btn-clear-search'); cachedLiveSearchSuggestions(this.value);">
-                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="display:none;" onclick="clearTargetedInputNodeField('search-line-item', 'btn-clear-search'); clearLiveSearchState();">✕</button>
-                            </div>
-                            <div id="autocomplete-panel-tray" class="suggestion-tray" style="display:none;"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-secondary small">Auto Category Match Output</label>
-                            <input type="text" id="display-bound-category" class="form-control form-control-sm bg-light text-muted" readonly placeholder="System automated mapping response...">
-                        </div>
-                        <div class="mb-3 position-relative">
-                            <label class="form-label fw-semibold text-secondary small">Volume Pricing Amount (BDT)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" step="0.01" id="field-amount" class="form-control" required placeholder="0.00" oninput="evaluateInputFieldContentState('field-amount', 'btn-clear-amount')">
-                                <button class="btn btn-outline-secondary" type="button" id="btn-clear-amount" style="display:none;" onclick="clearTargetedInputNodeField('field-amount', 'btn-clear-amount')">✕</button>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-danger text-uppercase">Baseline Base Expense</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-danger-subtle text-danger border-end-0 font-mono fw-bold">$</span>
+                                <input type="number" id="inpBulkExpense" class="form-control p-2.5 font-mono fw-bold text-dark border-start-0" placeholder="0.00" step="0.01" style="height:48px;">
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold text-secondary small">Execution Entry Date</label>
-                            <input type="date" id="field-date" class="form-control form-control-sm">
+                    </div>
+
+                    <!-- Component Tags Input Structure -->
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2">Dynamic Multi-Component Matrix Mapping (Type text + Comma or Enter to configure)</label>
+                        <div class="premium-tag-box" id="tagWrapperBox">
+                            <input type="text" id="inpTagTrigger" class="tag-core-input" placeholder="Type label details here..." autocomplete="off">
+                            <div id="boxSuggestions" class="suggestions-dropdown d-none"></div>
                         </div>
-                        <div class="d-flex justify-content-end gap-2 border-top pt-3">
-                            <button type="button" class="btn btn-sm btn-light border px-3" data-bs-dismiss="modal" onclick="toggleLedgerModalDisplayState(false)">Close</button>
-                            <button type="submit" class="btn btn-sm btn-preadmin-primary px-4 shadow-sm">Commit Entry</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer border-0 bg-light bg-opacity-75 p-3 px-4 d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-link text-secondary text-decoration-none fw-semibold small" data-bs-dismiss="modal">Discard Matrix Data</button>
+                <button type="button" class="btn btn-primary px-4 py-2.5 rounded-3 fw-bold text-white shadow-sm" onclick="processFinalOrderCommit()">
+                    <i class="fa-solid fa-circle-check me-1.5"></i> Commit Ledger Block
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Component Detail Information modal viewer -->
+<div class="modal fade" id="infoViewerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:24px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-extrabold text-dark m-0 d-flex align-items-center"><i class="fa-solid fa-rectangle-list text-info me-2.5"></i>Manifest Segment Metrics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="bg-light p-2.5 rounded-3 text-center">
+                            <div class="small text-muted mb-0.5">Token ID</div>
+                            <strong id="viewModalTokenId" class="text-primary font-mono small">-</strong>
                         </div>
-                    </form>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-2.5 rounded-3 text-center">
+                            <div class="small text-muted mb-0.5">Period Context</div>
+                            <strong id="viewModalPeriod" class="text-dark fw-bold">-</strong>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="fw-bold small text-uppercase text-muted mb-2 tracking-wider">Item Allocation Matrix Stack:</h6>
+                <div id="viewModalItemsBox" class="border rounded-3 overflow-hidden bg-white">
+                    <!-- Dynamic Component Generation Rows -->
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- POP-UP MODAL: Reports Parameter Engine -->
-    <div class="modal fade" id="reportsParameterModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-cpu text-warning me-1"></i> Business Intelligence Matrix Engine</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="toggleReportsModalDisplayState(false)"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="reports-parameter-form" onsubmit="executeFinancialHTMLReportCompilation(event)">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-secondary small">Report Layout Theme</label>
-                                <select id="rpt-param-type" class="form-select form-select-sm">
-                                    <option value="line-item">Line-Item Distribution Matrix</option>
-                                    <option value="group-wise">Group Category Aggregated Sheet</option>
-                                    <option value="p-and-l">Profit and Loss (P&L) Statement</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-secondary small">Temporal Matrix Scale</label>
-                                <select id="rpt-param-scale" class="form-select form-select-sm" onchange="synchronizeReportParameterFormViewState()">
-                                    <option value="monthly">Monthly Isolated Timeline</option>
-                                    <option value="yearly">Yearly Consolidated Target History</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="form-label fw-semibold text-secondary small">Target Calendar Year Node</label>
-                                <select id="rpt-param-year" class="form-select form-select-sm"></select>
-                            </div>
-                            <div class="col-sm-6" id="rpt-month-dropdown-wrapper">
-                                <label class="form-label fw-semibold text-secondary small">Target Month Segment Block</label>
-                                <select id="rpt-param-month" class="form-select form-select-sm">
-                                    <option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-4">
-                            <button type="button" class="btn btn-sm btn-light border px-3" data-bs-dismiss="modal" onclick="toggleReportsModalDisplayState(false)">Dismiss</button>
-                            <button type="submit" class="btn btn-sm btn-preadmin-primary px-4 shadow-sm"><i class="bi bi-gear-wide-connected me-1"></i> Compile Matrix</button>
-                        </div>
-                    </form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    /**
+     * Optimized System Architecture Engine
+     */
+    
+    // UI Node Elements Cache Registry
+    const DOM = {
+        toastContainer: document.getElementById('customToastContainer'),
+        incomePanelLabel: document.getElementById('incomePanelLabel'),
+        expensePanelLabel: document.getElementById('expensePanelLabel'),
+        balancePanelLabel: document.getElementById('balancePanelLabel'),
+        lblGlobalIncome: document.getElementById('lblGlobalIncome'),
+        lblGlobalExpenses: document.getElementById('lblGlobalExpenses'),
+        lblGlobalClosing: document.getElementById('lblGlobalClosing'),
+        globalPeriodFilter: document.getElementById('globalPeriodFilter'),
+        globalPeriodFilterMode: document.getElementById('globalPeriodFilterMode'),
+        gridTitleContext: document.getElementById('gridTitleContext'),
+        ledgerCounter: document.getElementById('ledgerCounter'),
+        masterGridBody: document.getElementById('masterGridBody'),
+        configOverlayPanel: document.getElementById('configOverlayPanel'),
+        lblTargetItem: document.getElementById('lblTargetItem'),
+        configModalTitle: document.getElementById('configModalTitle'),
+        txtSubrecordAmount: document.getElementById('txtSubrecordAmount'),
+        flowIncome: document.getElementById('flowIncome'),
+        flowExpense: document.getElementById('flowExpense'),
+        btnOverlayConfirm: document.getElementById('btnOverlayConfirm'),
+        typeFeedbackMsg: document.getElementById('typeFeedbackMsg'),
+        inpOrderPeriod: document.getElementById('inpOrderPeriod'),
+        inpOrderNum: document.getElementById('inpOrderNum'),
+        inpBulkIncome: document.getElementById('inpBulkIncome'),
+        inpBulkExpense: document.getElementById('inpBulkExpense'),
+        tagWrapperBox: document.getElementById('tagWrapperBox'),
+        inpTagTrigger: document.getElementById('inpTagTrigger'),
+        boxSuggestions: document.getElementById('boxSuggestions'),
+        viewModalTokenId: document.getElementById('viewModalTokenId'),
+        viewModalPeriod: document.getElementById('viewModalPeriod'),
+        viewModalItemsBox: document.getElementById('viewModalItemsBox'),
+        frmMasterOrder: document.getElementById('frmMasterOrder')
+    };
 
-                    <div id="html-report-output-canvas" class="mt-4" style="display:none;"></div>
-                </div>
+    // Global State Container Context Object
+    const System = {
+        databaseOrdersStore: [],
+        globalCounterIndex: 1,
+        localActiveOrderRecords: [],
+        stateCurrentTargetItemText: "",
+        activeEditingOrderId: null,
+        activeEditingTagIndex: null,
+        modalBootstrapContext: null,
+        infoModalContext: null,
+        monthsArray: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    };
+
+    /**
+     * Elegant Non-blocking Floating Notification Pipeline 
+     */
+    function showCustomNotification(messageText, type = 'info') {
+        const toastEl = document.createElement('div');
+        toastEl.className = `custom-toast toast-${type}`;
+        
+        let iconMarkup = '<i class="fa-solid fa-circle-info text-primary"></i>';
+        if (type === 'success') iconMarkup = '<i class="fa-solid fa-circle-check text-success"></i>';
+        if (type === 'danger') iconMarkup = '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
+
+        toastEl.innerHTML = `
+            <div class="fs-5">${iconMarkup}</div>
+            <div class="flex-grow-1">
+                <div class="small fw-bold text-dark">${type.toUpperCase()}</div>
+                <div class="text-muted small mt-0.5">${escapeHtml(messageText)}</div>
             </div>
-        </div>
-    </div>
+            <button type="button" class="btn-close small ms-2" style="font-size: 0.65rem;" onclick="this.parentElement.remove()"></button>
+        `;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        DOM.toastContainer.appendChild(toastEl);
+        
+        // Trigger smooth visual entrance phase
+        requestAnimationFrame(() => {
+            setTimeout(() => toastEl.classList.add('show'), 10);
+        });
 
-    <script>
-        let ledgerModalInstance, mappingModalInstance, reportsModalInstance;
+        // Setup self-destruct cycle execution
+        setTimeout(() => {
+            if(toastEl.parentNode) {
+                toastEl.classList.remove('show');
+                setTimeout(() => toastEl.remove(), 350);
+            }
+        }, 4000);
+    }
 
-        const DOM = {
-            monthSelector: document.getElementById('workspace-month'),
-            ledgerTarget: document.getElementById('ledger-rows-target'),
-            emptyNotice: document.getElementById('ledger-empty-notice'),
-            prevImportBox: document.getElementById('prev-month-import-container'),
-            statIncome: document.getElementById('stat-income'),
-            statExpenses: document.getElementById('stat-expenses'),
-            statSavings: document.getElementById('stat-savings'),
-            statBalance: document.getElementById('stat-balance'),
-            dashboardConfigForm: document.getElementById('dashboard-configuration-form'),
-            ledgerModalForm: document.getElementById('ledger-entry-form'),
-            rptYearSelect: document.getElementById('rpt-param-year'),
-            rptMonthSelect: document.getElementById('rpt-param-month'),
-            rptScaleSelect: document.getElementById('rpt-param-scale'),
-            rptTypeSelect: document.getElementById('rpt-param-type'),
-            rptMonthWrapper: document.getElementById('rpt-month-dropdown-wrapper'),
-            rptCanvas: document.getElementById('html-report-output-canvas'),
-            searchLineInput: document.getElementById('search-line-item'),
-            boundCatDisplay: document.getElementById('display-bound-category'),
-            fieldAmount: document.getElementById('field-amount'),
-            fieldDate: document.getElementById('field-date'),
-            modalLineInput: document.getElementById('modal-input-line-item'),
-            modalCatInput: document.getElementById('modal-input-category-group'),
-            modalTypeSelect: document.getElementById('modal-type-selection'),
-            liveTray: document.getElementById('autocomplete-panel-tray'),
-            modalLineTray: document.getElementById('modal-line-autocomplete-tray'),
-            modalCatTray: document.getElementById('modal-cat-autocomplete-tray')
+    document.addEventListener("DOMContentLoaded", () => {
+        System.modalBootstrapContext = new bootstrap.Modal(document.getElementById('unifiedOrderModal'));
+        System.infoModalContext = new bootstrap.Modal(document.getElementById('infoViewerModal'));
+        
+        const targetAnchorDate = new Date("2026-07-19");
+        DOM.globalPeriodFilter.value = `${targetAnchorDate.getFullYear()}-${(targetAnchorDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+        refreshGlobalCounterFromStorage();
+        initializeCustomTagListeners();
+        renderMasterTableLedgerGrid();
+    });
+
+    function refreshGlobalCounterFromStorage() {
+        const rawLocalData = localStorage.getItem('ledger_orders_v96');
+        if(rawLocalData) {
+            try {
+                System.databaseOrdersStore = JSON.parse(rawLocalData);
+                System.globalCounterIndex = 1; // Reset baseline counter reference
+                System.databaseOrdersStore.forEach(orderBlock => {
+                    const numericTokenPayload = parseInt(orderBlock.id.substring(4)); 
+                    if(!isNaN(numericTokenPayload) && numericTokenPayload >= System.globalCounterIndex) {
+                        System.globalCounterIndex = numericTokenPayload + 1;
+                    }
+                });
+            } catch(error) {
+                System.databaseOrdersStore = [];
+            }
+        }
+    }
+
+    /**
+     * JSON Pipeline: Matrix Export Engine
+     */
+    function triggerJsonDataExport() {
+        if (System.databaseOrdersStore.length === 0) {
+            showCustomNotification("There are no database entries in the current workspace to export.", "danger");
+            return;
+        }
+        
+        try {
+            const dataStringify = JSON.stringify(System.databaseOrdersStore, null, 2);
+            const dataBlob = new Blob([dataStringify], { type: 'application/json' });
+            const temporaryAnchor = document.createElement('a');
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            temporaryAnchor.download = `METSIS_FEM_Backup_${timestamp}.json`;
+            temporaryAnchor.href = window.URL.createObjectURL(dataBlob);
+            temporaryAnchor.style.display = 'none';
+            
+            document.body.appendChild(temporaryAnchor);
+            temporaryAnchor.click();
+            document.body.removeChild(temporaryAnchor);
+            
+            showCustomNotification("Ledger master parameters exported to JSON successfully.", "success");
+        } catch (err) {
+            showCustomNotification("System matrix translation failure: " + err.message, "danger");
+        }
+    }
+
+    /**
+     * JSON Pipeline: Matrix Import Engine
+     */
+    function executeJsonDataImport(fileInputNode) {
+        const selectedFile = fileInputNode.files[0];
+        if (!selectedFile) return;
+
+        const fileReaderPipeline = new FileReader();
+        fileReaderPipeline.onload = function(event) {
+            try {
+                const parsedPayload = JSON.parse(event.target.result);
+                
+                // Structured schema assertion verification loop
+                if (Array.isArray(parsedPayload)) {
+                    let standardValidated = true;
+                    for (let i = 0; i < parsedPayload.length; i++) {
+                        const block = parsedPayload[i];
+                        if (!block.id || !block.period || block.bulkIncome === undefined || block.bulkExpense === undefined) {
+                            standardValidated = false;
+                            break;
+                        }
+                    }
+
+                    if (!standardValidated) {
+                        showCustomNotification("Import structural rejection: Target array contains corrupt architecture schemas.", "danger");
+                        fileInputNode.value = '';
+                        return;
+                    }
+
+                    // Save verified stack inside live system registers
+                    System.databaseOrdersStore = parsedPayload;
+                    localStorage.setItem('ledger_orders_v96', JSON.stringify(System.databaseOrdersStore));
+                    
+                    // Remap core auto tokens and reconstruct operational workspace views
+                    refreshGlobalCounterFromStorage();
+                    renderMasterTableLedgerGrid();
+                    showCustomNotification(`Import processing complete. ${parsedPayload.length} nodes injected successfully.`, "success");
+                } else {
+                    showCustomNotification("Parsing payload failure: JSON parameters structure root must map as a list array.", "danger");
+                }
+            } catch (err) {
+                showCustomNotification("Corruption runtime crash: Invalid standard JSON coding logic formatting.", "danger");
+            }
+            // Clear buffer index tracking flag
+            fileInputNode.value = '';
         };
+        fileReaderPipeline.readAsText(selectedFile);
+    }
 
-        let storageTransactionsDb = JSON.parse(localStorage.getItem('aura_tx_ledger_db')) || [];
-        let globalEditTargetRowId = null;
+    function toTitleCase(str) {
+        if (!str) return "";
+        return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
 
-        const baselineIncomeBindings = [
-            { item: "Monthly Salary", cat: "Salary" },
-            { item: "Monthly Overtime Bill", cat: "Overtime" },
-            { item: "Eid-Ul-Fitre Bonus", cat: "Bonus" },
-            { item: "Eid-Ul-Azha Bonus", cat: "Bonus" },
-            { item: "Food Allowance", cat: "Allowance" },
-            { item: "Transport Allowance", cat: "Allowance" }
-        ];
-        const baselineExpenseBindings = [
-            { item: "House Rent", cat: "Household" },
-            { item: "Internet Bill", cat: "Internet" },
-            { item: "Electricity Bill", cat: "Electricity" },
-            { item: "Maid Bill", cat: "Household" },
-            { item: "Monthly School Fees", cat: "Education" },
-            { item: "Medicine Bill", cat: "Treatment" },
-            { item: "Transport Cost", cat: "Transport" }
-        ];
-        const baselineSavingsBindings = [
-            { item: "Monthly DPS", cat: "Bank Accounts" },
-            { item: "bKash Savings", cat: "Mobile Wallet" }
-        ];
+    function generateAlphabeticalOrderToken(counterInt, selectedDateStr) {
+        let referenceDate = selectedDateStr ? new Date(selectedDateStr + "-02") : new Date();
+        if(isNaN(referenceDate.getTime())) referenceDate = new Date();
 
-        let customIncomeRelations = JSON.parse(localStorage.getItem('a_inc_binds')) || baselineIncomeBindings;
-        let customExpenseRelations = JSON.parse(localStorage.getItem('a_exp_binds')) || baselineExpenseBindings;
-        let customSavingsRelations = JSON.parse(localStorage.getItem('a_sav_binds')) || baselineSavingsBindings;
+        const fullYearStr = referenceDate.getFullYear().toString();
+        const yearLastTwoDigits = fullYearStr.substring(fullYearStr.length - 2); 
+        const alphaYear = Array.from(yearLastTwoDigits).map(numChar => String.fromCharCode(65 + parseInt(numChar))).join('');
+        
+        const monthValueRaw = referenceDate.getMonth() + 1;
+        const monthPaddedStr = monthValueRaw < 10 ? '0' + monthValueRaw : monthValueRaw.toString();
+        const alphaMonth = Array.from(monthPaddedStr).map(numChar => String.fromCharCode(65 + parseInt(numChar))).join('');
+        
+        return `${alphaYear}${alphaMonth}${counterInt.toString().padStart(3, '0')}`;
+    }
 
-        const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    function formatPeriodStringToMmmYyyy(inputYearMonthStr) {
+        if(!inputYearMonthStr) return "N/A";
+        const pieces = inputYearMonthStr.split('-'); 
+        if(pieces.length !== 2) return inputYearMonthStr;
+        return `${System.monthsArray[parseInt(pieces[1]) - 1]} ${pieces[0]}`;
+    }
 
-        function parseAndFormatDateString(dateStr) {
-            if(!dateStr) return '';
-            const pieces = dateStr.split('-');
-            if(pieces.length !== 3) return dateStr;
-            const mIdx = parseInt(pieces[1], 10) - 1;
-            return (mIdx >= 0 && mIdx < 12) ? `${pieces[2]} ${MONTHS_SHORT[mIdx]} ${pieces[0].substring(2)}` : dateStr;
-        }
+    function getChronologicallySortedOrders() {
+        return [...System.databaseOrdersStore].sort((a, b) => {
+            if(a.period !== b.period) return a.period.localeCompare(b.period);
+            return a.id.localeCompare(b.id);
+        });
+    }
 
-        function debounce(func, delay = 40) {
-            let timeoutId;
-            return function (...args) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => func.apply(this, args), delay);
+    function computeCompleteFinancialChainMetrics() {
+        const sortedList = getChronologicallySortedOrders();
+        const computedChainMap = {};
+        let currentRollingBalanceAccumulator = 0;
+
+        for (let i = 0; i < sortedList.length; i++) {
+            const order = sortedList[i];
+            const baseIncome = parseFloat(order.bulkIncome) || 0;
+            const baseExpense = parseFloat(order.bulkExpense) || 0;
+            let itemIncome = 0;
+            let itemExpense = 0;
+
+            if (order.items && Array.isArray(order.items)) {
+                for (let j = 0; j < order.items.length; j++) {
+                    const item = order.items[j];
+                    if (item.type === 'Income') itemIncome += item.amount;
+                    else if (item.type === 'Expense') itemExpense += item.amount;
+                }
+            }
+
+            const totalIncomeThisBlock = baseIncome + itemIncome;
+            const totalExpenseThisBlock = baseExpense + itemExpense;
+            const netBlockProfitLoss = totalIncomeThisBlock - totalExpenseThisBlock;
+            const carryForwardBroughtDown = currentRollingBalanceAccumulator;
+            const closingBalanceCarriedForward = carryForwardBroughtDown + netBlockProfitLoss;
+
+            computedChainMap[order.id] = {
+                broughtDown: carryForwardBroughtDown,
+                income: totalIncomeThisBlock,
+                expense: totalExpenseThisBlock,
+                balance: netBlockProfitLoss,
+                carriedForward: closingBalanceCarriedForward
             };
+
+            currentRollingBalanceAccumulator = closingBalanceCarriedForward;
         }
 
-        function evaluateInputFieldContentState(inputId, clearBtnId) {
-            const inputField = document.getElementById(inputId);
-            const clearBtn = document.getElementById(clearBtnId);
-            if(inputField && clearBtn) {
-                clearBtn.style.display = inputField.value ? 'block' : 'none';
+        return { chainMap: computedChainMap, finalGlobalRollingBalance: currentRollingBalanceAccumulator };
+    }
+
+    function handleGlobalFilterChange() {
+        if (DOM.globalPeriodFilterMode.value === 'ALL') {
+            DOM.globalPeriodFilter.setAttribute('disabled', 'true');
+        } else {
+            DOM.globalPeriodFilter.removeAttribute('disabled');
+        }
+        renderMasterTableLedgerGrid();
+    }
+
+    function recalculateGlobalFinancialLedgers() {
+        const filterMode = DOM.globalPeriodFilterMode.value;
+        const targetFilterPeriod = DOM.globalPeriodFilter.value;
+        const metricsEngine = computeCompleteFinancialChainMetrics();
+        const sortedList = getChronologicallySortedOrders();
+
+        let visibleIncomeSum = 0;
+        let visibleExpenseSum = 0;
+        let displayBalanceValue = 0;
+
+        if (filterMode === 'SELECTED' && targetFilterPeriod) {
+            DOM.incomePanelLabel.innerText = `Revenue (${formatPeriodStringToMmmYyyy(targetFilterPeriod)})`;
+            DOM.expensePanelLabel.innerText = `Expenses (${formatPeriodStringToMmmYyyy(targetFilterPeriod)})`;
+            DOM.balancePanelLabel.innerText = `Carried Forward Balance (C/F)`;
+
+            let lastMatchingBlockMetrics = null;
+            for (let i = 0; i < sortedList.length; i++) {
+                if (sortedList[i].period === targetFilterPeriod) {
+                    const nodeMetrics = metricsEngine.chainMap[sortedList[i].id];
+                    if (nodeMetrics) {
+                        visibleIncomeSum += nodeMetrics.income;
+                        visibleExpenseSum += nodeMetrics.expense;
+                        lastMatchingBlockMetrics = nodeMetrics; 
+                    }
+                }
             }
-        }
 
-        function clearTargetedInputNodeField(inputId, clearBtnId) {
-            const inputField = document.getElementById(inputId);
-            const clearBtn = document.getElementById(clearBtnId);
-            if(inputField) {
-                inputField.value = '';
-                inputField.focus();
+            if (lastMatchingBlockMetrics) {
+                displayBalanceValue = lastMatchingBlockMetrics.carriedForward;
+            } else {
+                let lastPriorBalance = 0;
+                for (let i = 0; i < sortedList.length; i++) {
+                    if (sortedList[i].period < targetFilterPeriod) {
+                        const m = metricsEngine.chainMap[sortedList[i].id];
+                        if (m) lastPriorBalance = m.carriedForward;
+                    } else {
+                        break;
+                    }
+                }
+                displayBalanceValue = lastPriorBalance;
             }
-            if(clearBtn) clearBtn.style.display = 'none';
+        } else {
+            DOM.incomePanelLabel.innerText = "Total System Revenue";
+            DOM.expensePanelLabel.innerText = "Total System Expenses";
+            DOM.balancePanelLabel.innerText = "Net Portfolio Valuation";
+
+            sortedList.forEach(order => {
+                const nodeMetrics = metricsEngine.chainMap[order.id];
+                if (nodeMetrics) {
+                    visibleIncomeSum += nodeMetrics.income;
+                    visibleExpenseSum += nodeMetrics.expense;
+                }
+            });
+            displayBalanceValue = metricsEngine.finalGlobalRollingBalance;
         }
 
-        function evaluateAllClearButtonVisualStates() {
-            evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
-            evaluateInputFieldContentState('field-amount', 'btn-clear-amount');
-            evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line');
-            evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
-        }
+        DOM.lblGlobalIncome.innerText = `$${visibleIncomeSum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        DOM.lblGlobalExpenses.innerText = `$${visibleExpenseSum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        DOM.lblGlobalClosing.innerText = `$${displayBalanceValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        DOM.lblGlobalClosing.className = displayBalanceValue < 0 ? "fw-extrabold m-0 text-danger font-mono" : 
+                                         (displayBalanceValue > 0 ? "fw-extrabold m-0 text-success font-mono" : "fw-extrabold m-0 text-white font-mono");
+    }
 
-        function initializeDefaultTimeframe() {
+    function initiateNewOrderCreation() {
+        System.activeEditingOrderId = null; 
+        DOM.frmMasterOrder.reset();
+        
+        let activeFilterPeriod = DOM.globalPeriodFilter.value;
+        if(!activeFilterPeriod) {
             const dateObj = new Date();
-            if(!DOM.monthSelector.value) {
-                DOM.monthSelector.value = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-            }
-            synchronizeFormInputDay();
-            populateReportParameterDropdownYears();
+            activeFilterPeriod = `${dateObj.getFullYear()}-${(dateObj.getMonth()+1).toString().padStart(2,'0')}`;
         }
+        
+        DOM.inpOrderPeriod.value = activeFilterPeriod;
+        DOM.inpOrderNum.value = generateAlphabeticalOrderToken(System.globalCounterIndex, activeFilterPeriod);
+        DOM.inpBulkIncome.value = '';
+        DOM.inpBulkExpense.value = '';
 
-        function synchronizeFormInputDay() {
-            const activePeriodStr = DOM.monthSelector.value;
-            const today = new Date();
-            if(activePeriodStr === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`) {
-                DOM.fieldDate.value = today.toISOString().split('T')[0];
-            } else {
-                DOM.fieldDate.value = `${activePeriodStr}-01`;
-            }
+        System.localActiveOrderRecords = [];
+        syncActiveRecordsUiBadges();
+        System.modalBootstrapContext.show();
+    }
+
+    function handleModalPeriodChange() {
+        if(System.activeEditingOrderId === null) {
+            DOM.inpOrderNum.value = generateAlphabeticalOrderToken(System.globalCounterIndex, DOM.inpOrderPeriod.value);
         }
+    }
 
-        function populateReportParameterDropdownYears() {
-            if(!DOM.rptYearSelect) return;
-            DOM.rptYearSelect.textContent = '';
-            const observedYears = new Set([new Date().getFullYear()]);
-            for(let i = 0; i < storageTransactionsDb.length; i++) {
-                const tx = storageTransactionsDb[i];
-                if(tx.recordMonth) {
-                    const extractedYear = parseInt(tx.recordMonth.split('-')[0], 10);
-                    if(!isNaN(extractedYear)) observedYears.add(extractedYear);
+    function getDynamicSuggestionsMap() {
+        const dictionary = {};
+        for(let i = 0; i < System.databaseOrdersStore.length; i++) {
+            const items = System.databaseOrdersStore[i].items;
+            if(items) {
+                for(let j = 0; j < items.length; j++) {
+                    if(items[j].name) dictionary[items[j].name.trim()] = items[j].type;
                 }
             }
-            const sortedYears = Array.from(observedYears).sort((a,b)=>b-a);
-            sortedYears.forEach(yr => {
-                const nodeOption = document.createElement('option');
-                nodeOption.value = yr;
-                nodeOption.innerText = yr;
-                DOM.rptYearSelect.appendChild(nodeOption);
-            });
         }
+        return dictionary;
+    }
 
-        function persistDatabaseToDisk() {
-            localStorage.setItem('aura_tx_ledger_db', JSON.stringify(storageTransactionsDb));
-            localStorage.setItem('a_inc_binds', JSON.stringify(customIncomeRelations));
-            localStorage.setItem('a_exp_binds', JSON.stringify(customExpenseRelations));
-            localStorage.setItem('a_sav_binds', JSON.stringify(customSavingsRelations));
-            compileUserInterfaceMetrics();
-            populateReportParameterDropdownYears();
-        }
-
-        function toggleLedgerModalDisplayState(shouldShow) {
-            if (shouldShow) {
-                ledgerModalInstance.show();
-                synchronizeFormInputDay();
-                DOM.searchLineInput.value = '';
-                DOM.boundCatDisplay.value = '';
-            } else {
-                ledgerModalInstance.hide();
-                DOM.ledgerModalForm.reset();
-                clearLiveSearchState();
-                evaluateAllClearButtonVisualStates();
-            }
-        }
-
-        function toggleMappingModalDisplayState(shouldShow) {
-            if (shouldShow) {
-                mappingModalInstance.show();
-                DOM.dashboardConfigForm.reset();
-                clearModalAutocompletes();
-                evaluateAllClearButtonVisualStates();
-            } else {
-                mappingModalInstance.hide();
-                DOM.dashboardConfigForm.reset();
-                clearModalAutocompletes();
-                evaluateAllClearButtonVisualStates();
-            }
-        }
-
-        function toggleReportsModalDisplayState(shouldShow) {
-            if(shouldShow) {
-                reportsModalInstance.show();
-                const workspaceMonthValue = DOM.monthSelector.value;
-                if(workspaceMonthValue) {
-                    const parts = workspaceMonthValue.split('-');
-                    DOM.rptYearSelect.value = parts[0];
-                    DOM.rptMonthSelect.value = parts[1];
-                }
-                synchronizeReportParameterFormViewState();
-                DOM.rptCanvas.style.display = 'none';
-            } else {
-                reportsModalInstance.hide();
-            }
-        }
-
-        function synchronizeReportParameterFormViewState() {
-            DOM.rptMonthWrapper.style.display = DOM.rptScaleSelect.value === 'yearly' ? 'none' : 'block';
-        }
-
-        function clearLiveSearchState() {
-            DOM.searchLineInput.value = '';
-            DOM.boundCatDisplay.value = '';
-            evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
-            closeAutocompleteSuggestionsTray();
-        }
-
-        function clearModalAutocompletes() {
-            DOM.modalLineTray.textContent = ''; DOM.modalLineTray.style.display = 'none';
-            DOM.modalCatTray.textContent = ''; DOM.modalCatTray.style.display = 'none';
-        }
-
-        function globallyCloseActiveSuggestionTrays(event) {
-            if (event.target.classList.contains('prevent-global-dismiss')) return;
-            closeAutocompleteSuggestionsTray();
-            clearModalAutocompletes();
-        }
-
-        function getActiveBindingPool(typeValue) {
-            if(typeValue === 'income') return customIncomeRelations;
-            if(typeValue === 'expense') return customExpenseRelations;
-            return customSavingsRelations;
-        }
-
-        function commitNewDashboardMappingStructure(e) {
-            e.preventDefault();
-            const targetType = DOM.modalTypeSelect.value;
-            const targetItemText = DOM.modalLineInput.value.trim();
-            const targetCategoryText = DOM.modalCatInput.value.trim();
-
-            if(!targetItemText || !targetCategoryText) return;
-            const bindingPool = getActiveBindingPool(targetType);
-            
-            if (bindingPool.some(b => b.item.toLowerCase() === targetItemText.toLowerCase())) {
-                alert("Mapping rule already initialized.");
+    function initializeCustomTagListeners() {
+        DOM.inpTagTrigger.addEventListener('input', () => {
+            const rawString = DOM.inpTagTrigger.value;
+            if (rawString.includes(',')) {
+                let cleaned = rawString.replace(/,/g, '').trim();
+                if (cleaned.length > 0) launchInlineConfigurationFlow(toTitleCase(cleaned));
+                DOM.inpTagTrigger.value = '';
+                DOM.boxSuggestions.classList.add('d-none');
                 return;
             }
 
-            bindingPool.push({ item: targetItemText, cat: targetCategoryText });
-            persistDatabaseToDisk();
-            
-            toggleMappingModalDisplayState(false);
-            toggleLedgerModalDisplayState(true);
-            
-            document.getElementById(`r-${targetType.substring(0,3)}`).checked = true;
-            DOM.searchLineInput.value = targetItemText;
-            DOM.boundCatDisplay.value = targetCategoryText;
-            
-            evaluateAllClearButtonVisualStates();
-        }
-
-        const cachedLiveSearchSuggestions = debounce(function(queryValue) {
-            const activeTypeSelection = document.querySelector('input[name="entry_type"]:checked').value;
-            const pool = getActiveBindingPool(activeTypeSelection);
-            const normalizedQuery = queryValue.toLowerCase().trim();
-            const filteredNodes = !normalizedQuery ? pool : pool.filter(b => b.item.toLowerCase().includes(normalizedQuery));
-
-            if (filteredNodes.length === 0) {
-                DOM.liveTray.textContent = ''; DOM.liveTray.style.display = 'none'; return;
-            }
-
-            const frag = document.createDocumentFragment();
-            filteredNodes.forEach(matchNode => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'suggestion-item border-bottom d-flex justify-content-between align-items-center small';
-                itemDiv.innerHTML = `<span class="fw-medium">${matchNode.item}</span><span class="badge bg-light text-secondary">${matchNode.cat}</span>`;
-                itemDiv.onclick = (ev) => {
-                    ev.stopPropagation();
-                    DOM.searchLineInput.value = matchNode.item;
-                    DOM.boundCatDisplay.value = matchNode.cat;
-                    DOM.liveTray.style.display = 'none';
-                    evaluateInputFieldContentState('search-line-item', 'btn-clear-search');
-                };
-                frag.appendChild(itemDiv);
-            });
-            DOM.liveTray.textContent = ''; DOM.liveTray.appendChild(frag); DOM.liveTray.style.display = 'block';
-        }, 40);
-
-        function closeAutocompleteSuggestionsTray() {
-            DOM.liveTray.textContent = ''; DOM.liveTray.style.display = 'none';
-        }
-
-        const cachedModalLineSuggestions = debounce(function(queryValue) {
-            const targetType = DOM.modalTypeSelect.value;
-            const pool = getActiveBindingPool(targetType);
-            const normalizedQuery = queryValue.toLowerCase().trim();
-            const uniqueLines = !normalizedQuery ? Array.from(new Set(pool.map(b => b.item))) : Array.from(new Set(pool.map(b => b.item))).filter(item => item.toLowerCase().includes(normalizedQuery));
-
-            if(uniqueLines.length === 0) { DOM.modalLineTray.textContent = ''; DOM.modalLineTray.style.display = 'none'; return; }
-
-            const frag = document.createDocumentFragment();
-            uniqueLines.forEach(lineStr => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'suggestion-item small border-bottom';
-                itemDiv.innerText = lineStr;
-                itemDiv.onclick = (ev) => {
-                    ev.stopPropagation();
-                    DOM.modalLineInput.value = lineStr;
-                    DOM.modalLineTray.style.display = 'none';
-                    evaluateInputFieldContentState('modal-input-line-item', 'btn-clear-m-line');
-                    const match = pool.find(b => b.item === lineStr);
-                    if(match) {
-                        DOM.modalCatInput.value = match.cat;
-                        evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
-                    }
-                };
-                frag.appendChild(itemDiv);
-            });
-            DOM.modalLineTray.textContent = ''; DOM.modalLineTray.appendChild(frag); DOM.modalLineTray.style.display = 'block';
-        }, 40);
-
-        const cachedModalCategorySuggestions = debounce(function(queryValue) {
-            const targetType = DOM.modalTypeSelect.value;
-            const pool = getActiveBindingPool(targetType);
-            const normalizedQuery = queryValue.toLowerCase().trim();
-            const uniqueCats = !normalizedQuery ? Array.from(new Set(pool.map(b => b.cat))) : Array.from(new Set(pool.map(b => b.cat))).filter(cat => cat.toLowerCase().includes(normalizedQuery));
-
-            if(uniqueCats.length === 0) { DOM.modalCatTray.textContent = ''; DOM.modalCatTray.style.display = 'none'; return; }
-
-            const frag = document.createDocumentFragment();
-            uniqueCats.forEach(catStr => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'suggestion-item small border-bottom';
-                itemDiv.innerText = catStr;
-                itemDiv.onclick = (ev) => {
-                    ev.stopPropagation();
-                    DOM.modalCatInput.value = catStr;
-                    DOM.modalCatTray.style.display = 'none';
-                    evaluateInputFieldContentState('modal-input-category-group', 'btn-clear-m-cat');
-                };
-                frag.appendChild(itemDiv);
-            });
-            DOM.modalCatTray.textContent = ''; DOM.modalCatTray.appendChild(frag); DOM.modalCatTray.style.display = 'block';
-        }, 40);
-
-        function commitNewFormStatement(e) {
-            e.preventDefault();
-            const typeStr = document.querySelector('input[name="entry_type"]:checked').value;
-            const labelStr = DOM.searchLineInput.value.trim();
-            let catStr = DOM.boundCatDisplay.value.trim();
-            const amountVal = parseFloat(DOM.fieldAmount.value);
-            const dateStr = DOM.fieldDate.value;
-
-            if(!labelStr || isNaN(amountVal) || !dateStr) return;
-
-            if(!catStr) {
-                const bindingPool = getActiveBindingPool(typeStr);
-                const matchedBinding = bindingPool.find(b => b.item.toLowerCase() === labelStr.toLowerCase());
-                catStr = matchedBinding ? matchedBinding.cat : "Unassigned Matrix Flow";
-                if(!matchedBinding) bindingPool.push({ item: labelStr, cat: catStr });
-            }
-
-            const calculatedMonth = dateStr.substring(0, 7);
-
-            if(globalEditTargetRowId !== null) {
-                const index = storageTransactionsDb.findIndex(tx => tx.id === globalEditTargetRowId);
-                if(index !== -1) {
-                    storageTransactionsDb[index] = { id: globalEditTargetRowId, type: typeStr, item: labelStr, cat: catStr, amount: amountVal, date: dateStr, recordMonth: calculatedMonth };
-                }
-                globalEditTargetRowId = null;
-            } else {
-                storageTransactionsDb.push({
-                    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-                    type: typeStr, item: labelStr, cat: catStr, amount: amountVal, date: dateStr, recordMonth: calculatedMonth
-                });
-            }
-            persistDatabaseToDisk();
-            toggleLedgerModalDisplayState(false);
-        }
-
-        function triggerRowEditTargetMode(uuid) {
-            const targetTx = storageTransactionsDb.find(tx => tx.id === uuid);
-            if(!targetTx) return;
-
-            globalEditTargetRowId = uuid;
-            toggleLedgerModalDisplayState(true);
-
-            document.getElementById(`r-${targetTx.type.substring(0,3)}`).checked = true;
-            DOM.searchLineInput.value = targetTx.item;
-            DOM.boundCatDisplay.value = targetTx.cat;
-            DOM.fieldAmount.value = targetTx.amount;
-            DOM.fieldDate.value = targetTx.date;
-
-            evaluateAllClearButtonVisualStates();
-        }
-
-        function triggerRowPurgeOperation(uuid) {
-            if(confirm("Confirm structural deletion of row statement?")) {
-                storageTransactionsDb = storageTransactionsDb.filter(tx => tx.id !== uuid);
-                persistDatabaseToDisk();
-            }
-        }
-
-        function switchWorkspaceMonthContext() {
-            compileUserInterfaceMetrics();
-        }
-
-        function executePreviousMonthRollover() {
-            const activePeriodStr = DOM.monthSelector.value;
-            if(!activePeriodStr) return;
-
-            const parts = activePeriodStr.split('-');
-            let year = parseInt(parts[0], 10);
-            let month = parseInt(parts[1], 10) - 1;
-            if(month === 0) { month = 12; year -= 1; }
-            const priorPeriodStr = `${year}-${String(month).padStart(2, '0')}`;
-
-            const templateRecords = storageTransactionsDb.filter(tx => tx.recordMonth === priorPeriodStr);
-            if(templateRecords.length === 0) {
-                alert("No prior historic templates found.");
-                return;
-            }
-
-            const appendBatch = [];
-            const uniqueSignature = Date.now();
-            templateRecords.forEach((tpl, idx) => {
-                appendBatch.push({
-                    id: 'tx_' + uniqueSignature + '_' + idx,
-                    type: tpl.type, item: tpl.item, cat: tpl.cat, amount: tpl.amount, date: `${activePeriodStr}-${tpl.date.split('-')[2]}`, recordMonth: activePeriodStr
-                });
-            });
-
-            storageTransactionsDb.push(...appendBatch);
-            persistDatabaseToDisk();
-        }
-
-        function exportDataToCSV() {
-            if(storageTransactionsDb.length === 0) { alert("Matrix stream empty."); return; }
-            let contents = "Date,Line Item,Category,Type,Amount\r\n";
-            storageTransactionsDb.forEach(tx => {
-                contents += `${tx.date},"${tx.item.replace(/"/g, '""')}","${tx.cat.replace(/"/g, '""')}",${tx.type},${tx.amount}\r\n`;
-            });
-            const blob = new Blob([contents], { type: 'text/csv;charset=utf-8;' });
-            const anchor = document.createElement('a');
-            anchor.href = URL.createObjectURL(blob);
-            anchor.setAttribute('download', `FEM_Data_${DOM.monthSelector.value}.csv`);
-            document.body.appendChild(anchor); anchor.click(); document.body.removeChild(anchor);
-        }
-
-        function importDataViaCSV(event) {
-            const fileRef = event.target.files[0];
-            if(!fileRef) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const rows = e.target.result.split(/\r?\n/);
-                if(rows.length <= 1) return;
-
-                let incomingCount = 0;
-                const batch = [];
-                const stamp = Date.now();
-                for(let i = 1; i < rows.length; i++) {
-                    const rowText = rows[i].trim();
-                    if(!rowText) continue;
-
-                    const tokens = rowText.split(',');
-                    if(tokens.length < 5) continue;
-
-                    let cellDate = tokens[0].trim();
-                    let cellItem = tokens[1].trim().replace(/^"|"$/g, '').replace(/""/g, '"');
-                    let cellCat = tokens[2].trim().replace(/^"|"$/g, '').replace(/""/g, '"');
-                    let cellType = tokens[3].trim().toLowerCase();
-                    let cellAmount = parseFloat(tokens[4].trim().replace(/[^0-9.-]/g, ''));
-
-                    if(!cellDate || !cellItem || isNaN(cellAmount)) continue;
-                    if(cellType !== 'income' && cellType !== 'expense' && cellType !== 'savings') cellType = 'expense';
-
-                    batch.push({
-                        id: 'tx_' + stamp + '_' + i,
-                        type: cellType, item: cellItem, cat: cellCat || "Imported Matrix", amount: cellAmount, date: cellDate, recordMonth: cellDate.substring(0, 7)
-                    });
-                    incomingCount++;
-                }
-
-                if(incomingCount > 0) {
-                    storageTransactionsDb.push(...batch);
-                    persistDatabaseToDisk();
-                    alert(`Imported ${incomingCount} items successfully.`);
-                }
-                document.getElementById('csv-upload-ghost').value = '';
-            };
-            reader.readAsText(fileRef);
-        }
-
-        function executeFinancialHTMLReportCompilation(e) {
-            e.preventDefault();
-            const rptType = DOM.rptTypeSelect.value;
-            const rptScale = DOM.rptScaleSelect.value;
-            const targetYear = DOM.rptYearSelect.value;
-            const targetMonth = DOM.rptMonthSelect.value;
-
-            const isMonthly = rptScale === 'monthly';
-            const targetMatcher = isMonthly ? `${targetYear}-${targetMonth}` : targetYear;
-            
-            const filteredPool = storageTransactionsDb.filter(tx => 
-                tx.recordMonth && (isMonthly ? tx.recordMonth === targetMatcher : tx.recordMonth.startsWith(targetMatcher))
-            );
-
-            DOM.rptCanvas.style.display = 'block';
-            if(filteredPool.length === 0) {
-                DOM.rptCanvas.innerHTML = `<div class="alert alert-warning text-center small my-2">No matching records found.</div>`; return;
-            }
-
-            let html = `<div class="table-responsive"><table class="table table-sm table-bordered align-middle text-nowrap mt-3 small">`;
-
-            if(rptType === 'line-item') {
-                html += `<thead class="table-light"><tr><th>Line Item</th><th>Category</th><th>Type</th><th class="text-end">Amount</th></tr></thead><tbody>`;
-                const matrixGroupMap = {};
-                filteredPool.forEach(tx => {
-                    const signatureKey = `${tx.item}__${tx.type}__${tx.cat}`;
-                    if(!matrixGroupMap[signatureKey]) {
-                        matrixGroupMap[signatureKey] = { itemName: tx.item, type: tx.type, category: tx.cat, totalVolume: 0, occurrences: 0 };
-                    }
-                    matrixGroupMap[signatureKey].totalVolume += tx.amount;
-                    matrixGroupMap[signatureKey].occurrences += 1;
-                });
-
-                let grandTotalSurplusNet = 0;
-                Object.keys(matrixGroupMap).sort().forEach(key => {
-                    const aggregatedRow = matrixGroupMap[key];
-                    grandTotalSurplusNet += (aggregatedRow.totalVolume * (aggregatedRow.type === 'income' ? 1 : -1));
-                    const badgeClass = aggregatedRow.type === 'income' ? 'bg-success' : aggregatedRow.type === 'expense' ? 'bg-danger' : 'bg-primary';
-                    html += `<tr>
-                        <td><strong>${aggregatedRow.itemName}</strong><br><small class="text-muted">Records: ${aggregatedRow.occurrences}</small></td>
-                        <td>${aggregatedRow.category}</td>
-                        <td><span class="badge ${badgeClass} text-uppercase" style="font-size:9px;">${aggregatedRow.type}</span></td>
-                        <td class="text-end fw-bold">BDT ${aggregatedRow.totalVolume.toFixed(2)}</td>
-                    </tr>`;
-                });
-                html += `<tr class="table-dark"><td colspan="3">Aggregated Net Timeline Surplus</td><td class="text-end fw-bold">BDT ${grandTotalSurplusNet.toFixed(2)}</td></tr>`;
-            
-            } else if(rptType === 'group-wise') {
-                html += `<thead class="table-light"><tr><th>Category Pipeline</th><th>Type</th><th class="text-end">Volume</th></tr></thead><tbody>`;
-                const map = {};
-                filteredPool.forEach(tx => { const k = `${tx.cat}__${tx.type}`; map[k] = (map[k] || 0) + tx.amount; });
-                Object.keys(map).sort().forEach(k => {
-                    const [cName, cType] = k.split('__');
-                    const badgeClass = cType === 'income' ? 'bg-success' : cType === 'expense' ? 'bg-danger' : 'bg-primary';
-                    html += `<tr><td><strong>${cName}</strong></td><td><span class="badge ${badgeClass} text-uppercase" style="font-size:9px;">${cType}</span></td><td class="text-end fw-bold">BDT ${map[k].toFixed(2)}</td></tr>`;
-                });
-            } else if(rptType === 'p-and-l') {
-                let inc = 0, exp = 0, sav = 0;
-                filteredPool.forEach(tx => { if(tx.type==='income') inc+=tx.amount; else if(tx.type==='expense') exp+=tx.amount; else sav+=tx.amount; });
-                html += `
-                    <tr class="table-secondary fw-bold"><td colspan="2">1. Operating Revenues</td></tr>
-                    <tr><td>Gross Capital Inflows</td><td class="text-end text-success fw-bold">BDT ${inc.toFixed(2)}</td></tr>
-                    <tr class="table-secondary fw-bold"><td colspan="2">2. Operating Expenses</td></tr>
-                    <tr><td>Spending Discharges</td><td class="text-end text-danger fw-bold">BDT ${exp.toFixed(2)}</td></tr>
-                    <tr class="table-secondary fw-bold"><td colspan="2">3. Capital Reserve Provisions</td></tr>
-                    <tr><td>Sinking Reserves</td><td class="text-end text-primary fw-bold">BDT ${sav.toFixed(2)}</td></tr>
-                    <tr class="table-dark fw-bold"><td>Net Retained Operational Surplus</td><td class="text-end">BDT ${(inc - exp - sav).toFixed(2)}</td></tr>`;
-            }
-            html += `</tbody></table></div>`;
-            DOM.rptCanvas.innerHTML = html;
-        }
-
-        function compileUserInterfaceMetrics() {
-            const activePeriodStr = DOM.monthSelector.value;
-            const filteredArray = [];
-            let incSum = 0, expSum = 0, savSum = 0, hasPriorRecords = false;
-            let historicalBalanceAccumulator = 0;
-
-            storageTransactionsDb.forEach(tx => {
-                if (tx.recordMonth && tx.recordMonth < activePeriodStr) {
-                    hasPriorRecords = true;
-                    if (tx.type === 'income') historicalBalanceAccumulator += tx.amount;
-                    else if (tx.type === 'expense') historicalBalanceAccumulator -= tx.amount;
-                    else if (tx.type === 'savings') historicalBalanceAccumulator -= tx.amount;
-                } else if (tx.recordMonth === activePeriodStr) {
-                    filteredArray.push(tx);
-                    if (tx.type === 'income') incSum += tx.amount;
-                    else if (tx.type === 'expense') expSum += tx.amount;
-                    else if (tx.type === 'savings') savSum += tx.amount;
-                }
-            });
-
-            DOM.ledgerTarget.textContent = '';
-            
-            if (filteredArray.length === 0 && historicalBalanceAccumulator === 0) {
-                DOM.emptyNotice.style.display = 'block';
-                DOM.prevImportBox.style.display = hasPriorRecords ? 'block' : 'none';
-            } else {
-                DOM.emptyNotice.style.display = 'none';
-                const frag = document.createDocumentFragment();
-
-                if (historicalBalanceAccumulator !== 0) {
-                    const rowBf = document.createElement('tr');
-                    rowBf.className = 'table-light text-muted';
-                    rowBf.style.opacity = '0.85';
-                    const balColor = historicalBalanceAccumulator < 0 ? 'text-danger' : 'text-success';
-                    rowBf.innerHTML = `
-                        <td class="ps-4 small fw-semibold text-secondary">—</td>
-                        <td class="fw-bold text-dark"><i class="bi bi-arrow-right-square-fill text-primary me-1"></i> Balance Carried Forward (BF)</td>
-                        <td><span class="text-secondary">Historical Rollover</span></td>
-                        <td><span class="badge bg-secondary text-uppercase" style="font-size:10px; padding: 4px 8px;">Rollover</span></td>
-                        <td class="text-end fw-bold ${balColor}">BDT ${historicalBalanceAccumulator.toFixed(2)}</td>
-                        <td class="text-end pe-4"><small class="text-muted italic">System Locked</small></td>
-                    `;
-                    frag.appendChild(rowBf);
-                }
-
-                filteredArray.sort((a,b) => b.date.localeCompare(a.date));
-
-                filteredArray.forEach(tx => {
-                    const tr = document.createElement('tr');
-                    const badgeClass = tx.type === 'income' ? 'bg-success' : tx.type === 'expense' ? 'bg-danger' : 'bg-primary';
-                    const amountColor = tx.type === 'expense' ? 'text-danger' : 'text-dark';
-                    tr.innerHTML = `
-                        <td class="ps-4 text-secondary small fw-medium">${parseAndFormatDateString(tx.date)}</td>
-                        <td class="fw-bold text-dark">${tx.item}</td>
-                        <td><span class="text-secondary">${tx.cat}</span></td>
-                        <td><span class="badge ${badgeClass} text-uppercase" style="font-size:10px; padding: 4px 8px;">${tx.type}</span></td>
-                        <td class="text-end fw-bold ${amountColor}">BDT ${tx.amount.toFixed(2)}</td>
-                        <td class="text-end pe-4">
-                            <div class="d-flex gap-1 justify-content-end">
-                                <button type="button" class="btn btn-light text-dark border btn-sm py-1 px-2" onclick="triggerRowEditTargetMode('${tx.id}')"><i class="bi bi-pencil-square"></i></button>
-                                <button type="button" class="btn btn-outline-danger btn-sm py-1 px-2" onclick="triggerRowPurgeOperation('${tx.id}')"><i class="bi bi-trash3"></i></button>
+            const query = rawString.trim().toLowerCase();
+            if (query.length > 0) {
+                const dynamicMap = getDynamicSuggestionsMap();
+                const matchedKeys = Object.keys(dynamicMap).filter(key => key.toLowerCase().includes(query));
+                
+                if(matchedKeys.length > 0) {
+                    DOM.boxSuggestions.innerHTML = matchedKeys.map(key => {
+                        const typeVal = dynamicMap[key];
+                        return `
+                            <div class="suggestion-row" data-value="${escapeHtml(toTitleCase(key))}" data-type="${typeVal}">
+                                <span class="fw-semibold text-dark small">${escapeHtml(toTitleCase(key))}</span>
+                                <span class="badge border px-2 py-1 font-mono fs-8 ${typeVal === 'Income' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">${typeVal.toUpperCase()}</span>
                             </div>
-                        </td>`;
-                    frag.appendChild(tr);
-                });
-                DOM.ledgerTarget.appendChild(frag);
+                        `;
+                    }).join('');
+                    DOM.boxSuggestions.classList.remove('d-none');
+                } else {
+                    DOM.boxSuggestions.classList.add('d-none');
+                }
+            } else {
+                DOM.boxSuggestions.classList.add('d-none');
             }
+        });
 
-            DOM.statIncome.innerText = `BDT ${incSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            DOM.statExpenses.innerText = `BDT ${expSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            DOM.statSavings.innerText = `BDT ${savSum.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            
-            const cumulativeNetSurplus = historicalBalanceAccumulator + incSum - expSum - savSum;
-            DOM.statBalance.innerText = `BDT ${cumulativeNetSurplus.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            DOM.statBalance.className = cumulativeNetSurplus < 0 ? 'fw-bold m-0 mt-1 text-danger' : 'fw-bold m-0 mt-1 text-dark';
+        DOM.inpTagTrigger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                let cleaned = DOM.inpTagTrigger.value.trim();
+                if (cleaned.length > 0) {
+                    const currentMap = getDynamicSuggestionsMap();
+                    let exactMatchKey = Object.keys(currentMap).find(k => k.toLowerCase() === cleaned.toLowerCase());
+                    if(exactMatchKey) launchInlineConfigurationFlow(toTitleCase(exactMatchKey), null, currentMap[exactMatchKey]);
+                    else launchInlineConfigurationFlow(toTitleCase(cleaned));
+                }
+                DOM.inpTagTrigger.value = '';
+                DOM.boxSuggestions.classList.add('d-none');
+            }
+        });
+
+        DOM.boxSuggestions.addEventListener('click', (e) => {
+            const selectedRow = e.target.closest('.suggestion-row');
+            if (selectedRow) {
+                DOM.inpTagTrigger.value = '';
+                DOM.boxSuggestions.classList.add('d-none');
+                launchInlineConfigurationFlow(toTitleCase(selectedRow.getAttribute('data-value')), null, selectedRow.getAttribute('data-type'));
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#tagWrapperBox')) DOM.boxSuggestions.classList.add('d-none');
+        });
+    }
+
+    function validateTypeRequirement() {
+        const checked = document.querySelector('input[name="optFlowType"]:checked');
+        if (checked) {
+            DOM.btnOverlayConfirm.removeAttribute('disabled');
+            DOM.typeFeedbackMsg.classList.add('d-none');
+        } else {
+            DOM.btnOverlayConfirm.setAttribute('disabled', 'true');
+            DOM.typeFeedbackMsg.classList.remove('d-none');
+        }
+    }
+
+    function launchInlineConfigurationFlow(itemName, tagIndexToEdit = null, autoInjectedType = null) {
+        System.stateCurrentTargetItemText = itemName;
+        System.activeEditingTagIndex = tagIndexToEdit;
+
+        DOM.lblTargetItem.innerText = itemName;
+        DOM.configModalTitle.innerText = tagIndexToEdit !== null ? "Modify Element Parameters" : "Configure Parameters";
+        
+        if (tagIndexToEdit !== null) {
+            const sourceItem = System.localActiveOrderRecords[tagIndexToEdit];
+            DOM.txtSubrecordAmount.value = sourceItem.amount > 0 ? sourceItem.amount : '';
+            DOM.flowIncome.checked = sourceItem.type === 'Income';
+            DOM.flowExpense.checked = sourceItem.type === 'Expense';
+        } else {
+            DOM.txtSubrecordAmount.value = '';
+            DOM.flowIncome.checked = autoInjectedType === 'Income';
+            DOM.flowExpense.checked = autoInjectedType === 'Expense';
         }
 
-        window.onload = function() {
-            ledgerModalInstance = new bootstrap.Modal(document.getElementById('ledgerEntryModal'));
-            mappingModalInstance = new bootstrap.Modal(document.getElementById('rulesMappingModal'));
-            reportsModalInstance = new bootstrap.Modal(document.getElementById('reportsParameterModal'));
+        validateTypeRequirement();
+        DOM.configOverlayPanel.classList.add('active');
+        DOM.txtSubrecordAmount.focus();
+    }
 
-            initializeDefaultTimeframe();
-            compileUserInterfaceMetrics();
-            evaluateAllClearButtonVisualStates();
+    function commitConfiguredRecordItem() {
+        const checkedTypeElement = document.querySelector('input[name="optFlowType"]:checked');
+        if (!checkedTypeElement) return;
+
+        const inputAmountRaw = DOM.txtSubrecordAmount.value;
+        const packageData = {
+            name: System.stateCurrentTargetItemText,
+            type: checkedTypeElement.value,
+            amount: inputAmountRaw === '' ? 0.00 : parseFloat(inputAmountRaw)
         };
-    </script>
+
+        if (System.activeEditingTagIndex !== null) {
+            System.localActiveOrderRecords[System.activeEditingTagIndex] = packageData;
+        } else {
+            System.localActiveOrderRecords.push(packageData);
+        }
+
+        DOM.configOverlayPanel.classList.remove('active');
+        System.activeEditingTagIndex = null;
+        syncActiveRecordsUiBadges();
+        setTimeout(() => DOM.inpTagTrigger.focus(), 100);
+    }
+
+    function syncActiveRecordsUiBadges() {
+        DOM.tagWrapperBox.querySelectorAll('.badge-clickable-tag').forEach(node => node.remove());
+
+        System.localActiveOrderRecords.forEach((record, arrayIndex) => {
+            const spanBadge = document.createElement('span');
+            spanBadge.className = `badge-clickable-tag ${record.type === 'Income' ? 'badge-income' : 'badge-expense'}`;
+            spanBadge.addEventListener('click', () => launchInlineConfigurationFlow(record.name, arrayIndex));
+            
+            spanBadge.innerHTML = `
+                <small class="fw-bold me-1 text-uppercase font-mono" style="font-size:0.65rem;">[${record.type === 'Income' ? 'INC' : 'EXP'}]</small>
+                <span class="fw-semibold">${escapeHtml(record.name)}</span>
+                <span class="ms-1 opacity-75 font-mono">($${record.amount.toFixed(2)})</span>
+                <i class="fa-solid fa-circle-xmark remove-tag-btn" title="Remove element"></i>
+            `;
+
+            spanBadge.querySelector('.remove-tag-btn').addEventListener('click', (event) => {
+                event.stopPropagation();
+                System.localActiveOrderRecords.splice(arrayIndex, 1);
+                syncActiveRecordsUiBadges();
+            });
+
+            DOM.tagWrapperBox.insertBefore(spanBadge, DOM.inpTagTrigger);
+        });
+    }
+
+    function processFinalOrderCommit() {
+        if(!DOM.inpOrderPeriod.value) {
+            showCustomNotification("Please specify a baseline temporal parameters month context structure.", "danger");
+            return;
+        }
+
+        const inputIncVal = DOM.inpBulkIncome.value;
+        const inputExpVal = DOM.inpBulkExpense.value;
+        const targetDataStructure = {
+            id: DOM.inpOrderNum.value,
+            period: DOM.inpOrderPeriod.value,
+            bulkIncome: inputIncVal === '' ? 0.00 : parseFloat(inputIncVal),
+            bulkExpense: inputExpVal === '' ? 0.00 : parseFloat(inputExpVal),
+            items: [...System.localActiveOrderRecords]
+        };
+
+        if (System.activeEditingOrderId !== null) {
+            const targetIndex = System.databaseOrdersStore.findIndex(o => o.id === System.activeEditingOrderId);
+            if (targetIndex !== -1) System.databaseOrdersStore[targetIndex] = targetDataStructure;
+            showCustomNotification(`Ledger node entry token block ${targetDataStructure.id} updated successfully.`, "success");
+        } else {
+            System.databaseOrdersStore.push(targetDataStructure);
+            System.globalCounterIndex++; 
+            showCustomNotification(`Instantiated block ${targetDataStructure.id} appended to master ledger.`, "success");
+        }
+
+        localStorage.setItem('ledger_orders_v96', JSON.stringify(System.databaseOrdersStore));
+        System.modalBootstrapContext.hide();
+        renderMasterTableLedgerGrid();
+    }
+
+    function renderMasterTableLedgerGrid() {
+        DOM.masterGridBody.innerHTML = '';
+        const filterMode = DOM.globalPeriodFilterMode.value;
+        const targetFilterPeriod = DOM.globalPeriodFilter.value;
+
+        DOM.gridTitleContext.innerText = (filterMode === 'SELECTED' && targetFilterPeriod) ? 
+            `Ledger Balance Audit: ${formatPeriodStringToMmmYyyy(targetFilterPeriod)}` : "Historical Matrix Roll Logs";
+
+        if (System.databaseOrdersStore.length === 0) {
+            DOM.masterGridBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <div class="p-4 text-center">
+                            <i class="fa-solid fa-bezier-curve fa-3x mb-3 text-secondary opacity-30"></i>
+                            <h6 class="fw-bold text-dark">No Ledger Nodes Localized</h6>
+                            <p class="small text-muted mb-0">Generate your initial accounting block to instantiate tracking data structures.</p>
+                        </div>
+                    </td>
+                </tr>`;
+            DOM.ledgerCounter.innerText = "0 Records";
+            recalculateGlobalFinancialLedgers();
+            return;
+        }
+
+        const runningEngineMetrics = computeCompleteFinancialChainMetrics();
+        const sortedDisplayList = getChronologicallySortedOrders();
+        const visibleRowsList = sortedDisplayList.filter(order => filterMode === 'ALL' || order.period === targetFilterPeriod).reverse();
+
+        DOM.ledgerCounter.innerText = `${visibleRowsList.length} Allocated Block${visibleRowsList.length === 1 ? '' : 's'}`;
+
+        if(visibleRowsList.length === 0) {
+            DOM.masterGridBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted bg-white">
+                        <i class="fa-regular fa-calendar-minus fa-2x mb-2 text-muted opacity-40"></i>
+                        <span class="small d-block text-secondary fw-semibold">No elements registered on this timescale slice.</span>
+                    </td>
+                </tr>`;
+            recalculateGlobalFinancialLedgers();
+            return;
+        }
+
+        // Optimize visual layout pipeline frame cycle 
+        requestAnimationFrame(() => {
+            const documentFragmentContainer = document.createDocumentFragment();
+            
+            visibleRowsList.forEach(order => {
+                const nodeMetrics = runningEngineMetrics.chainMap[order.id] || { broughtDown:0, income:0, expense:0, carriedForward:0 };
+                const labelCollection = [];
+                
+                if((parseFloat(order.bulkIncome) || 0) > 0) labelCollection.push(`Base Revenue ($${parseFloat(order.bulkIncome).toFixed(2)})`);
+                if((parseFloat(order.bulkExpense) || 0) > 0) labelCollection.push(`Base Expense ($${parseFloat(order.bulkExpense).toFixed(2)})`);
+                
+                order.items.forEach(item => {
+                    labelCollection.push(`${item.name} [${item.type === 'Income' ? 'INC' : 'EXP'}] ($${item.amount.toFixed(2)})`);
+                });
+
+                const commaSeparatedHtml = labelCollection.length > 0 
+                    ? labelCollection.map(txt => `<span class="comma-item me-1 mb-1">${escapeHtml(txt)}</span>`).join(' ')
+                    : `<span class="text-muted small italic">No nested mappings.</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "align-middle";
+                tr.innerHTML = `
+                    <td class="fw-bold text-dark text-nowrap">
+                        <span class="d-flex align-items-center gap-2">
+                            <span class="p-2 bg-light rounded-2 text-primary" style="font-size: 0.85rem;"><i class="fa-solid fa-calendar-day"></i></span>
+                            ${formatPeriodStringToMmmYyyy(order.period)}
+                        </span>
+                    </td>
+                    <td class="font-mono fw-bold text-primary small">${order.id}</td>
+                    <td><div class="lh-base py-1">${commaSeparatedHtml}</div></td>
+                    <td>
+                        <div class="order-summary-box font-mono small">
+                            <div class="d-flex justify-content-between text-secondary mb-0.5" style="font-size:0.75rem;">
+                                <span>Brought Down (B/D):</span><span>$${nodeMetrics.broughtDown.toFixed(2)}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-success mb-0.5" style="font-size:0.75rem;">
+                                <span>Period Revenue:</span><span>+$${nodeMetrics.income.toFixed(2)}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-danger mb-1" style="font-size:0.75rem;">
+                                <span>Period Expenses:</span><span>-$${nodeMetrics.expense.toFixed(2)}</span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-1 fw-bold ${nodeMetrics.carriedForward < 0 ? 'text-danger' : 'text-dark'}" style="font-size:0.8rem;">
+                                <span>Carried Forward (C/F):</span><span>$${nodeMetrics.carriedForward.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-1.5">
+                            <button class="btn btn-sm btn-white border rounded-2 px-2.5 py-1.5 btn-show-action fw-medium text-secondary">
+                                <i class="fa-solid fa-expand text-info me-1"></i> View
+                            </button>
+                            <button class="btn btn-sm btn-white border rounded-2 px-2.5 py-1.5 btn-edit-action fw-medium text-secondary">
+                                <i class="fa-solid fa-sliders text-primary me-1"></i> Edit
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tr.querySelector('.btn-show-action').addEventListener('click', () => triggerDeepInspectorView(order.id));
+                tr.querySelector('.btn-edit-action').addEventListener('click', () => triggerOrderStructureEdit(order.id));
+                documentFragmentContainer.appendChild(tr);
+            });
+
+            DOM.masterGridBody.appendChild(documentFragmentContainer);
+            recalculateGlobalFinancialLedgers();
+        });
+    }
+
+    function triggerDeepInspectorView(orderId) {
+        const order = System.databaseOrdersStore.find(o => o.id === orderId);
+        if(!order) return;
+
+        DOM.viewModalTokenId.innerText = order.id;
+        DOM.viewModalPeriod.innerText = formatPeriodStringToMmmYyyy(order.period);
+
+        const rowElements = [
+            { name: 'Baseline Allocation Revenue', type: 'Income', amount: parseFloat(order.bulkIncome) || 0 },
+            { name: 'Baseline Allocation Expense', type: 'Expense', amount: parseFloat(order.bulkExpense) || 0 }
+        ];
+        
+        if(order.items) rowElements.push(...order.items);
+        const validRows = rowElements.filter(rowItem => rowItem.amount > 0);
+
+        DOM.viewModalItemsBox.innerHTML = validRows.length === 0 
+            ? `<div class="p-4 text-muted small text-center italic">No dynamic mapped assets inside this node container.</div>`
+            : validRows.map(rowItem => `
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom px-3 font-mono">
+                    <span class="text-secondary small fw-medium">${escapeHtml(rowItem.name)}</span>
+                    <span class="badge rounded-pill px-2.5 py-1.5 ${rowItem.type === 'Income' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">
+                        ${rowItem.type === 'Income' ? '+' : '-'}$${rowItem.amount.toFixed(2)}
+                    </span>
+                </div>
+            `).join('');
+
+        System.infoModalContext.show();
+    }
+
+    function triggerOrderStructureEdit(orderId) {
+        const target = System.databaseOrdersStore.find(o => o.id === orderId);
+        if (!target) return;
+
+        System.activeEditingOrderId = orderId; 
+        DOM.inpOrderPeriod.value = target.period || '';
+        DOM.inpOrderNum.value = target.id;
+        DOM.inpBulkIncome.value = target.bulkIncome || '';
+        DOM.inpBulkExpense.value = target.bulkExpense || '';
+        System.localActiveOrderRecords = JSON.parse(JSON.stringify(target.items || []));
+        
+        syncActiveRecordsUiBadges();
+        System.modalBootstrapContext.show();
+    }
+
+    function escapeHtml(stringInput) {
+        return String(stringInput).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    }
+</script>
 </body>
 </html>
