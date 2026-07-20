@@ -3,138 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Direct Private Chat</title>
-  <!-- Bootstrap 5 -->
+  <title>Instant URL Chat</title>
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- PeerJS for direct device-to-device connection -->
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- MQTTJS via CDN for firewall-proof global connection -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <style>
-    body { background-color: #f8f9fa; }
-    .chat-box { height: 50vh; overflow-y: auto; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6; }
-    .message { max-width: 80%; padding: 10px 15px; border-radius: 20px; margin-bottom: 10px; word-wrap: break-word; }
-    .msg-sent { background-color: #0d6efd; color: white; margin-left: auto; border-bottom-right-radius: 2px; }
-    .msg-received { background-color: #e9ecef; color: black; margin-right: auto; border-bottom-left-radius: 2px; }
+    body { background-color: #f0f2f5; font-family: -apple-system, sans-serif; }
+    .chat-container { max-width: 600px; margin: 1rem auto; padding: 10px; }
+    .chat-box { height: 55vh; overflow-y: auto; background-color: #ffffff; padding: 15px; border-radius: 12px; }
+    .message { max-width: 75%; padding: 10px 14px; border-radius: 18px; margin-bottom: 10px; word-wrap: break-word; }
+    .msg-sent { background-color: #0d6efd; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+    .msg-received { background-color: #e9ecef; color: black; margin-right: auto; border-bottom-left-radius: 4px; }
+    .sender-title { font-size: 0.75rem; opacity: 0.8; margin-bottom: 2px; font-weight: bold; }
   </style>
 </head>
 <body>
 
-<div class="container py-4" style="max-width: 600px;">
-  <div class="card shadow-sm border-0 mb-3">
-    <div class="card-body bg-light rounded">
-      <h5 class="text-primary mb-3">Step 1: Your Secure ID</h5>
-      <p class="small text-muted mb-2">Share this ID with your friend so they can connect to you.</p>
-      <div class="input-group mb-3">
-        <input type="text" id="my-id" class="form-control text-center fw-bold" readonly placeholder="Generating ID...">
-        <button class="btn btn-outline-primary" onclick="copyId()">Copy</button>
-      </div>
-      
-      <hr>
-
-      <h5 class="text-primary mb-3">Step 2: Connect to Friend</h5>
-      <p class="small text-muted mb-2">Or, paste your friend's ID here to connect to them.</p>
+<div class="container chat-container">
+  <!-- Link Sharing Card -->
+  <div class="card shadow-sm border-0 rounded-3 mb-3" id="shareCard">
+    <div class="card-body bg-white">
+      <h6 class="text-primary fw-bold mb-1">🌐 Invite Your Friend</h6>
+      <p class="small text-muted mb-2">Send this exact link to your friend. Once they open it on their phone, your chat room will link up.</p>
       <div class="input-group">
-        <input type="text" id="friend-id" class="form-control" placeholder="Paste friend's ID here">
-        <button class="btn btn-success" id="connect-btn" onclick="connectToFriend()">Connect</button>
+        <input type="text" id="shareUrl" class="form-control form-control-sm bg-light text-secondary" readonly>
+        <button class="btn btn-sm btn-primary" onclick="copyLink()">Copy Link</button>
       </div>
-      <div id="status" class="text-center mt-3 fw-bold text-secondary">Status: Waiting to connect...</div>
     </div>
   </div>
 
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <div class="chat-box d-flex flex-column mb-3" id="chatBox">
-        <div class="text-center text-muted small mt-2">Chat is empty. Connect to start!</div>
-      </div>
+  <!-- Chat Window -->
+  <div class="card shadow border-0 rounded-4 overflow-hidden">
+    <div class="card-header bg-primary text-white p-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold">Global Chat Line</h5>
+      <span class="badge bg-light text-primary py-2 px-3 rounded-pill" id="myUsername">...</span>
+    </div>
+    
+    <div class="card-body chat-box d-flex flex-column" id="chatBox">
+      <div class="text-center text-muted small my-auto" id="loadingStatus">Connecting to secure web network...</div>
+    </div>
+    
+    <div class="card-footer bg-white p-3 border-top-0">
       <form id="chatForm" class="input-group">
         <input type="text" id="messageInput" class="form-control rounded-pill me-2" placeholder="Type a message..." disabled required autocomplete="off">
-        <button class="btn btn-primary rounded-circle px-3" type="submit" id="send-btn" disabled>Send</button>
+        <button class="btn btn-primary rounded-circle px-3" type="submit" id="sendBtn" disabled>Send</button>
       </form>
     </div>
   </div>
 </div>
 
 <script>
-  // Initialize PeerJS (Connects to a free public signaling server automatically)
-  const peer = new Peer();
-  let conn;
-
-  // When PeerJS gives us an ID, show it on the screen
-  peer.on('open', (id) => {
-    document.getElementById('my-id').value = id;
-  });
-
-  // When a friend connects to US
-  peer.on('connection', (connection) => {
-    conn = connection;
-    setupConnection();
-  });
-
-  // When WE connect to a friend
-  function connectToFriend() {
-    const friendId = document.getElementById('friend-id').value.trim();
-    if (!friendId) return alert("Please enter an ID");
-    
-    document.getElementById('status').innerText = "Connecting...";
-    document.getElementById('status').className = "text-center mt-3 fw-bold text-warning";
-    
-    conn = peer.connect(friendId);
-    setupConnection();
+  // 1. Handle the Room URL Assignment Automatically
+  const urlParams = new URLSearchParams(window.location.search);
+  let room = urlParams.get('room');
+  
+  if (!room) {
+    // Generates a unique secure string for your chat room if none exists in the URL bar
+    room = 'room_' + Math.random().toString(36).substring(2, 11);
+    urlParams.set('room', room);
+    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + urlParams.toString();
+    window.history.pushState({path: newUrl}, '', newUrl);
   }
 
-  // Handle the active connection for both sending and receiving
-  function setupConnection() {
-    conn.on('open', () => {
-      document.getElementById('status').innerText = "Connected! You can now chat.";
-      document.getElementById('status').className = "text-center mt-3 fw-bold text-success";
+  // Set the live sharing URL input field value
+  document.getElementById('shareUrl').value = window.location.href;
+
+  // 2. Identify the Chattering Parties
+  let username = localStorage.getItem('chat_nickname');
+  if (!username) {
+    username = prompt("Enter your name:") || "User_" + Math.floor(Math.random() * 1000);
+    localStorage.setItem('chat_nickname', username);
+  }
+  document.getElementById('myUsername').innerText = username;
+
+  // 3. Connect via Global Public WebSockets Broker (Bypasses Carrier NAT Walls)
+  const brokerUrl = 'wss://broker.hivemq.com:8884/mqtt'; 
+  const topic = 'uniquesecureline/' + room;
+  
+  const client = mqtt.connect(brokerUrl, {
+    clientId: 'user_' + Math.random().toString(36).substring(2, 11),
+    clean: true,
+    connectTimeout: 5000
+  });
+
+  const chatBox = document.getElementById('chatBox');
+  const loadingStatus = document.getElementById('loadingStatus');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  client.on('connect', () => {
+    if(loadingStatus) loadingStatus.remove();
+    
+    // Subscribe to your unique link-generated channel
+    client.subscribe(topic, (err) => {
+      if (!err) {
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        
+        const banner = document.createElement('div');
+        banner.className = 'text-center text-success small my-2 fw-bold';
+        banner.innerText = "✓ Active connection established.";
+        chatBox.appendChild(banner);
+      }
+    });
+  });
+
+  // 4. Inbound Message Streams
+  client.on('message', (incomingTopic, payload) => {
+    try {
+      const data = JSON.parse(payload.toString());
+      const isMe = data.sender === username;
       
-      // Enable chat inputs
-      document.getElementById('messageInput').disabled = false;
-      document.getElementById('send-btn').disabled = false;
-      document.getElementById('chatBox').innerHTML = ""; // Clear empty message
-    });
-
-    // When we receive a message
-    conn.on('data', (data) => {
-      displayMessage(data, 'received');
-    });
-
-    conn.on('close', () => {
-      document.getElementById('status').innerText = "Connection lost.";
-      document.getElementById('status').className = "text-center mt-3 fw-bold text-danger";
-    });
-  }
-
-  // Handle sending a message
-  document.getElementById('chatForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const msgInput = document.getElementById('messageInput');
-    const msg = msgInput.value.trim();
-    
-    if (msg && conn && conn.open) {
-      conn.send(msg);               // Send to friend
-      displayMessage(msg, 'sent');  // Show on our screen
-      msgInput.value = '';          // Clear input
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', isMe ? 'msg-sent' : 'msg-received', 'd-flex', 'flex-column');
+      
+      msgDiv.innerHTML = `
+        <span class="sender-title">${data.sender}</span>
+        <span>${data.text}</span>
+      `;
+      
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (e) {
+      console.error(e);
     }
   });
 
-  // Function to show messages in the UI
-  function displayMessage(text, type) {
-    const chatBox = document.getElementById('chatBox');
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message', type === 'sent' ? 'msg-sent' : 'msg-received');
-    msgDiv.innerText = text;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
-  }
+  // 5. Outbound Message Transmissions
+  document.getElementById('chatForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (text) {
+      const payload = { sender: username, text: text };
+      client.publish(topic, JSON.stringify(payload));
+      messageInput.value = '';
+    }
+  });
 
-  // Copy ID helper
-  function copyId() {
-    const idField = document.getElementById('my-id');
-    idField.select();
-    document.execCommand('copy');
-    alert("ID copied! Send this to your friend.");
+  // Helper copy execution
+  function copyLink() {
+    const copyText = document.getElementById("shareUrl");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Mobile compatibility constraint
+    navigator.clipboard.writeText(copyText.value);
+    alert("Link copied! Send it to your friend now.");
   }
 </script>
-
 </body>
 </html>
