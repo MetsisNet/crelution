@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Private Cloud Chat</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,14 +21,17 @@
 
         body { 
             background-color: var(--bg-main); 
-            height: 100vh; 
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile modern environments */
             display: flex; 
             flex-direction: column; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-dark);
+            margin: 0;
+            overflow: hidden;
         }
         
-        /* Premium Minimal PIN Access Screen */
+        /* Minimal PIN Access Screen */
         #pin-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg-main); z-index: 2000; 
@@ -40,36 +43,38 @@
             border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
         }
 
-        /* Main Modern Container */
+        /* Fully Responsive App Container */
         #chat-container { 
-            flex: 1; display: none; flex-direction: column; 
-            max-width: 700px; margin: 0 auto; width: 100%; 
-            background: var(--chat-bg); box-shadow: 0 4px 24px rgba(0,0,0,0.02);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            flex: 1; 
+            display: none; /* Toggled by JS */
+            flex-direction: column; 
+            max-width: 700px; margin: 0 auto; width: 100%;
+            background: var(--chat-bg); 
+            box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+            height: 100%;
         }
 
-        /* Modern App Header Layout */
+        /* App Header Layout */
         .app-header {
             background: white;
             border-bottom: 1px solid var(--border-color);
-            padding: 16px 20px;
+            padding: 12px 16px;
         }
 
         /* Chat Threads Space */
         #messages { 
-            flex: 1; overflow-y: auto; padding: 24px; 
-            display: flex; flex-direction: column; gap: 16px; 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            display: flex; flex-direction: column; gap: 14px; 
             background-color: var(--chat-bg);
         }
 
-        /* Minimal Drop Shadows and Smooth Scroll */
+        /* Custom Scrollbar */
         #messages::-webkit-scrollbar { width: 5px; }
         #messages::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         
         /* Modernized Speech Bubbles */
         .msg { 
-            max-width: 70%; padding: 12px 16px; 
+            max-width: 75%; padding: 10px 14px; 
             font-size: 0.95rem; line-height: 1.5; 
             word-wrap: break-word; position: relative;
             box-shadow: 0 2px 4px rgba(0,0,0,0.01);
@@ -88,27 +93,50 @@
         }
         .msg-meta { 
             font-size: 0.72rem; display: block; 
-            margin-bottom: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
         }
         .msg-me .msg-meta { color: #0284c7; }
         .msg-them .msg-meta { color: #475569; }
 
-        /* Floating Interactive Action Bar */
+        /* Interactive Footer Action Bar */
         .action-bar {
             background: white;
             border-top: 1px solid var(--border-color);
-            padding: 16px 20px;
+            padding: 12px 16px;
         }
         .custom-input {
             border: 1px solid #e2e8f0;
             background-color: #f8fafc;
             transition: all 0.2s ease;
-            padding: 12px 20px;
+            padding: 10px 16px;
         }
         .custom-input:focus {
             background-color: white;
             border-color: #cbd5e1;
             box-shadow: none;
+        }
+
+        /* Custom Modal UI Overlays */
+        .custom-modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(4px);
+            z-index: 3000; display: flex; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+        }
+        .custom-modal-backdrop.show { opacity: 1; pointer-events: auto; }
+        .custom-modal-box {
+            background: white; border-radius: 16px; max-width: 400px; width: 100%;
+            padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            transform: scale(0.95); transition: transform 0.2s ease;
+        }
+        .custom-modal-backdrop.show .custom-modal-box { transform: scale(1); }
+
+        /* Mobile Responsive Text Scaling Tweak */
+        @media (max-width: 576px) {
+            .app-header { padding: 10px 12px; }
+            .btn-responsive span { display: none; } /* Hide button text labels on tight layout devices */
+            #messages { padding: 16px; }
+            .msg { max-width: 85%; }
         }
     </style>
 </head>
@@ -122,7 +150,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
             </div>
             <h4 class="fw-bold mb-1">Enter Secret Room</h4>
-            <p class="small text-muted mb-4">Provide the shared access key parameter to decrypt your peer-to-peer visual stream interface.</p>
+            <p class="small text-muted mb-4">Provide your shared access key code to enter your private real-time network workspace.</p>
             <form onsubmit="unlockChat(event)">
                 <input type="password" id="pin-input" class="form-control form-control-lg text-center mb-3 rounded-3 fw-bold custom-input" placeholder="0 0 0 0" required autocomplete="off">
                 <button type="submit" class="btn btn-dark btn-lg w-100 rounded-3 fs-6 py-2">Decrypt & Connect</button>
@@ -131,39 +159,49 @@
     </div>
 </div>
 
-<!-- 2. MAIN MODERN LIGHT INTERFACE -->
+<!-- 2. MAIN RESPONSIVE CHAT INTERFACE (Clean Header: Identity / Room IDs Hidden) -->
 <div id="chat-container">
-    <!-- Clean Minimal Header -->
-    <div class="app-header d-flex justify-content-between align-items-center">
-        <div>
-            <h6 class="mb-0 fw-bold text-dark" id="room-display">Establishing Workspace...</h6>
-            <span class="badge bg-light text-muted fw-normal border" style="font-size: 0.72rem;" id="user-display">Connecting...</span>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-light border text-secondary rounded-3 px-3 py-2 d-flex align-items-center gap-1" onclick="copyShareUrl()">
+    <div class="app-header d-flex justify-content-end align-items-center">
+        <div class="d-flex gap-1 gap-sm-2">
+            <button class="btn btn-sm btn-light border text-secondary rounded-3 px-2 px-sm-3 py-2 d-flex align-items-center gap-1 btn-responsive" onclick="copyShareUrl()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.586-.586a1.003 1.003 0 0 0 .154-.199 2 2 0 0 1-.861-3.337L8.88 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/></svg>
-                Copy URL
+                <span>Copy URL</span>
             </button>
-            <button class="btn btn-sm btn-outline-danger border-0 rounded-3 px-3 py-2 d-flex align-items-center gap-1" onclick="triggerDeleteAll()">
+            <button class="btn btn-sm btn-outline-danger border-0 rounded-3 px-2 px-sm-3 py-2 d-flex align-items-center gap-1 btn-responsive" onclick="triggerDeleteAll()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
-                Wipe Screen
+                <span>Wipe Chat</span>
+            </button>
+            <button class="btn btn-sm btn-dark rounded-3 px-2 px-sm-3 py-2 d-flex align-items-center gap-1 btn-responsive" onclick="triggerLogout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/><path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/></svg>
+                <span>Logout</span>
             </button>
         </div>
     </div>
 
-    <!-- Active Stream Viewframe -->
+    <!-- Active Message Window -->
     <div id="messages">
-        <div class="text-center text-muted small my-auto opacity-50" id="welcome-note">End-to-end cloud bridge connected.</div>
+        <div class="text-center text-muted small my-auto opacity-50" id="welcome-note">Secure cloud network bridged. Say hello!</div>
     </div>
 
-    <!-- Bottom Action Console Bar -->
+    <!-- Bottom Input Bar -->
     <div class="action-bar">
         <form id="chat-form" onsubmit="sendMessage(event)" class="d-flex gap-2">
             <input type="text" id="msg-input" class="form-control rounded-3 custom-input" placeholder="Type a secure message..." autocomplete="off" required>
-            <button type="submit" class="btn btn-dark rounded-3 px-4 d-flex align-items-center">
+            <button type="submit" class="btn btn-dark rounded-3 px-3 px-sm-4 d-flex align-items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/></svg>
             </button>
         </form>
+    </div>
+</div>
+
+<!-- 3. CUSTOMIZED MODAL POPUP DIALOG MODULE -->
+<div id="custom-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-box">
+        <h5 id="modal-title" class="fw-bold mb-2">Notice</h5>
+        <p id="modal-message" class="small text-muted mb-4"></p>
+        <div id="modal-actions" class="d-flex justify-content-end gap-2">
+            <!-- Programmatically built action buttons inject here -->
+        </div>
     </div>
 </div>
 
@@ -177,7 +215,7 @@
 
     let pubnub, finalSecretChannel, myId;
 
-    // Automatic Routing Initialization
+    // Initialize Routing & URL state
     const urlParams = new URLSearchParams(window.location.search);
     let roomId = urlParams.get('room');
     if (!roomId) {
@@ -186,18 +224,65 @@
         window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
     }
 
+    // Set stable device unique pseudonym
     myId = localStorage.getItem('chat_api_user_id');
     if (!myId) {
         myId = 'ID_' + Math.floor(1000 + Math.random() * 9000);
         localStorage.setItem('chat_api_user_id', myId);
     }
 
+    // UI Custom Dialog Popups Orchestrator
+    function openPopup({ title, message, type = "alert", confirmText = "Confirm", onConfirm = null }) {
+        const modal = document.getElementById('custom-modal');
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-message').innerText = message;
+        
+        const actionArea = document.getElementById('modal-actions');
+        actionArea.innerHTML = ''; // Reset actions area
+
+        if (type === "confirm") {
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = "btn btn-light btn-sm rounded-3 px-3 border";
+            cancelBtn.innerText = "Cancel";
+            cancelBtn.onclick = closePopup;
+            actionArea.appendChild(cancelBtn);
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = "btn btn-dark btn-sm rounded-3 px-3";
+            confirmBtn.innerText = confirmText;
+            confirmBtn.onclick = () => {
+                if (onConfirm) onConfirm();
+                closePopup();
+            };
+            actionArea.appendChild(confirmBtn);
+        } else {
+            const okBtn = document.createElement('button');
+            okBtn.className = "btn btn-dark btn-sm rounded-3 px-4";
+            okBtn.innerText = "OK";
+            okBtn.onclick = closePopup;
+            actionArea.appendChild(okBtn);
+        }
+
+        modal.classList.add('show');
+    }
+
+    function closePopup() {
+        document.getElementById('custom-modal').classList.remove('show');
+    }
+
+    // Unlocks UI screen and maps subscription channel loops
     function unlockChat(e) {
-        e.preventDefault();
-        const pinValue = document.getElementById('pin-input').value.trim();
+        if(e) e.preventDefault();
+        
+        const pinInput = document.getElementById('pin-input');
+        const pinValue = pinInput.value.trim();
         if(!pinValue) return;
 
         finalSecretChannel = `chan_${roomId}_${pinValue}`;
+
+        // Save session state to localStorage to prevent logout on page reloads
+        localStorage.setItem('chat_session_room', roomId);
+        localStorage.setItem('chat_session_pin', pinValue);
 
         pubnub = new PubNub({
             publishKey: MY_PUBLISH_KEY,
@@ -217,10 +302,9 @@
 
         document.getElementById('pin-screen').style.display = 'none';
         document.getElementById('chat-container').style.display = 'flex';
-        document.getElementById('room-display').innerText = `Room: ${roomId}`;
-        document.getElementById('user-display').innerText = `Peer Identity: ${myId}`;
     }
 
+    // Handles inbound message streams 
     function handleIncomingStream(payload) {
         const welcomeNote = document.getElementById('welcome-note');
         if (welcomeNote) welcomeNote.remove();
@@ -261,17 +345,49 @@
     }
 
     function triggerDeleteAll() {
-        if (confirm("Permanently wipe chat history from both screens?")) {
-            pubnub.publish({
-                channel: finalSecretChannel,
-                message: { isControlMessage: true, action: "clear_all_screens" }
-            });
-        }
+        openPopup({
+            title: "Wipe Chat Room History?",
+            message: "This action will permanently delete all conversation streams across both active screen connections immediately.",
+            type: "confirm",
+            confirmText: "Wipe History",
+            onConfirm: () => {
+                pubnub.publish({
+                    channel: finalSecretChannel,
+                    message: { isControlMessage: true, action: "clear_all_screens" }
+                });
+            }
+        });
+    }
+
+    function triggerLogout() {
+        openPopup({
+            title: "End Session?",
+            message: "Are you sure you want to log out? You will need to enter your secure access key PIN code again to rejoin the room stream.",
+            type: "confirm",
+            confirmText: "Logout",
+            onConfirm: () => {
+                localStorage.removeItem('chat_session_room');
+                localStorage.removeItem('chat_session_pin');
+                
+                if (pubnub) {
+                    pubnub.unsubscribeAll();
+                }
+                
+                document.getElementById('pin-input').value = '';
+                document.getElementById('chat-container').style.display = 'none';
+                document.getElementById('pin-screen').style.display = 'flex';
+                document.getElementById('messages').innerHTML = '<div class="text-center text-muted small my-auto opacity-50" id="welcome-note">Secure cloud network bridged. Say hello!</div>';
+            }
+        });
     }
 
     function copyShareUrl() {
         navigator.clipboard.writeText(window.location.href);
-        alert("Encrypted room reference copied! Send this browser URL to your companion.");
+        openPopup({
+            title: "Link Copied!",
+            message: "The encrypted workspace chat URL is safely saved to your clipboard. Forward it directly to your recipient.",
+            type: "alert"
+        });
     }
 
     function escapeHTML(str) {
@@ -279,6 +395,17 @@
             tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
         );
     }
+
+    // Session Persistence Engine verification run on initial page load
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedRoom = localStorage.getItem('chat_session_room');
+        const savedPin = localStorage.getItem('chat_session_pin');
+        
+        if (savedRoom === roomId && savedPin) {
+            document.getElementById('pin-input').value = savedPin;
+            unlockChat(null);
+        }
+    });
 </script>
 </body>
 </html>
