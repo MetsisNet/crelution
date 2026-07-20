@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Modern Secure Portal</title>
+    <title>SMS</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -15,8 +15,6 @@
             --modern-text: #0f172a;
             --modern-text-muted: #64748b;
             --modern-border: #e2e8f0;
-            
-            /* Message Stream Color Configurations */
             --bubble-me: #6366f1;
             --bubble-them: #f1f5f9;
         }
@@ -27,19 +25,19 @@
             height: 100dvh;
             display: flex; 
             flex-direction: column; 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--modern-text);
             margin: 0;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
         
-        /* Accelerated Micro-Transitions */
         .fade-layer {
             transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
             opacity: 1;
             transform: scale(1);
             visibility: visible;
+            will-change: transform, opacity;
         }
         .fade-layer.hidden {
             opacity: 0;
@@ -48,7 +46,6 @@
             pointer-events: none;
         }
 
-        /* Modern Minimalist Login Gate */
         #pin-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--modern-bg); z-index: 2000; 
@@ -58,10 +55,9 @@
         .modern-auth-card { 
             max-width: 400px; width: 100%; background: var(--modern-surface); 
             border: 1px solid var(--modern-border); border-radius: 16px; padding: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        /* Central Responsive Application Workspace Shell */
         #chat-container { 
             flex: 1; 
             display: flex;
@@ -74,27 +70,25 @@
             border-right: 1px solid var(--modern-border);
         }
 
-        /* Textless Clean Action Header */
         .app-header {
             background: var(--modern-surface);
             border-bottom: 1px solid var(--modern-border);
             padding: 12px 20px;
             display: flex;
-            justify-content: flex-end; /* Stripped of text, aligned control items right */
+            justify-content: flex-end;
             align-items: center;
         }
 
-        /* Flowing Message Stream Wrapper */
         #messages { 
             flex: 1; overflow-y: auto; padding: 24px; 
             display: flex; flex-direction: column; gap: 12px; 
             background-color: var(--modern-surface);
+            scroll-behavior: auto; /* Fast scrolling snap for heavy rendering feeds */
         }
 
         #messages::-webkit-scrollbar { width: 5px; }
         #messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* Modern Structural Dialog Blocks */
         .msg-wrapper {
             display: flex;
             width: 100%;
@@ -106,88 +100,62 @@
             max-width: 70%; padding: 12px 18px; 
             font-size: 0.93rem; line-height: 1.5; 
             word-wrap: break-word; position: relative;
-            transition: transform 0.1s ease;
         }
 
-        /* Sent Messages Style: Bottom Right Positioning Rules */
         .wrapper-me { justify-content: flex-end; }
         .wrapper-me .msg {
-            background-color: var(--bubble-me); 
-            color: #ffffff; 
+            background-color: var(--bubble-me); color: #ffffff; 
             border-radius: 16px 16px 4px 16px;
         }
 
-        /* Received Messages Style: Bottom Left Positioning Rules */
         .wrapper-them { justify-content: flex-start; }
         .wrapper-them .msg {
-            background-color: var(--bubble-them); 
-            color: var(--modern-text); 
+            background-color: var(--bubble-them); color: var(--modern-text); 
             border-radius: 16px 16px 16px 4px;
         }
 
-        /* Micro Inline Trash Controls */
         .inline-del-btn {
             background: transparent; border: none; color: #ef4444; padding: 0 8px;
-            display: none; align-items: center; cursor: pointer; opacity: 0.7; transition: opacity 0.1s;
+            display: none; align-items: center; cursor: pointer; opacity: 0.7;
         }
         .inline-del-btn:hover { opacity: 1; }
         .msg-wrapper:hover .inline-del-btn { display: flex; }
-        .wrapper-me .inline-del-btn { order: -1; } /* Place trash before message on right alignment */
+        .wrapper-me .inline-del-btn { order: -1; }
 
-        /* Input Controls Drawer */
         .action-bar {
             background: var(--modern-surface);
             border-top: 1px solid var(--modern-border);
             padding: 16px 20px;
         }
         .modern-pill-input {
-            border: 1px solid var(--modern-border);
-            background-color: #f8fafc;
-            color: var(--modern-text);
-            border-radius: 12px;
-            padding: 12px 18px;
-            font-size: 0.95rem;
+            border: 1px solid var(--modern-border); background-color: #f8fafc; color: var(--modern-text);
+            border-radius: 12px; padding: 12px 18px; font-size: 0.95rem;
             transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
         }
         .modern-pill-input:focus {
-            background-color: #ffffff;
-            border-color: var(--modern-primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
-            outline: 0;
+            background-color: #ffffff; border-color: var(--modern-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12); outline: 0;
         }
 
-        /* Button Framework Elements */
         .btn-modern {
             font-size: 0.85rem; font-weight: 600; padding: 8px 14px;
             border-radius: 10px; transition: all 0.15s ease;
             display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent;
         }
-        .btn-modern-primary {
-            background-color: var(--modern-primary); color: #ffffff;
-        }
-        .btn-modern-primary:hover {
-            background-color: var(--modern-primary-hover); color: #ffffff;
-        }
-        .btn-modern-secondary {
-            background-color: #ffffff; border-color: var(--modern-border); color: var(--modern-text-muted);
-        }
-        .btn-modern-secondary:hover {
-            background-color: #f1f5f9; color: var(--modern-text); border-color: #cbd5e1;
-        }
-        .btn-modern-danger {
-            background-color: #fff1f2; color: #e11d48;
-        }
-        .btn-modern-danger:hover {
-            background-color: #ffe4e6; color: #be123c;
-        }
+        .btn-modern-primary { background-color: var(--modern-primary); color: #ffffff; }
+        .btn-modern-primary:hover { background-color: var(--modern-primary-hover); color: #ffffff; }
+        .btn-modern-secondary { background-color: #ffffff; border-color: var(--modern-border); color: var(--modern-text-muted); }
+        .btn-modern-secondary:hover { background-color: #f1f5f9; color: var(--modern-text); border-color: #cbd5e1; }
+        .btn-modern-danger { background-color: #fff1f2; color: #e11d48; }
+        .btn-modern-danger:hover { background-color: #ffe4e6; color: #be123c; }
 
-        /* Context Notification Pop-Up Interventions */
         .custom-modal-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(4px);
             z-index: 3000; display: flex; align-items: center; justify-content: center;
             padding: 24px; opacity: 0; pointer-events: none; 
             transition: opacity 0.15s ease-out;
+            will-change: opacity;
         }
         .custom-modal-backdrop.show { opacity: 1; pointer-events: auto; }
         .custom-modal-box {
@@ -195,6 +163,7 @@
             padding: 24px; border: 1px solid var(--modern-border);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             transform: scale(0.96); transition: transform 0.15s ease-out;
+            will-change: transform;
         }
         .custom-modal-backdrop.show .custom-modal-box { transform: scale(1); }
 
@@ -213,9 +182,8 @@
 <!-- 1. MODERN MINIMALIST AUTH GATEWAY -->
 <div id="pin-screen" class="fade-layer">
     <div class="modern-auth-card">
-        <h4 class="fw-bold mb-2" style="letter-spacing: -0.5px;">Security Access Handshake</h4>
-        <p class="small mb-4" style="color: var(--modern-text-muted);">Enter the target configuration routing key down below to bind database logs to your workstation runtime loop.</p>
-        <form onsubmit="unlockChat(event)">
+        <h4 class="fw-bold mb-2" style="letter-spacing: -0.5px;">Login</h4>
+        <form id="auth-form">
             <input type="password" id="pin-input" class="form-control text-center mb-3 modern-pill-input fw-bold" placeholder="••••" required autocomplete="off">
             <button type="submit" class="btn btn-modern btn-modern-primary w-100 py-2.5 justify-content-center">Verify Access</button>
         </form>
@@ -224,18 +192,17 @@
 
 <!-- 2. MAIN APPLICATION INTERACTION CONTAINER -->
 <div id="chat-container" class="fade-layer hidden">
-    <!-- Action Menu Header Area (No Text Titles) -->
     <div class="app-header">
         <div class="d-flex gap-2">
-            <button class="btn-modern btn-modern-secondary" onclick="copyShareUrl()" title="Copy Link Token">
+            <button class="btn-modern btn-modern-secondary" id="btn-share" title="Copy Link Token">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.586-.586a1.003 1.003 0 0 0 .154-.199 2 2 0 0 1-.861-3.337L8.88 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/></svg>
                 <span>Share Room</span>
             </button>
-            <button class="btn-modern btn-modern-danger" onclick="triggerDeleteAll()" title="Wipe History Database">
+            <button class="btn-modern btn-modern-danger" id="btn-delete-all" title="Wipe History Database">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
                 <span>Delete History</span>
             </button>
-            <button class="btn-modern btn-modern-secondary text-dark" onclick="triggerLogout()" title="Disconnect Pipeline">
+            <button class="btn-modern btn-modern-secondary text-dark" id="btn-logout" title="Disconnect Pipeline">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/><path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/></svg>
                 <span>Logout</span>
             </button>
@@ -251,7 +218,7 @@
 
     <!-- Messaging Drawer Input Node -->
     <div class="action-bar">
-        <form id="chat-form" onsubmit="sendMessage(event)" class="d-flex gap-2">
+        <form id="chat-form" class="d-flex gap-2">
             <input type="text" id="msg-input" class="form-control modern-pill-input" placeholder="Write a secure message..." autocomplete="off" required>
             <button type="submit" class="btn btn-modern btn-modern-primary px-4 shadow-sm">Send</button>
         </form>
@@ -263,13 +230,10 @@
     <div class="custom-modal-box">
         <h5 id="modal-title" class="fw-bold mb-2">System Notice</h5>
         <p id="modal-message" class="small mb-4 text-secondary" style="line-height: 1.5;"></p>
-        <div id="modal-actions" class="d-flex justify-content-end gap-2">
-            <!-- Programmatic components injected here -->
-        </div>
+        <div id="modal-actions" class="d-flex justify-content-end gap-2"></div>
     </div>
 </div>
 
-<!-- Official Production PubNub Component Core Engine -->
 <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
 
 <script>
@@ -277,7 +241,28 @@
     const MY_SUBSCRIBE_KEY = "demo";
 
     let pubnub, finalSecretChannel, myId, dbKey;
+    let messagesCache = []; // Highly optimized internal state tracker to completely replace read calls
 
+    // Centralized Cached DOM Elements Map
+    const DOM = {
+        pinScreen: document.getElementById('pin-screen'),
+        pinInput: document.getElementById('pin-input'),
+        authForm: document.getElementById('auth-form'),
+        chatContainer: document.getElementById('chat-container'),
+        messages: document.getElementById('messages'),
+        chatForm: document.getElementById('chat-form'),
+        msgInput: document.getElementById('msg-input'),
+        welcomeNote: document.getElementById('welcome-note'),
+        modal: document.getElementById('custom-modal'),
+        modalTitle: document.getElementById('modal-title'),
+        modalMessage: document.getElementById('modal-message'),
+        modalActions: document.getElementById('modal-actions'),
+        btnShare: document.getElementById('btn-share'),
+        btnDeleteAll: document.getElementById('btn-delete-all'),
+        btnLogout: document.getElementById('btn-logout')
+    };
+
+    // Parse URL room configs instantly
     const urlParams = new URLSearchParams(window.location.search);
     let roomId = urlParams.get('room');
     if (!roomId) {
@@ -292,21 +277,18 @@
         localStorage.setItem('modern_chat_user_id', myId);
     }
 
-    // Modal Control Handler
+    // Modal Control System
     function openPopup({ title, message, type = "alert", confirmText = "Confirm", onConfirm = null }) {
-        const modal = document.getElementById('custom-modal');
-        document.getElementById('modal-title').innerText = title;
-        document.getElementById('modal-message').innerText = message;
-        
-        const actionArea = document.getElementById('modal-actions');
-        actionArea.innerHTML = ''; 
+        DOM.modalTitle.innerText = title;
+        DOM.modalMessage.innerText = message;
+        DOM.modalActions.innerHTML = ''; 
 
         if (type === "confirm") {
             const cancelBtn = document.createElement('button');
             cancelBtn.className = "btn btn-modern btn-modern-secondary py-1.5";
             cancelBtn.innerText = "Cancel";
             cancelBtn.onclick = closePopup;
-            actionArea.appendChild(cancelBtn);
+            DOM.modalActions.appendChild(cancelBtn);
 
             const confirmBtn = document.createElement('button');
             confirmBtn.className = "btn btn-modern btn-modern-primary py-1.5";
@@ -315,27 +297,26 @@
                 if (onConfirm) onConfirm();
                 closePopup();
             };
-            actionArea.appendChild(confirmBtn);
+            DOM.modalActions.appendChild(confirmBtn);
         } else {
             const okBtn = document.createElement('button');
             okBtn.className = "btn btn-modern btn-modern-primary px-4 py-1.5";
             okBtn.innerText = "OK";
             okBtn.onclick = closePopup;
-            actionArea.appendChild(okBtn);
+            DOM.modalActions.appendChild(okBtn);
         }
-        modal.classList.add('show');
+        DOM.modal.classList.add('show');
     }
 
     function closePopup() {
-        document.getElementById('custom-modal').classList.remove('show');
+        DOM.modal.classList.remove('show');
     }
 
-    // Unlocks container interface and loads secure LocalDB caches
+    // Initialization routine
     function unlockChat(e) {
         if(e) e.preventDefault();
         
-        const pinInput = document.getElementById('pin-input');
-        const pinValue = pinInput.value.trim();
+        const pinValue = DOM.pinInput.value.trim();
         if(!pinValue) return;
 
         finalSecretChannel = `chan_mod_${roomId}_${pinValue}`;
@@ -352,37 +333,36 @@
             userId: myId
         });
 
-        pubnub.addListener({
-            message: function(event) {
-                processIncomingPayload(event.message);
-            }
-        });
+        pubnub.addListener({ message: (event) => processIncomingPayload(event.message) });
+        pubnub.subscribe({ channels: [finalSecretChannel] });
 
-        pubnub.subscribe({
-            channels: [finalSecretChannel]
-        });
-
-        document.getElementById('pin-screen').classList.add('hidden');
-        document.getElementById('chat-container').classList.remove('hidden');
+        DOM.pinScreen.classList.add('hidden');
+        DOM.chatContainer.classList.remove('hidden');
     }
 
-    // Reads array structures out of local storage DB cleanly across reloads
+    // High performance History batch-processor utilizing single reflow DocumentFragments
     function loadLocalHistory() {
         const cache = localStorage.getItem(dbKey);
-        if (cache) {
-            const messagesArray = JSON.parse(cache);
-            const welcomeNote = document.getElementById('welcome-note');
-            if (welcomeNote && messagesArray.length > 0) welcomeNote.remove();
+        messagesCache = cache ? JSON.parse(cache) : [];
+        
+        if (messagesCache.length > 0) {
+            if (DOM.welcomeNote) DOM.welcomeNote.remove();
             
-            messagesArray.forEach(msg => appendMessageUI(msg.id, msg.sender, msg.text));
+            const fragment = document.createDocumentFragment();
+            messagesCache.forEach(msg => {
+                fragment.appendChild(createMessageElement(msg.id, msg.sender, msg.text));
+            });
+            DOM.messages.appendChild(fragment);
+            DOM.messages.scrollTop = DOM.messages.scrollHeight;
         }
     }
 
     function processIncomingPayload(payload) {
         if (payload.isControlMessage) {
             if (payload.action === "clear_all_screens") {
+                messagesCache = [];
                 localStorage.removeItem(dbKey);
-                document.getElementById('messages').innerHTML = '<div class="text-center text-muted small my-auto opacity-40">Conversation history deleted.</div>';
+                DOM.messages.innerHTML = '<div class="text-center text-muted small my-auto opacity-40">Conversation history deleted.</div>';
             } else if (payload.action === "delete_single_msg") {
                 removeMessageFromUIAndStorage(payload.targetId, false);
             }
@@ -390,48 +370,50 @@
         }
 
         if (payload.text) {
-            const cache = localStorage.getItem(dbKey);
-            const messagesArray = cache ? JSON.parse(cache) : [];
-            
-            // Protect against duplicate injection on publisher mirror reflection echo loops
-            if (!messagesArray.some(m => m.id === payload.id)) {
-                messagesArray.push({ id: payload.id, sender: payload.sender, text: payload.text });
-                localStorage.setItem(dbKey, JSON.stringify(messagesArray));
+            // Rapid state duplicate checks utilizing local cache array values directly
+            if (!messagesCache.some(m => m.id === payload.id)) {
+                messagesCache.push({ id: payload.id, sender: payload.sender, text: payload.text });
+                localStorage.setItem(dbKey, JSON.stringify(messagesCache));
                 
-                const welcomeNote = document.getElementById('welcome-note');
-                if (welcomeNote) welcomeNote.remove();
+                if (DOM.welcomeNote) DOM.welcomeNote.remove();
 
-                appendMessageUI(payload.id, payload.sender, payload.text);
+                DOM.messages.appendChild(createMessageElement(payload.id, payload.sender, payload.text));
+                DOM.messages.scrollTop = DOM.messages.scrollHeight;
             }
         }
     }
 
-    // Appends UI packet grids with precise left/right alignment models
-    function appendMessageUI(id, sender, text) {
-        const container = document.getElementById('messages');
+    // Safe Node Builder avoiding execution overhead inside innerHTML strings
+    function createMessageElement(id, sender, text) {
         const isMe = sender === myId;
         
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${isMe ? 'wrapper-me' : 'wrapper-them'}`;
         wrapper.id = `msg-wrap-${id}`;
         
-        wrapper.innerHTML = `
-            <div class="msg shadow-sm">
-                <div style="word-break: break-word;">${escapeHTML(text)}</div>
-            </div>
-            <button class="inline-del-btn" onclick="triggerDeleteSingle('${id}')" title="Delete message">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>
-            </button>
-        `;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'msg shadow-sm';
         
-        container.appendChild(wrapper);
-        container.scrollTop = container.scrollHeight;
+        const textContainer = document.createElement('div');
+        textContainer.style.wordBreak = 'break-word';
+        textContainer.textContent = text; // Native textContent completely bypasses programmatic regex safety overhead
+        
+        msgDiv.appendChild(textContainer);
+        wrapper.appendChild(msgDiv);
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = 'inline-del-btn';
+        delBtn.setAttribute('data-id', id); // Binding identifier directly to data properties
+        delBtn.title = 'Delete message';
+        delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>`;
+        
+        wrapper.appendChild(delBtn);
+        return wrapper;
     }
 
     function sendMessage(e) {
         e.preventDefault();
-        const input = document.getElementById('msg-input');
-        const text = input.value.trim();
+        const text = DOM.msgInput.value.trim();
         if (!text) return;
 
         const messageId = 'MSG_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
@@ -440,29 +422,17 @@
             channel: finalSecretChannel,
             message: { id: messageId, sender: myId, text: text }
         }, function(status) {
-            if (!status.error) input.value = '';
+            if (!status.error) DOM.msgInput.value = '';
         });
     }
 
-    // Individual LocalDB and network removal sequence 
-    function triggerDeleteSingle(id) {
-        removeMessageFromUIAndStorage(id, true);
-    }
-
     function removeMessageFromUIAndStorage(id, broadcast = false) {
-        // Strip data from local array storage context
-        const cache = localStorage.getItem(dbKey);
-        if (cache) {
-            let messagesArray = JSON.parse(cache);
-            messagesArray = messagesArray.filter(m => m.id !== id);
-            localStorage.setItem(dbKey, JSON.stringify(messagesArray));
-        }
+        messagesCache = messagesCache.filter(m => m.id !== id);
+        localStorage.setItem(dbKey, JSON.stringify(messagesCache));
 
-        // Clean element node safely from UI views
         const element = document.getElementById(`msg-wrap-${id}`);
         if (element) element.remove();
 
-        // Broadcast structural update packet to remote client
         if (broadcast && pubnub) {
             pubnub.publish({
                 channel: finalSecretChannel,
@@ -471,7 +441,25 @@
         }
     }
 
-    function triggerDeleteAll() {
+    // Highly optimized event delegation engine attaching single event handler onto parent layout
+    DOM.messages.addEventListener('click', (e) => {
+        const button = e.target.closest('.inline-del-btn');
+        if (button) {
+            const messageId = button.getAttribute('data-id');
+            removeMessageFromUIAndStorage(messageId, true);
+        }
+    });
+
+    // Event Bindings
+    DOM.authForm.addEventListener('submit', unlockChat);
+    DOM.chatForm.addEventListener('submit', sendMessage);
+    
+    DOM.btnShare.addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        openPopup({ title: "Clipboard Synced", message: "The clean layout token parameter has been captured successfully.", type: "alert" });
+    });
+
+    DOM.btnDeleteAll.addEventListener('click', () => {
         openPopup({
             title: "Clear All History Logs?",
             message: "This will clean your local device data indexes completely and wipe screens globally across connected terminal participants.",
@@ -484,9 +472,9 @@
                 });
             }
         });
-    }
+    });
 
-    function triggerLogout() {
+    DOM.btnLogout.addEventListener('click', () => {
         openPopup({
             title: "Exit Chat Session?",
             message: "Active updates stand down. History nodes stay locked inside your offline local database blocks securely until you re-authenticate.",
@@ -498,36 +486,22 @@
                 
                 if (pubnub) pubnub.unsubscribeAll();
                 
-                document.getElementById('pin-input').value = '';
-                document.getElementById('chat-container').classList.add('hidden');
-                document.getElementById('pin-screen').classList.remove('hidden');
-                document.getElementById('messages').innerHTML = '<div class="text-center text-muted small my-auto py-5 opacity-50" id="welcome-note">Secure offline-first tracking configuration connected.</div>';
+                DOM.pinInput.value = '';
+                DOM.chatContainer.classList.add('hidden');
+                DOM.pinScreen.classList.remove('hidden');
+                DOM.messages.innerHTML = '<div class="text-center text-muted small my-auto py-5 opacity-50" id="welcome-note">Secure offline-first tracking configuration connected.</div>';
+                messagesCache = [];
             }
         });
-    }
+    });
 
-    function copyShareUrl() {
-        navigator.clipboard.writeText(window.location.href);
-        openPopup({
-            title: "Clipboard Synced",
-            message: "The absolute clean interface path was captured and parsed smoothly to clipboard memory blocks.",
-            type: "alert"
-        });
-    }
-
-    function escapeHTML(str) {
-        return str.replace(/[&<>'"]/g, 
-            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-        );
-    }
-
-    // Lifecycle monitoring hooks capturing cached routing indicators on boot
+    // Page Load Validation checks
     window.addEventListener('DOMContentLoaded', () => {
         const savedRoom = localStorage.getItem('modern_session_room');
         const savedPin = localStorage.getItem('modern_session_pin');
         
         if (savedRoom === roomId && savedPin) {
-            document.getElementById('pin-input').value = savedPin;
+            DOM.pinInput.value = savedPin;
             unlockChat(null);
         }
     });
