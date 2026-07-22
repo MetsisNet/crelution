@@ -5,136 +5,311 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MetsisPad</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Resource Hints for Speed -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
     <style>
-        body, html { height: 100%; margin: 0; display: flex; flex-direction: column; overflow: hidden; background-color: #282a36; }
+        :root {
+            --bg-main: #f8f9fa;
+            --header-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-color: #1f2937;
+            --brand-color: #4f46e5;
+            --btn-bg: #ffffff;
+            --btn-border: #d1d5db;
+            --btn-hover: #f3f4f6;
+            --btn-run-bg: #10b981;
+            --btn-run-hover: #059669;
+        }
 
-        .editor-menubar { background-color: #1e1f29; border-bottom: 1px solid #44475a; padding: 0.2rem 0.5rem; }
-        .navbar-brand { font-weight: 800; color: #bd93f9 !important; font-size: 1.1rem; margin-left: 0.5rem; }
-        .nav-link { font-size: 0.85rem; color: #f8f8f2 !important; padding: 0.4rem 0.8rem !important; }
-        .nav-link:hover { background-color: #44475a; border-radius: 4px; }
-        .dropdown-menu { background-color: #282a36; border: 1px solid #44475a; }
-        .dropdown-item { color: #f8f8f2; }
-        .dropdown-item:hover { background-color: #44475a; color: #fff; }
-        
-        #editor-container { flex-grow: 1; position: relative; }
-        #editor { position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: 15px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        #toast { position: fixed; bottom: 20px; right: 20px; background: #44475a; color: #f8f8f2; padding: 10px 20px; border-radius: 6px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; }
-        #toast.show { opacity: 1; }
+        body, html { 
+            height: 100%; 
+            width: 100%;
+            overflow: hidden; 
+            background-color: var(--bg-main); 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-color);
+        }
+
+        /* Responsive Header Navigation */
+        .editor-header { 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--header-bg); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 0.5rem 1rem;
+            min-height: 52px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            z-index: 10;
+        }
+
+        .brand-logo { 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700; 
+            color: var(--brand-color); 
+            font-size: 1.1rem; 
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        /* Action Buttons Toolbar */
+        .action-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+            min-height: 36px;
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .btn-run {
+            background-color: var(--btn-run-bg);
+            border-color: var(--btn-run-bg);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-run:hover {
+            background-color: var(--btn-run-hover);
+            border-color: var(--btn-run-hover);
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* Editor Area */
+        #editor-container { 
+            flex: 1 1 auto;
+            position: relative; 
+            width: 100%;
+            height: calc(100vh - 52px);
+        }
+
+        #editor { 
+            position: absolute; 
+            top: 0; 
+            right: 0; 
+            bottom: 0; 
+            left: 0; 
+            font-size: 15px; 
+        }
+
+        /* Notification Toast */
+        #toast { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            background: #1f2937; 
+            color: #ffffff; 
+            padding: 10px 16px; 
+            border-radius: 8px; 
+            font-size: 0.85rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0; 
+            transform: translateY(8px);
+            transition: opacity 0.2s ease, transform 0.2s ease; 
+            pointer-events: none; 
+            z-index: 1050; 
+        }
+
+        #toast.show { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+
+        /* Mobile Optimization Breakpoint */
+        @media (max-width: 576px) {
+            .btn span {
+                display: none; /* Hide button text labels on small mobile screens */
+            }
+            .btn {
+                padding: 0.4rem 0.6rem;
+            }
+            .brand-logo {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand editor-menubar">
-        <a class="navbar-brand" href="#"><i class="bi bi-code-square"></i> MetsisPad</a>
-        
-        <ul class="navbar-nav me-auto">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">File</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="document.getElementById('fileInput').click()">Open</a></li>
-                    <li><a class="dropdown-item" onclick="saveFile()">Save As</a></li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Edit</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="editor.selectAll()">Select All</a></li>
-                    <li><a class="dropdown-item" onclick="copyText()">Copy</a></li>
-                    <li><a class="dropdown-item" onclick="pasteText()">Paste</a></li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="languageLabel">Lang: JavaScript</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="setLanguage('javascript')">JavaScript</a></li>
-                    <li><a class="dropdown-item" onclick="setLanguage('html')">HTML</a></li>
-                    <li><a class="dropdown-item" onclick="setLanguage('css')">CSS</a></li>
-                    <li><a class="dropdown-item" onclick="setLanguage('python')">Python</a></li>
-                    <li><a class="dropdown-item" onclick="setLanguage('java')">Java</a></li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-success" href="#" data-bs-toggle="dropdown">Run</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item text-success" onclick="runCode()">Execute in Browser</a></li>
-                </ul>
-            </li>
-        </ul>
-        <input type="file" id="fileInput" class="d-none" onchange="openFile(event)">
-    </nav>
+    <!-- Lightweight Header -->
+    <header class="editor-header">
+        <a class="brand-logo" href="#" aria-label="MetsisPad Home">
+            <!-- Code Square Icon -->
+            <svg viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/></svg>
+            MetsisPad
+        </a>
 
-    <div id="editor-container"><div id="editor">console.log("Welcome to MetsisPad");</div></div>
+        <!-- 4 Responsive Action Buttons -->
+        <div class="action-toolbar">
+            <button class="btn" onclick="saveFile()" title="Save File" aria-label="Save File">
+                <svg viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                <span>Save</span>
+            </button>
+            <button class="btn" onclick="copyCode()" title="Copy Code" aria-label="Copy Code">
+                <svg viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                <span>Copy</span>
+            </button>
+            <button class="btn" onclick="pasteCode()" title="Paste Code" aria-label="Paste Code">
+                <svg viewBox="0 0 16 16"><path d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1zm1 0v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5H10z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M8.5 6.5a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V10.5a.5.5 0 0 0 1 0V9H10a.5.5 0 0 0 0-1H8.5V6.5z"/></svg>
+                <span>Paste</span>
+            </button>
+            <button class="btn btn-run" onclick="runCode()" title="Run Code" aria-label="Run Code">
+                <svg viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/></svg>
+                <span>Run</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Code Editor Container -->
+    <div id="editor-container">
+        <div id="editor">console.log("Welcome to MetsisPad");</div>
+    </div>
+
+    <!-- Notification Toast -->
     <div id="toast"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+    <!-- Ace Editor Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js" defer></script>
     
     <script>
-        const editor = ace.edit("editor");
-        let currentLang = 'javascript';
-        const langNames = { 'javascript': 'JavaScript', 'html': 'HTML', 'css': 'CSS', 'python': 'Python', 'java': 'Java' };
+        let editor, currentLang = 'javascript';
 
-        editor.setOptions({ theme: "ace/theme/dracula", fontSize: '15px', showPrintMargin: false });
+        // Wait for Ace library to load via defer
+        window.addEventListener('DOMContentLoaded', () => {
+            editor = ace.edit("editor");
+            editor.setOptions({ 
+                theme: "ace/theme/chrome", 
+                mode: "ace/mode/javascript",
+                fontSize: '15px', 
+                showPrintMargin: false,
+                useWorker: false // Boosts reliability and load performance
+            });
 
-        // Detection Logic
+            // Auto-resize editor on window size changes or mobile orientation flips
+            const resizeObserver = new ResizeObserver(() => editor.resize());
+            resizeObserver.observe(document.getElementById('editor-container'));
+
+            // Debounced language detection listener
+            editor.on('change', () => {
+                clearTimeout(window.detTimer);
+                window.detTimer = setTimeout(() => {
+                    const detected = analyze(editor.getValue());
+                    if (detected !== currentLang) {
+                        currentLang = detected;
+                        editor.session.setMode("ace/mode/" + detected);
+                    }
+                }, 800);
+            });
+        });
+
+        // Fast code analysis helper
         function analyze(code) {
-            if (/<!DOCTYPE html>/i.test(code)) return 'html';
+            if (/<!DOCTYPE html>/i.test(code) || /<html/i.test(code)) return 'html';
             if (/\b(public|class|void|static)\b/i.test(code)) return 'java';
             if (/\b(def|elif|print|import)\b/i.test(code)) return 'python';
             if (/[a-z-]+\s*:\s*[^;{}]+;/i.test(code)) return 'css';
             return 'javascript';
         }
 
-        // Auto-detection event listener
-        editor.on('change', () => {
-            clearTimeout(window.det);
-            window.det = setTimeout(() => {
-                const detected = analyze(editor.getValue());
-                if (detected !== currentLang) setLanguage(detected);
-            }, 800);
-        });
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            editor.session.setMode("ace/mode/" + lang);
-            document.getElementById('languageLabel').innerText = "Lang: " + langNames[lang];
+        // 1. SAVE: Download current code file
+        function saveFile() {
+            if (!editor) return;
+            const extMap = { javascript: 'js', html: 'html', css: 'css', python: 'py', java: 'java' };
+            const ext = extMap[currentLang] || 'txt';
+            const blob = new Blob([editor.getValue()], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `code.${ext}`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast(`Saved as code.${ext}`);
         }
 
-        function runCode() {
-            if (currentLang === "javascript") {
-                try { eval(editor.getValue()); } catch(e) { alert("Error: " + e.message); }
-            } else if (currentLang === "html") {
-                const w = window.open(); w.document.write(editor.getValue()); w.document.close();
-            } else {
-                showToast("Run only available for JS and HTML.");
+        // 2. COPY: Copies code to clipboard
+        function copyCode() {
+            if (!editor) return;
+            navigator.clipboard.writeText(editor.getValue());
+            showToast("Copied code to clipboard!");
+        }
+
+        // 3. PASTE: Pastes & overwrites current editor content
+        async function pasteCode() {
+            if (!editor) return;
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    editor.setValue(text, -1);
+                    showToast("Code overwritten from clipboard!");
+                }
+            } catch (err) {
+                showToast("Clipboard permission denied.");
             }
         }
 
-        function showToast(msg) {
-            const t = document.getElementById("toast");
-            t.innerText = msg; t.classList.add("show");
-            setTimeout(() => t.classList.remove("show"), 2000);
+        // 4. RUN: Executes JS or opens HTML in a new tab
+        function runCode() {
+            if (!editor) return;
+            const code = editor.getValue();
+            if (currentLang === "javascript") {
+                try { 
+                    eval(code); 
+                } catch(e) { 
+                    alert("JavaScript Error: " + e.message); 
+                }
+            } else if (currentLang === "html") {
+                const w = window.open();
+                if (w) {
+                    w.document.write(code);
+                    w.document.close();
+                } else {
+                    showToast("Pop-up blocked! Allow pop-ups to run HTML.");
+                }
+            } else {
+                showToast("Direct run available for JS and HTML.");
+            }
         }
 
-        // Helpers
-        function saveFile() {
-            const blob = new Blob([editor.getValue()], {type: "text/plain"});
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = `MetsisCode.${currentLang === 'javascript' ? 'js' : currentLang}`;
-            a.click();
+        // Toast Helper
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; 
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 2200);
         }
-        function openFile(e) {
-            const r = new FileReader();
-            r.onload = (ev) => editor.setValue(ev.target.result, -1);
-            r.readAsText(e.target.files[0]);
-        }
-        function copyText() { navigator.clipboard.writeText(editor.getValue()); showToast("Copied!"); }
-        async function pasteText() { editor.insert(await navigator.clipboard.readText()); }
     </script>
 </body>
 </html>
