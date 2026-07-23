@@ -206,7 +206,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js" defer></script>
     
     <script>
-        let editor, currentLang = 'javascript', fileCounter = 1;
+        let editor, currentLang = 'javascript';
 
         // Wait for Ace library to load via defer
         window.addEventListener('DOMContentLoaded', () => {
@@ -245,12 +245,28 @@
             return 'javascript';
         }
 
-        // 1. SAVE: Download current code file with auto-incrementing name
+        // 1. SAVE: Download current code file formatted as "HTML Template dd mmm yyyy hh mm ss tt.<ext>"
         function saveFile() {
             if (!editor) return;
             const extMap = { javascript: 'js', html: 'html', css: 'css', python: 'py', java: 'java' };
             const ext = extMap[currentLang] || 'txt';
-            const fileName = `HTML Template ${String(fileCounter).padStart(4, '0')}.${ext}`;
+
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            const mmm = months[now.getMonth()];
+            const yyyy = now.getFullYear();
+
+            let hours = now.getHours();
+            const tt = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12;
+            const hh = String(hours).padStart(2, '0');
+
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+
+            const fileName = `HTML Template ${dd} ${mmm} ${yyyy} ${hh} ${mm} ${ss} ${tt}.${ext}`;
+
             const blob = new Blob([editor.getValue()], { type: "text/plain" });
             const a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
@@ -258,7 +274,6 @@
             a.click();
             URL.revokeObjectURL(a.href);
             showToast(`Saved as ${fileName}`);
-            fileCounter++;
         }
 
         // 2. COPY: Copies code to clipboard
