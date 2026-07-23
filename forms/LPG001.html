@@ -206,7 +206,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js" defer></script>
     
     <script>
-        let editor, currentLang = 'javascript';
+        let editor, currentLang = 'javascript', fileCounter = 1;
 
         // Wait for Ace library to load via defer
         window.addEventListener('DOMContentLoaded', () => {
@@ -245,18 +245,20 @@
             return 'javascript';
         }
 
-        // 1. SAVE: Download current code file
+        // 1. SAVE: Download current code file with auto-incrementing name
         function saveFile() {
             if (!editor) return;
             const extMap = { javascript: 'js', html: 'html', css: 'css', python: 'py', java: 'java' };
             const ext = extMap[currentLang] || 'txt';
+            const fileName = `HTML Template ${String(fileCounter).padStart(4, '0')}.${ext}`;
             const blob = new Blob([editor.getValue()], { type: "text/plain" });
             const a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
-            a.download = `code.${ext}`;
+            a.download = fileName;
             a.click();
             URL.revokeObjectURL(a.href);
-            showToast(`Saved as code.${ext}`);
+            showToast(`Saved as ${fileName}`);
+            fileCounter++;
         }
 
         // 2. COPY: Copies code to clipboard
