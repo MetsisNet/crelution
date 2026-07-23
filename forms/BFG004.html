@@ -3,1233 +3,1974 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METSIS FEM</title>
+    <title>FEM — macOS System</title>
+    <!-- Favicon link -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
     
-    <!-- Google Fonts & FontAwesome UI Elements -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Font Awesome 6 Icons CDN -->
+    <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
+    
     <style>
         :root {
-            --bs-body-font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --brand-primary: #4f46e5;
-            --brand-primary-light: rgba(79, 70, 229, 0.08);
-            --brand-success: #10b981;
-            --brand-danger: #ef4444;
-            --surface-card: #ffffff;
-            --surface-bg: #f8fafc;
-            --border-color: #e2e8f0;
+            --mac-bg: #f5f5f7;
+            --mac-card-bg: rgba(255, 255, 255, 0.72);
+            --mac-glass-border: rgba(255, 255, 255, 0.8);
+            --mac-border-subtle: rgba(0, 0, 0, 0.08);
+            --mac-text-primary: #1d1d1f;
+            --mac-text-secondary: #86868b;
+            
+            /* Apple System Colors */
+            --mac-blue: #007aff;
+            --mac-blue-hover: #0062cc;
+            --mac-green: #34c759;
+            --mac-green-hover: #2aa147;
+            --mac-red: #ff3b30;
+            --mac-red-hover: #d70015;
+            --mac-orange: #ff9500;
+            --mac-purple: #af52de;
+            --mac-gray: #e5e5ea;
+            --mac-gray-hover: #d1d1d6;
         }
 
         body {
-            background-color: var(--surface-bg);
-            color: #0f172a;
-            min-height: 100vh;
-            letter-spacing: -0.01em;
+            background-color: var(--mac-bg);
+            background-image: radial-gradient(at 0% 0%, rgba(200, 220, 255, 0.25) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(230, 210, 255, 0.25) 0px, transparent 50%);
+            background-attachment: fixed;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--mac-text-primary);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            letter-spacing: -0.02em;
-        }
-
-        .dashboard-header {
-            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-            border-radius: 24px;
-            padding: 2.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .premium-card {
-            background: var(--surface-card);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .analytics-card {
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            background: var(--surface-card);
-            padding: 1.5rem;
-            display: flex;
+        /* Apple Traffic Control Buttons Component */
+        .window-dots {
+            display: inline-flex;
+            gap: 6px;
             align-items: center;
-            justify-content: space-between;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .analytics-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+        .window-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
         }
+        .dot-red { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .dot-yellow { background-color: #ffbd2e; border: 1px solid #dea123; }
+        .dot-green { background-color: #27c93f; border: 1px solid #1aab29; }
 
-        .icon-shape {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* macOS Glassmorphic Sticky Navigation Header */
+        .app-header {
+            background: rgba(255, 255, 255, 0.75) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--mac-border-subtle);
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
-
-        .premium-tag-box {
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            background: #ffffff;
-            padding: 10px 14px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            min-height: 54px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .premium-tag-box:focus-within {
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
-
-        .badge-clickable-tag {
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+        .app-header .header-title {
+            font-size: 1.05rem;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            letter-spacing: -0.01em;
+            color: var(--mac-text-primary);
+            margin: 0;
         }
-
-        .badge-income {
-            background-color: #f0fdf4 !important;
-            color: #166534 !important;
-            border: 1px solid #dcfce7;
-        }
-
-        .badge-income:hover { background-color: #dcfce7 !important; }
-
-        .badge-expense {
-            background-color: #fdf2f2 !important;
-            color: #991b1b !important;
-            border: 1px solid #fee2e2;
-        }
-
-        .badge-expense:hover { background-color: #fee2e2 !important; }
-
-        .remove-tag-btn {
-            margin-left: 8px;
-            opacity: 0.5;
-            transition: opacity 0.15s;
-        }
-        .remove-tag-btn:hover { opacity: 1; }
-
-        .tag-core-input {
-            border: none;
-            outline: none;
-            flex: 1;
-            min-width: 150px;
-            font-size: 0.95rem;
-            color: #334155;
-        }
-
-        .suggestions-dropdown {
-            position: absolute;
-            top: calc(100% + 6px); left: 0; right: 0;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1050;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .suggestion-row {
-            padding: 10px 16px;
-            cursor: pointer;
+        .header-controls {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            transition: background 0.15s;
+            gap: 8px;
+            flex-wrap: wrap;
         }
-        .suggestion-row:hover { background: #f8fafc; }
 
-        .config-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.97);
-            z-index: 1060;
+        /* macOS System Style Form Controls */
+        .form-control, .form-select {
+            color: var(--mac-text-primary) !important;
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            border: 1px solid var(--mac-border-subtle) !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            padding: 6px 12px !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02) !important;
+            transition: all 0.15s ease-in-out !important;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff !important;
+            border-color: var(--mac-blue) !important;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25) !important;
+        }
+        .input-group-text {
+            background-color: rgba(240, 240, 245, 0.8) !important;
+            border: 1px solid var(--mac-border-subtle) !important;
+            border-radius: 8px 0 0 8px !important;
+            font-size: 12px !important;
+        }
+
+        /* Subtotal Highlight Row */
+        .subtotal-row {
+            background-color: rgba(255, 248, 225, 0.6) !important;
+            border-bottom: 1px solid rgba(255, 224, 130, 0.5) !important;
+        }
+
+        /* macOS Button Styles */
+        .btn-mac-primary {
+            background-color: var(--mac-blue);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 6px 14px;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-mac-primary:hover {
+            background-color: var(--mac-blue-hover);
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-mac-success {
+            background-color: var(--mac-green);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 6px 14px;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-mac-success:hover {
+            background-color: var(--mac-green-hover);
+            color: #ffffff;
+        }
+
+        .btn-mac-info {
+            background-color: var(--mac-purple);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 6px 14px;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-mac-info:hover {
+            background-color: #9832ca;
+            color: #ffffff;
+        }
+
+        .btn-mac-secondary {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--mac-border-subtle);
+            border-radius: 8px;
+            color: var(--mac-text-primary);
+            font-weight: 500;
+            font-size: 13px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-mac-secondary:hover {
+            background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-mac-danger {
+            background-color: var(--mac-red);
+            border: 1px solid rgba(0,0,0,0.08);
+            color: white;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-mac-danger:hover {
+            background-color: var(--mac-red-hover);
+        }
+
+        .grid-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--mac-border-subtle);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--mac-text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .grid-action-btn:hover {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .btn-act-delete {
+            color: var(--mac-red);
+            border-color: rgba(255, 59, 48, 0.2);
+            background: rgba(255, 59, 48, 0.05);
+        }
+        .btn-act-delete:hover {
+            background: var(--mac-red);
+            color: #ffffff;
+        }
+
+        /* macOS Window Modal System */
+        .porto-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease-in-out;
-            border-radius: 24px;
-        }
-        .config-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+            padding: 15px;
+            box-sizing: border-box;
+            z-index: 1050;
         }
 
-        .order-summary-box {
-            background-color: #f8fafc;
-            border-radius: 12px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .comma-item {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            display: inline-flex;
-            border: 1px solid #e2e8f0;
-        }
-
-        .font-mono {
-            font-family: var(--font-mono);
-        }
-
-        .table > :not(caption) > * > * {
-            padding: 1rem 1rem;
-        }
-
-        /* Custom Notification Toast Wrapper */
-        .toast-container-custom {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 2000;
+        .porto-modal {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid var(--mac-glass-border);
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-width: 380px;
-            width: 100%;
+            margin: auto;
+            position: relative;
+            animation: modalPopIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .porto-modal-lg {
+            max-width: 720px;
         }
 
-        .custom-toast {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-left: 5px solid var(--brand-primary);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+        @keyframes modalPopIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Apple System Notification Toasts */
+        #portoNotificationContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 11000;
             display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            transform: translateX(120%);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-direction: column;
+            gap: 10px;
+            max-width: 340px;
+        }
+        .porto-toast {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            color: var(--mac-text-primary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--mac-blue);
+            animation: toastSlideIn 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+        @keyframes toastSlideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .porto-toast.toast-success { border-left-color: var(--mac-green); }
+        .porto-toast.toast-danger { border-left-color: var(--mac-red); }
+        .porto-toast.toast-warning { border-left-color: var(--mac-orange); }
+        .porto-toast.toast-info { border-left-color: var(--mac-blue); }
+        .porto-toast-close {
+            cursor: pointer;
+            margin-left: 12px;
+            font-weight: normal;
+            color: var(--mac-text-secondary);
+            font-size: 16px;
+        }
+        .porto-toast-close:hover { color: var(--mac-text-primary); }
+
+        /* macOS Search Dropdown Box */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--mac-border-subtle);
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1080;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .autocomplete-suggestion {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            color: var(--mac-text-primary);
+        }
+        .autocomplete-suggestion:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-suggestion:hover, .autocomplete-active {
+            background-color: var(--mac-blue);
+            color: #ffffff !important;
+        }
+        .autocomplete-suggestion:hover .text-secondary {
+            color: rgba(255, 255, 255, 0.8) !important;
         }
 
-        .custom-toast.show {
-            transform: translateX(0);
+        /* macOS Glass Container Card */
+        .card {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--mac-glass-border) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
         }
 
-        .custom-toast.toast-danger { border-left-color: var(--brand-danger); }
-        .custom-toast.toast-success { border-left-color: var(--brand-success); }
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+        }
+        .table {
+            --bs-table-bg: transparent;
+        }
+        
+        /* macOS Calendar Selection Widgets */
+        .month-btn {
+            padding: 8px 4px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--mac-border-subtle);
+            color: var(--mac-text-primary);
+            transition: all 0.15s;
+        }
+        .month-btn:hover {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .month-btn.active {
+            background: var(--mac-blue);
+            color: #fff;
+            border-color: var(--mac-blue);
+        }
 
+        /* Dashboard Widget Metric Cards */
+        .dash-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 14px;
+            border: 1px solid var(--mac-glass-border);
+            padding: 18px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+        }
+        .dash-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Responsive Optimization Across Screen Sizes */
         @media (max-width: 768px) {
-            .dashboard-header { padding: 1.5rem; }
-            .analytics-card { padding: 1.25rem; }
-            .toast-container-custom { top: 12px; right: 12px; left: 12px; max-width: none; }
+            .app-header {
+                padding: 12px 16px;
+            }
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .header-input-group {
+                width: 100%;
+                max-width: 100%;
+            }
+            #portoNotificationContainer {
+                left: 16px;
+                right: 16px;
+                max-width: calc(100% - 32px);
+            }
+            .porto-modal {
+                padding: 18px;
+                max-height: 95vh;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- Dynamic UI Layer: Custom Floating Popups Container -->
-<div class="toast-container-custom" id="customToastContainer"></div>
-
-<!-- Hidden File Input for JSON Imports -->
-<input type="file" id="importJsonFileInput" accept=".json" style="display: none;" onchange="executeJsonDataImport(this)">
-
-<div class="container py-4 py-md-5" style="max-width: 1340px;">
-    
-    <!-- Modern Dark Header Module -->
-    <div class="dashboard-header text-white mb-4 shadow-sm d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge bg-white bg-opacity-10 text-white-50 px-2.5 py-1 rounded-pill small font-mono">v10.0 Pro Architecture</span>
-                <span class="badge bg-success bg-opacity-20 text-success px-2.5 py-1 rounded-pill small"><i class="fa-solid fa-circle-nodes me-1"></i>Continuous Pipeline Active</span>
+<!-- MAC OS GLASS HEADER CONTROL TOOLBAR -->
+<header class="app-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="window-dots me-2">
+                <span class="window-dot dot-red"></span>
+                <span class="window-dot dot-yellow"></span>
+                <span class="window-dot dot-green"></span>
             </div>
-            <h1 class="fw-extrabold m-0 tracking-tight text-white fs-2">METSIS FEM</h1>
-            <p class="text-white-50 m-0 mt-1 small">Continuous previous month closing balance roll forward system.</p>
-        </div>
-        <div class="d-flex flex-column flex-sm-row gap-2.5">
-            <button class="btn btn-outline-light px-3 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="triggerJsonDataExport()">
-                <i class="fa-solid fa-download"></i> Export JSON
-            </button>
-            <button class="btn btn-outline-light px-3 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('importJsonFileInput').click()">
-                <i class="fa-solid fa-upload"></i> Import JSON
-            </button>
-            <button class="btn btn-light px-4 py-2.5 rounded-3 fw-bold text-dark shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="initiateNewOrderCreation()">
-                <i class="fa-solid fa-square-plus text-primary fs-5"></i> Create New Entry
-            </button>
-        </div>
-    </div>
-
-    <!-- Live Analytics Dashboard Cards Grid -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-4">
-            <div class="analytics-card">
-                <div>
-                    <div class="small fw-bold text-uppercase text-muted tracking-wider mb-1" id="incomePanelLabel">Period Revenue</div>
-                    <h2 class="fw-extrabold m-0 text-success font-mono" id="lblGlobalIncome">$0.00</h2>
-                </div>
-                <div class="icon-shape bg-success-subtle text-success">
-                    <i class="fa-solid fa-turn-up fs-4"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="analytics-card">
-                <div>
-                    <div class="small fw-bold text-uppercase text-muted tracking-wider mb-1" id="expensePanelLabel">Period Expenses</div>
-                    <h2 class="fw-extrabold m-0 text-danger font-mono" id="lblGlobalExpenses">$0.00</h2>
-                </div>
-                <div class="icon-shape bg-danger-subtle text-danger">
-                    <i class="fa-solid fa-turn-down fs-4"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="analytics-card bg-dark text-white border-0 shadow">
-                <div>
-                    <div class="small fw-bold text-uppercase text-white-50 tracking-wider mb-1" id="balancePanelLabel">Carried Forward Balance (C/F)</div>
-                    <h2 class="fw-extrabold m-0 text-white font-mono" id="lblGlobalClosing">$0.00</h2>
-                </div>
-                <div class="icon-shape bg-white bg-opacity-10 text-white">
-                    <i class="fa-solid fa-vault fs-4"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Context & Pipeline Filter Controls -->
-    <div class="premium-card p-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-        <div class="d-flex align-items-center gap-2.5">
-            <div class="icon-shape bg-light text-primary" style="width:36px; height:36px;">
-                <i class="fa-solid fa-sliders"></i>
-            </div>
-            <div>
-                <label for="globalPeriodFilter" class="fw-bold text-dark small m-0 d-block">Temporal Matrix Scope</label>
-                <span class="text-muted small">Change month to verify continuous balance flows.</span>
-            </div>
-        </div>
-        <div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto">
-            <select id="globalPeriodFilterMode" class="form-select form-select-md rounded-3 fw-medium text-secondary" style="width: 160px; height: 44px;" onchange="handleGlobalFilterChange()">
-                <option value="SELECTED">Selected Month</option>
-                <option value="ALL">All History Ledger</option>
-            </select>
-            <input type="month" id="globalPeriodFilter" class="form-control form-control-md rounded-3 fw-bold text-dark border-secondary-subtle" style="flex:1; max-width: 220px; height: 44px;" onchange="handleGlobalFilterChange()">
-        </div>
-    </div>
-
-    <!-- Main Content Ledger Grid -->
-    <div class="premium-card p-0 overflow-hidden">
-        <div class="p-4 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 bg-light bg-opacity-50">
-            <div>
-                <h5 class="fw-extrabold m-0 text-dark" id="gridTitleContext">Chronological Master Ledger Matrix</h5>
-                <p class="text-muted small m-0 mt-0.5">Validated chronological account flow states mapping inputs to rolling targets.</p>
-            </div>
-            <div>
-                <span id="ledgerCounter" class="badge bg-dark px-3 py-2 rounded-pill font-mono fw-medium">0 Record Blocks</span>
-            </div>
+            <h5 class="header-title"><i class="fa-brands fa-apple me-2 text-dark"></i>FEM Workstation</h5>
         </div>
         
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-muted fs-7 text-uppercase tracking-wider border-bottom">
-                    <tr>
-                        <th style="width: 15%">Period Scope</th>
-                        <th style="width: 12%">ID Token</th>
-                        <th style="width: 38%">Mapped Component Matrix</th>
-                        <th style="width: 23%">Financial Run Summary</th>
-                        <th style="width: 12%" class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="masterGridBody" class="border-0">
-                    <!-- Dynamic Component Render Mount -->
-                </tbody>
-            </table>
+        <div class="header-controls">
+            <!-- ENTRY MONTH & YEAR -->
+            <div class="header-input-group autocomplete-wrapper">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text text-secondary"><i class="fa-solid fa-calendar-days"></i></span>
+                    <input type="text" id="gEntryMonth" class="form-control global-config-input bg-white text-center fw-bold" readonly style="cursor: pointer; max-width: 110px; font-size: 12px;" placeholder="Select...">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTriggerCalendar" title="Calendar">
+                        <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+                    </button>
+                </div>
+                
+                <!-- macOS Calendar Glass Dropdown -->
+                <div id="monthCalendarPopup" class="month-calendar-picker" style="display: none; position: absolute; top: 100%; right: 0; z-index: 1050; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid var(--mac-glass-border); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); padding: 14px; margin-top: 6px; min-width: 230px;">
+                    <div class="month-calendar-header d-flex justify-content-between align-items-center mb-2">
+                        <button type="button" class="btn btn-sm btn-light month-calendar-nav border-0" id="btnCalPrev" title="Previous Year"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="calendarYearDisplay" class="month-calendar-year fw-bold text-dark">2026</span>
+                        <button type="button" class="btn btn-sm btn-light month-calendar-nav border-0" id="btnCalNext" title="Next Year"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="month-grid" id="monthGridContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- CREATE ORDER BUTTON -->
+            <button id="btnCreateOrder" class="btn-mac-primary btn-sm" title="Create Order">
+                <i class="fa-solid fa-plus me-1"></i> New Order
+            </button>
+
+            <!-- EXPORT TO JSON BUTTON -->
+            <button id="btnExportJson" class="btn-mac-success btn-sm" title="Export to JSON">
+                <i class="fa-solid fa-arrow-up-from-bracket me-1"></i> Export
+            </button>
+
+            <!-- IMPORT FROM JSON BUTTON -->
+            <button id="btnImportJson" class="btn-mac-info btn-sm" title="Import from JSON">
+                <i class="fa-solid fa-arrow-down-to-bracket me-1"></i> Import
+            </button>
+            <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+
+            <!-- DELETE ALL BUTTON -->
+            <button id="btnClearGrid1" class="btn btn-sm btn-outline-danger px-3 rounded-3" title="Delete All">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
         </div>
     </div>
-</div>
+</header>
 
-<!-- Core Entry Editor Modal Frame -->
-<div class="modal fade" id="unifiedOrderModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 position-relative shadow-lg" style="border-radius: 24px; overflow: hidden; min-height: 520px;">
-            
-            <!-- Dynamic Inline Config Panel Overlay -->
-            <div id="configOverlayPanel" class="config-overlay">
-                <div class="p-4 w-100 text-center" style="max-width: 440px;">
-                    <div class="mb-3">
-                        <span class="p-3 bg-primary bg-opacity-10 rounded-circle d-inline-flex justify-content-center align-items-center">
-                            <i class="fa-solid fa-focus text-primary fa-xl"></i>
-                        </span>
-                    </div>
-                    <h5 class="fw-extrabold mb-1" id="configModalTitle">Configure Parameters</h5>
-                    <p class="text-muted small mb-4">Assign flow data identities for: <strong id="lblTargetItem" class="text-dark"></strong></p>
-                    
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase d-block mb-2 text-start text-muted">Flow Allocation Type</label>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="optFlowType" id="flowIncome" value="Income" autocomplete="off" onchange="validateTypeRequirement()">
-                            <label class="btn btn-outline-success py-2.5 rounded-start-3 fw-bold" for="flowIncome"><i class="fa-solid fa-circle-chevron-up me-2"></i>Income</label>
-                            
-                            <input type="radio" class="btn-check" name="optFlowType" id="flowExpense" value="Expense" autocomplete="off" onchange="validateTypeRequirement()">
-                            <label class="btn btn-outline-danger py-2.5 rounded-end-3 fw-bold" for="flowExpense"><i class="fa-solid fa-circle-chevron-down me-2"></i>Expense</label>
-                        </div>
-                        <div id="typeFeedbackMsg" class="text-danger small text-start mt-1.5 fw-medium"><i class="fa-solid fa-circle-exclamation me-1"></i>Please configure a mapping behavior state.</div>
-                    </div>
+<div id="portoNotificationContainer"></div>
+<div id="portoRouterViewport"></div>
+<div id="portoModalContainer"></div>
 
-                    <div class="form-floating mb-4">
-                        <input type="number" id="txtSubrecordAmount" class="form-control rounded-3 font-mono fw-bold text-dark fs-5" placeholder="0.00" step="0.01" style="height:62px;">
-                        <label for="txtSubrecordAmount" class="fw-medium text-secondary">Component Allocation Value ($)</label>
+<!-- WORKSPACE LAYOUT TEMPLATE -->
+<template id="tpl-workspacePage">
+    <main class="amzn-content px-3 px-md-4 mb-4">
+        
+        <!-- ADMIN HOMEPAGE SUMMARY DASHBOARD -->
+        <div class="row g-3 mb-4">
+            <!-- CURRENT DATE SUMMARY -->
+            <div class="col-12 col-md-4">
+                <div class="dash-card h-100" style="border-top: 4px solid var(--mac-blue);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0 text-dark" style="font-size:13px;"><i class="fa-solid fa-sun me-2 text-primary"></i> Today Summary</h6>
+                        <span class="badge bg-light text-dark border rounded-pill px-2" id="dashTodayDate" style="font-size:10px;">Today</span>
                     </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light w-50 py-2.5 rounded-3 fw-bold text-secondary" onclick="document.getElementById('configOverlayPanel').classList.remove('active')">Cancel</button>
-                        <button type="button" id="btnOverlayConfirm" class="btn btn-primary w-50 py-2.5 rounded-3 fw-bold shadow-sm" disabled onclick="commitConfiguredRecordItem()">
-                            Save Item <i class="fa-solid fa-arrow-right ms-1"></i>
-                        </button>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Income:</span>
+                        <span class="fw-bold text-success" id="dashTodayInc">0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Expense:</span>
+                        <span class="fw-bold text-danger" id="dashTodayExp">0.00</span>
+                    </div>
+                    <hr class="my-2 style-subtle">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark" style="font-size:12px;">Balance:</span>
+                        <span class="fw-bold" id="dashTodayBal" style="font-size:14px;">0.00</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Form Structural Elements -->
-            <div class="modal-header border-0 pt-4 px-4 pb-2">
-                <div>
-                    <h5 class="modal-title fw-extrabold fs-4 text-dark"><i class="fa-solid fa-wallet text-primary me-2"></i>Ledger Processing Node</h5>
-                    <p class="text-muted small m-0">Setup dates, base calculations, and dynamic metadata mappings.</p>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body px-4 pb-4 pt-2">
-                <form id="frmMasterOrder" onsubmit="event.preventDefault();">
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Target Month/Year Context</label>
-                            <input type="month" id="inpOrderPeriod" class="form-control p-2.5 rounded-3 fw-bold text-dark border-secondary-subtle" style="height:48px;" onchange="handleModalPeriodChange()" required>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Generated Token Reference</label>
-                            <input type="text" id="inpOrderNum" class="form-control p-2.5 rounded-3 bg-light fw-bold text-center font-mono text-primary border-0" readonly style="height:48px; letter-spacing: 0.5px;">
-                        </div>
+            <!-- MONTHLY SUMMARY WITH CARRYOVER -->
+            <div class="col-12 col-md-4">
+                <div class="dash-card h-100" style="border-top: 4px solid var(--mac-orange);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0 text-dark" style="font-size:13px;"><i class="fa-solid fa-calendar me-2 text-warning"></i> Monthly Summary</h6>
+                        <span class="badge bg-warning bg-opacity-20 text-dark fw-bold rounded-pill px-2" id="dashMonthLabel" style="font-size:10px;">Month</span>
                     </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small fw-bold text-success text-uppercase">Baseline Base Income</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-success-subtle text-success border-end-0 font-mono fw-bold">$</span>
-                                <input type="number" id="inpBulkIncome" class="form-control p-2.5 font-mono fw-bold text-dark border-start-0" placeholder="0.00" step="0.01" style="height:48px;">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small fw-bold text-danger text-uppercase">Baseline Base Expense</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-danger-subtle text-danger border-end-0 font-mono fw-bold">$</span>
-                                <input type="number" id="inpBulkExpense" class="form-control p-2.5 font-mono fw-bold text-dark border-start-0" placeholder="0.00" step="0.01" style="height:48px;">
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Month Income:</span>
+                        <span class="fw-bold text-success" id="dashMonthInc">0.00</span>
                     </div>
-
-                    <!-- Component Tags Input Structure -->
-                    <div class="col-12">
-                        <label class="form-label small fw-bold text-muted text-uppercase mb-2">Dynamic Multi-Component Matrix Mapping (Type text + Comma or Enter to configure)</label>
-                        <div class="premium-tag-box" id="tagWrapperBox">
-                            <input type="text" id="inpTagTrigger" class="tag-core-input" placeholder="Type label details here..." autocomplete="off">
-                            <div id="boxSuggestions" class="suggestions-dropdown d-none"></div>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Month Expense:</span>
+                        <span class="fw-bold text-danger" id="dashMonthExp">0.00</span>
                     </div>
-                </form>
-            </div>
-
-            <div class="modal-footer border-0 bg-light bg-opacity-75 p-3 px-4 d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-link text-secondary text-decoration-none fw-semibold small" data-bs-dismiss="modal">Discard Matrix Data</button>
-                <button type="button" class="btn btn-primary px-4 py-2.5 rounded-3 fw-bold text-white shadow-sm" onclick="processFinalOrderCommit()">
-                    <i class="fa-solid fa-circle-check me-1.5"></i> Commit Ledger Block
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Secondary Component Detail Information modal viewer -->
-<div class="modal fade" id="infoViewerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius:24px;">
-            <div class="modal-header border-0 pt-4 px-4 pb-0">
-                <h5 class="fw-extrabold text-dark m-0 d-flex align-items-center"><i class="fa-solid fa-rectangle-list text-info me-2.5"></i>Manifest Segment Metrics</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <div class="bg-light p-2.5 rounded-3 text-center">
-                            <div class="small text-muted mb-0.5">Token ID</div>
-                            <strong id="viewModalTokenId" class="text-primary font-mono small">-</strong>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;" title="Carryover balance from previous months">Prev. Carryover:</span>
+                        <span class="fw-bold text-info" id="dashMonthCarry">0.00</span>
                     </div>
-                    <div class="col-6">
-                        <div class="bg-light p-2.5 rounded-3 text-center">
-                            <div class="small text-muted mb-0.5">Period Context</div>
-                            <strong id="viewModalPeriod" class="text-dark fw-bold">-</strong>
-                        </div>
+                    <hr class="my-2 style-subtle">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark" style="font-size:12px;">Total Month Balance:</span>
+                        <span class="fw-bold" id="dashMonthBal" style="font-size:14px;">0.00</span>
                     </div>
                 </div>
-                <h6 class="fw-bold small text-uppercase text-muted mb-2 tracking-wider">Item Allocation Matrix Stack:</h6>
-                <div id="viewModalItemsBox" class="border rounded-3 overflow-hidden bg-white">
-                    <!-- Dynamic Component Generation Rows -->
+            </div>
+
+            <!-- YEARLY SUMMARY -->
+            <div class="col-12 col-md-4">
+                <div class="dash-card h-100" style="border-top: 4px solid var(--mac-green);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0 text-dark" style="font-size:13px;"><i class="fa-solid fa-chart-pie me-2 text-success"></i> Yearly Summary</h6>
+                        <span class="badge bg-success bg-opacity-20 text-dark fw-bold rounded-pill px-2" id="dashYearLabel" style="font-size:10px;">Year</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Year Income:</span>
+                        <span class="fw-bold text-success" id="dashYearInc">0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size:12px;">Year Expense:</span>
+                        <span class="fw-bold text-danger" id="dashYearExp">0.00</span>
+                    </div>
+                    <hr class="my-2 style-subtle">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark" style="font-size:12px;">Year Balance:</span>
+                        <span class="fw-bold" id="dashYearBal" style="font-size:14px;">0.00</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- MAIN DATA GRID WORKSPACE -->
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="card p-3 p-md-4">
+                    <!-- TOP TOOLBAR & PAGINATION -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-3 border-bottom">
+                        <h5 class="card-title m-0 text-dark fw-bold" style="font-size:15px;">
+                            <i class="fa-solid fa-table-cells me-2 text-secondary"></i> Data Grid 1: Recorded Entries (<span id="grid1Count" style="color: var(--mac-blue);">0 Orders</span>)
+                        </h5>
+                        
+                        <!-- PAGINATION CONTROLS -->
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <button class="btn-mac-secondary py-0 px-2 pagination-trigger" style="height:30px; font-size:12px;" data-grid="1" data-dir="-1" title="Previous Page"><i class="fa-solid fa-chevron-left"></i></button>
+                            <span class="page-num-indicator text-dark fw-bold" id="g1PageIndicator" style="font-size:12px;">Page 1 / 1</span>
+                            <button class="btn-mac-secondary py-0 px-2 pagination-trigger" style="height:30px; font-size:12px;" data-grid="1" data-dir="1" title="Next Page"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- DATA TABLE -->
+                    <div class="table-responsive-wrapper">
+                        <table class="table table-hover align-middle" id="grid1">
+                            <thead><tr id="grid1Header" class="text-dark"></tr></thead>
+                            <tbody id="grid1Body" class="text-dark"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</template>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+<!-- APPLICATION PROCESSING MODULE -->
 <script>
-    /**
-     * Optimized System Architecture Engine
-     */
-    
-    // UI Node Elements Cache Registry
-    const DOM = {
-        toastContainer: document.getElementById('customToastContainer'),
-        incomePanelLabel: document.getElementById('incomePanelLabel'),
-        expensePanelLabel: document.getElementById('expensePanelLabel'),
-        balancePanelLabel: document.getElementById('balancePanelLabel'),
-        lblGlobalIncome: document.getElementById('lblGlobalIncome'),
-        lblGlobalExpenses: document.getElementById('lblGlobalExpenses'),
-        lblGlobalClosing: document.getElementById('lblGlobalClosing'),
-        globalPeriodFilter: document.getElementById('globalPeriodFilter'),
-        globalPeriodFilterMode: document.getElementById('globalPeriodFilterMode'),
-        gridTitleContext: document.getElementById('gridTitleContext'),
-        ledgerCounter: document.getElementById('ledgerCounter'),
-        masterGridBody: document.getElementById('masterGridBody'),
-        configOverlayPanel: document.getElementById('configOverlayPanel'),
-        lblTargetItem: document.getElementById('lblTargetItem'),
-        configModalTitle: document.getElementById('configModalTitle'),
-        txtSubrecordAmount: document.getElementById('txtSubrecordAmount'),
-        flowIncome: document.getElementById('flowIncome'),
-        flowExpense: document.getElementById('flowExpense'),
-        btnOverlayConfirm: document.getElementById('btnOverlayConfirm'),
-        typeFeedbackMsg: document.getElementById('typeFeedbackMsg'),
-        inpOrderPeriod: document.getElementById('inpOrderPeriod'),
-        inpOrderNum: document.getElementById('inpOrderNum'),
-        inpBulkIncome: document.getElementById('inpBulkIncome'),
-        inpBulkExpense: document.getElementById('inpBulkExpense'),
-        tagWrapperBox: document.getElementById('tagWrapperBox'),
-        inpTagTrigger: document.getElementById('inpTagTrigger'),
-        boxSuggestions: document.getElementById('boxSuggestions'),
-        viewModalTokenId: document.getElementById('viewModalTokenId'),
-        viewModalPeriod: document.getElementById('viewModalPeriod'),
-        viewModalItemsBox: document.getElementById('viewModalItemsBox'),
-        frmMasterOrder: document.getElementById('frmMasterOrder')
+(function () {
+    let grid1Storage = [];
+    let orderBulkMap = {}; 
+    let dbInstance = null;
+    let currentFilteredGrid1Data = [];
+
+    let calendarActiveYear = 2026;
+    const calendarMonthNames = [
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+    ];
+
+    let formConfigStateCache = {
+        entryMonth: "JULY-2026"
     };
 
-    // Global State Container Context Object
-    const System = {
-        databaseOrdersStore: [],
-        globalCounterIndex: 1,
-        localActiveOrderRecords: [],
-        stateCurrentTargetItemText: "",
-        activeEditingOrderId: null,
-        activeEditingTagIndex: null,
-        modalBootstrapContext: null,
-        infoModalContext: null,
-        monthsArray: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    };
+    const maxRowsPerPage = 100;
+    let currentGrid1Page = 1;
 
-    /**
-     * Elegant Non-blocking Floating Notification Pipeline 
-     */
-    function showCustomNotification(messageText, type = 'info') {
-        const toastEl = document.createElement('div');
-        toastEl.className = `custom-toast toast-${type}`;
+    const dbName = "FEM_DB";
+    const storeName = "app_order_state";
+
+    /* GRID 1 DISPLAY SCHEMA */
+    const grid1DisplayFields = [
+        "Order No.", "Category Tags & Type", "Description", "Subtotal", "MonthAndYear"
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initIndexedDBEngine();
+        initializeHeaderListeners();
+    });
+
+    /* HEADER CONTROLS INITIALIZATION */
+    function initializeHeaderListeners() {
+        const btnCalTrigger = document.getElementById('btnTriggerCalendar');
+        const inputEntryMonth = document.getElementById('gEntryMonth');
         
-        let iconMarkup = '<i class="fa-solid fa-circle-info text-primary"></i>';
-        if (type === 'success') iconMarkup = '<i class="fa-solid fa-circle-check text-success"></i>';
-        if (type === 'danger') iconMarkup = '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
+        if (inputEntryMonth) inputEntryMonth.addEventListener('click', toggleMonthCalendarPopup);
+        if (btnCalTrigger) btnCalTrigger.addEventListener('click', toggleMonthCalendarPopup);
 
-        toastEl.innerHTML = `
-            <div class="fs-5">${iconMarkup}</div>
-            <div class="flex-grow-1">
-                <div class="small fw-bold text-dark">${type.toUpperCase()}</div>
-                <div class="text-muted small mt-0.5">${escapeHtml(messageText)}</div>
-            </div>
-            <button type="button" class="btn-close small ms-2" style="font-size: 0.65rem;" onclick="this.parentElement.remove()"></button>
-        `;
+        const btnPrev = document.getElementById('btnCalPrev');
+        const btnNext = document.getElementById('btnCalNext');
+        if (btnPrev) btnPrev.addEventListener('click', () => adjustCalendarYear(-1));
+        if (btnNext) btnNext.addEventListener('click', () => adjustCalendarYear(1));
 
-        DOM.toastContainer.appendChild(toastEl);
+        const monthContainer = document.getElementById('monthGridContainer');
+        if (monthContainer) {
+            monthContainer.addEventListener('click', (e) => {
+                if(e.target.classList.contains('month-btn')) {
+                    selectCalendarMonthYear(e.target.getAttribute('data-month'), calendarActiveYear);
+                }
+            });
+        }
+
+        const btnCreateOrder = document.getElementById('btnCreateOrder');
+        if (btnCreateOrder) btnCreateOrder.addEventListener('click', openCreateOrderModal);
+
+        const btnExportJson = document.getElementById('btnExportJson');
+        if (btnExportJson) btnExportJson.addEventListener('click', exportToJsonFile);
+
+        const btnImportJson = document.getElementById('btnImportJson');
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        if (btnImportJson && jsonFileInput) {
+            btnImportJson.addEventListener('click', () => jsonFileInput.click());
+            jsonFileInput.addEventListener('change', importFromJsonFile);
+        }
+
+        const btnClearGrid1 = document.getElementById('btnClearGrid1');
+        if (btnClearGrid1) btnClearGrid1.addEventListener('click', clearGrid1DataStore);
+    }
+
+    /* POP-UP CALENDAR PICKER */
+    function toggleMonthCalendarPopup() {
+        const popup = document.getElementById('monthCalendarPopup');
+        if (!popup) return;
+        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        if (popup.style.display === 'block') renderMonthCalendarGrid();
+    }
+
+    function adjustCalendarYear(offset) {
+        calendarActiveYear += offset;
+        renderMonthCalendarGrid();
+    }
+
+    function renderMonthCalendarGrid() {
+        const yearDisplay = document.getElementById('calendarYearDisplay');
+        const gridContainer = document.getElementById('monthGridContainer');
+        if (!yearDisplay || !gridContainer) return;
+
+        yearDisplay.innerText = calendarActiveYear;
         
-        // Trigger smooth visual entrance phase
-        requestAnimationFrame(() => {
-            setTimeout(() => toastEl.classList.add('show'), 10);
+        const currentSelectedToken = formConfigStateCache.entryMonth || "JULY-2026";
+        const [selMonth, selYear] = currentSelectedToken.split("-");
+
+        const frag = document.createDocumentFragment();
+        calendarMonthNames.forEach(month => {
+            const btn = document.createElement('div');
+            const isSelected = (month === selMonth && String(calendarActiveYear) === selYear);
+            btn.className = `month-btn ${isSelected ? 'active' : ''}`;
+            btn.innerText = month.substring(0, 3);
+            btn.setAttribute('data-month', month);
+            frag.appendChild(btn);
         });
+        gridContainer.replaceChildren(frag);
+    }
 
-        // Setup self-destruct cycle execution
+    function selectCalendarMonthYear(monthStr, yearNum) {
+        const formattedValue = `${monthStr}-${yearNum}`;
+        const inputEl = document.getElementById('gEntryMonth');
+        if (inputEl) {
+            inputEl.value = formattedValue;
+        }
+
+        formConfigStateCache.entryMonth = formattedValue;
+        
+        const popup = document.getElementById('monthCalendarPopup');
+        if (popup) popup.style.display = 'none';
+
+        applyTimeSelectionFilters();
+        if (document.getElementById('grid1Body')) {
+            renderGrid1();
+        }
+        saveApplicationStateToDatabase();
+        showNotification(`Timeframe updated to: ${formattedValue}`, "info");
+    }
+
+    /* ALPHABET CONVERSION FOR CUSTOM SERIAL GENERATION */
+    function convertNumberToAlphabetCode(numStr) {
+        let res = '';
+        for (let i = 0; i < numStr.length; i++) {
+            const val = parseInt(numStr[i]);
+            res += (isNaN(val) || val === 0) ? 'Z' : String.fromCharCode(64 + val);
+        }
+        return res;
+    }
+
+    /* GET NEXT UNIQUE ORDER SEQUENCE */
+    function getNextOrderSequence() {
+        const uniqueOrders = new Set(grid1Storage.map(r => r["Order No."]));
+        return uniqueOrders.size + 1;
+    }
+
+    /* AUTOMATIC ORDER NUMBER GENERATOR */
+    function generateOrderNumber(entryMonthStr, sequenceNum) {
+        const parts = (entryMonthStr || "JULY-2026").split("-");
+        const monthName = (parts[0] || "JULY").toUpperCase();
+        const yearStr = parts[1] || "2026";
+
+        const monthIdx = calendarMonthNames.indexOf(monthName) + 1;
+        const mmStr = String(monthIdx > 0 ? monthIdx : 1).padStart(2, '0');
+        const yyStr = String(yearStr).slice(-2);
+
+        const alphaYY = convertNumberToAlphabetCode(yyStr);
+        const alphaMM = convertNumberToAlphabetCode(mmStr);
+        const seqStr = String(sequenceNum).padStart(4, '0');
+
+        return `${alphaYY}${alphaMM}${seqStr}`;
+    }
+
+    /* HELPER TO CONVERT TEXT TO PROPER CASE */
+    function toProperCase(str) {
+        if (!str) return '';
+        return str.replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    function getMonthSortKey(monthYearStr) {
+        if (!monthYearStr) return 0;
+        const parts = monthYearStr.split('-');
+        if (parts.length !== 2) return 0;
+        const mIdx = calendarMonthNames.indexOf(parts[0].toUpperCase()) + 1;
+        const yNum = parseInt(parts[1]) || 0;
+        return yNum * 12 + mIdx;
+    }
+
+    function showNotification(message, type = "info") {
+        const container = document.getElementById('portoNotificationContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `porto-toast toast-${type}`;
+        toast.innerHTML = `<span>${message}</span><span class="porto-toast-close">&times;</span>`;
+        
+        toast.querySelector('.porto-toast-close').addEventListener('click', () => toast.remove());
+        
+        container.appendChild(toast);
         setTimeout(() => {
-            if(toastEl.parentNode) {
-                toastEl.classList.remove('show');
-                setTimeout(() => toastEl.remove(), 350);
+            if (toast.parentElement) {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 200);
             }
         }, 4000);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        System.modalBootstrapContext = new bootstrap.Modal(document.getElementById('unifiedOrderModal'));
-        System.infoModalContext = new bootstrap.Modal(document.getElementById('infoViewerModal'));
-        
-        const targetAnchorDate = new Date("2026-07-19");
-        DOM.globalPeriodFilter.value = `${targetAnchorDate.getFullYear()}-${(targetAnchorDate.getMonth() + 1).toString().padStart(2, '0')}`;
-
-        refreshGlobalCounterFromStorage();
-        initializeCustomTagListeners();
-        renderMasterTableLedgerGrid();
-    });
-
-    function refreshGlobalCounterFromStorage() {
-        const rawLocalData = localStorage.getItem('ledger_orders_v96');
-        if(rawLocalData) {
-            try {
-                System.databaseOrdersStore = JSON.parse(rawLocalData);
-                System.globalCounterIndex = 1; // Reset baseline counter reference
-                System.databaseOrdersStore.forEach(orderBlock => {
-                    const numericTokenPayload = parseInt(orderBlock.id.substring(4)); 
-                    if(!isNaN(numericTokenPayload) && numericTokenPayload >= System.globalCounterIndex) {
-                        System.globalCounterIndex = numericTokenPayload + 1;
-                    }
-                });
-            } catch(error) {
-                System.databaseOrdersStore = [];
-            }
-        }
-    }
-
-    /**
-     * JSON Pipeline: Matrix Export Engine
-     */
-    function triggerJsonDataExport() {
-        if (System.databaseOrdersStore.length === 0) {
-            showCustomNotification("There are no database entries in the current workspace to export.", "danger");
-            return;
-        }
-        
-        try {
-            const dataStringify = JSON.stringify(System.databaseOrdersStore, null, 2);
-            const dataBlob = new Blob([dataStringify], { type: 'application/json' });
-            const temporaryAnchor = document.createElement('a');
-            
-            const timestamp = new Date().toISOString().slice(0, 10);
-            temporaryAnchor.download = `METSIS_FEM_Backup_${timestamp}.json`;
-            temporaryAnchor.href = window.URL.createObjectURL(dataBlob);
-            temporaryAnchor.style.display = 'none';
-            
-            document.body.appendChild(temporaryAnchor);
-            temporaryAnchor.click();
-            document.body.removeChild(temporaryAnchor);
-            
-            showCustomNotification("Ledger master parameters exported to JSON successfully.", "success");
-        } catch (err) {
-            showCustomNotification("System matrix translation failure: " + err.message, "danger");
-        }
-    }
-
-    /**
-     * JSON Pipeline: Matrix Import Engine
-     */
-    function executeJsonDataImport(fileInputNode) {
-        const selectedFile = fileInputNode.files[0];
-        if (!selectedFile) return;
-
-        const fileReaderPipeline = new FileReader();
-        fileReaderPipeline.onload = function(event) {
-            try {
-                const parsedPayload = JSON.parse(event.target.result);
-                
-                // Structured schema assertion verification loop
-                if (Array.isArray(parsedPayload)) {
-                    let standardValidated = true;
-                    for (let i = 0; i < parsedPayload.length; i++) {
-                        const block = parsedPayload[i];
-                        if (!block.id || !block.period || block.bulkIncome === undefined || block.bulkExpense === undefined) {
-                            standardValidated = false;
-                            break;
-                        }
-                    }
-
-                    if (!standardValidated) {
-                        showCustomNotification("Import structural rejection: Target array contains corrupt architecture schemas.", "danger");
-                        fileInputNode.value = '';
-                        return;
-                    }
-
-                    // Save verified stack inside live system registers
-                    System.databaseOrdersStore = parsedPayload;
-                    localStorage.setItem('ledger_orders_v96', JSON.stringify(System.databaseOrdersStore));
-                    
-                    // Remap core auto tokens and reconstruct operational workspace views
-                    refreshGlobalCounterFromStorage();
-                    renderMasterTableLedgerGrid();
-                    showCustomNotification(`Import processing complete. ${parsedPayload.length} nodes injected successfully.`, "success");
-                } else {
-                    showCustomNotification("Parsing payload failure: JSON parameters structure root must map as a list array.", "danger");
-                }
-            } catch (err) {
-                showCustomNotification("Corruption runtime crash: Invalid standard JSON coding logic formatting.", "danger");
-            }
-            // Clear buffer index tracking flag
-            fileInputNode.value = '';
+    function showConfirmModal(message, confirmCallback) {
+        const container = document.getElementById('portoModalContainer');
+        container.innerHTML = `
+            <div class="porto-modal-backdrop" style="z-index: 99990;">
+                <div class="porto-modal" style="z-index: 99991;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="window-dots">
+                            <span class="window-dot dot-red"></span>
+                            <span class="window-dot dot-yellow"></span>
+                            <span class="window-dot dot-green"></span>
+                        </div>
+                    </div>
+                    <h6 class="mb-2 text-dark font-weight-bold" style="font-size:15px;">Operational Confirmation</h6>
+                    <p class="text-secondary mb-4" style="font-size:13px; line-height:1.4;">${message}</p>
+                    <div class="text-end d-flex justify-content-end gap-2">
+                        <button class="btn-mac-secondary" id="btnModalCancel" title="Cancel">Cancel</button>
+                        <button class="btn-mac-danger" id="btnModalConfirm" title="Confirm Delete">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('btnModalCancel').onclick = () => container.innerHTML = '';
+        document.getElementById('btnModalConfirm').onclick = () => {
+            container.innerHTML = '';
+            confirmCallback();
         };
-        fileReaderPipeline.readAsText(selectedFile);
     }
 
-    function toTitleCase(str) {
-        if (!str) return "";
-        return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    /* INDEXED STORAGE ENGINE */
+    function initIndexedDBEngine() {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(storeName)) { 
+                db.createObjectStore(storeName, { keyPath: "id" }); 
+            }
+        };
+        request.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            loadApplicationStateFromDatabase();
+        };
     }
 
-    function generateAlphabeticalOrderToken(counterInt, selectedDateStr) {
-        let referenceDate = selectedDateStr ? new Date(selectedDateStr + "-02") : new Date();
-        if(isNaN(referenceDate.getTime())) referenceDate = new Date();
+    function saveApplicationStateToDatabase() {
+        if (!dbInstance) return;
 
-        const fullYearStr = referenceDate.getFullYear().toString();
-        const yearLastTwoDigits = fullYearStr.substring(fullYearStr.length - 2); 
-        const alphaYear = Array.from(yearLastTwoDigits).map(numChar => String.fromCharCode(65 + parseInt(numChar))).join('');
+        const stateObj = {
+            id: "session_state",
+            formConfigStateCache: formConfigStateCache,
+            grid1Data: grid1Storage,
+            orderBulkMap: orderBulkMap
+        };
+        dbInstance.transaction([storeName], "readwrite").objectStore(storeName).put(stateObj);
+    }
+
+    function loadApplicationStateFromDatabase() {
+        if (!dbInstance) { loadPageLayout('workspacePage'); return; }
+        const request = dbInstance.transaction([storeName], "readonly").objectStore(storeName).get("session_state");
+
+        request.onsuccess = (e) => {
+            const state = e.target.result;
+            if (state) {
+                if(state.formConfigStateCache) formConfigStateCache = state.formConfigStateCache;
+                if(state.grid1Data) grid1Storage = state.grid1Data;
+                if(state.orderBulkMap) orderBulkMap = state.orderBulkMap;
+            }
+            
+            restoreHeaderMonthValue();
+            applyTimeSelectionFilters();
+            loadPageLayout('workspacePage');
+        };
+        request.onerror = () => loadPageLayout('workspacePage');
+    }
+
+    function restoreHeaderMonthValue() {
+        const em = document.getElementById('gEntryMonth');
+        if (!em) return;
+
+        const entryVal = formConfigStateCache.entryMonth || "JULY-2026";
+        em.value = entryVal;
         
-        const monthValueRaw = referenceDate.getMonth() + 1;
-        const monthPaddedStr = monthValueRaw < 10 ? '0' + monthValueRaw : monthValueRaw.toString();
-        const alphaMonth = Array.from(monthPaddedStr).map(numChar => String.fromCharCode(65 + parseInt(numChar))).join('');
-        
-        return `${alphaYear}${alphaMonth}${counterInt.toString().padStart(3, '0')}`;
+        const parts = entryVal.split("-");
+        if (parts.length === 2 && !isNaN(parts[1])) {
+            calendarActiveYear = parseInt(parts[1]);
+        }
     }
 
-    function formatPeriodStringToMmmYyyy(inputYearMonthStr) {
-        if(!inputYearMonthStr) return "N/A";
-        const pieces = inputYearMonthStr.split('-'); 
-        if(pieces.length !== 2) return inputYearMonthStr;
-        return `${System.monthsArray[parseInt(pieces[1]) - 1]} ${pieces[0]}`;
+    /* ASYNCHRONOUS PAGE ROUTER */
+    async function loadPageLayout(targetPageId) {
+        const viewport = document.getElementById('portoRouterViewport');
+        if (!viewport) return;
+
+        const templateNode = document.getElementById(`tpl-${targetPageId}`);
+        viewport.replaceChildren(templateNode.content.cloneNode(true));
+
+        if (targetPageId === 'workspacePage') {
+            applyTimeSelectionFilters(); 
+            initializeWorkspacePageListeners();
+        }
+
+        saveApplicationStateToDatabase();
     }
 
-    function getChronologicallySortedOrders() {
-        return [...System.databaseOrdersStore].sort((a, b) => {
-            if(a.period !== b.period) return a.period.localeCompare(b.period);
-            return a.id.localeCompare(b.id);
+    /* RENDERING FILTERS & SORTING */
+    function applyTimeSelectionFilters() {
+        const monthYearParts = (formConfigStateCache.entryMonth || "JULY-2026").split("-");
+        const matchToken = `${monthYearParts[0]}-${monthYearParts[1]}`.trim().toUpperCase();
+
+        const filtered = [];
+        for (let i = 0; i < grid1Storage.length; i++) {
+            const row = grid1Storage[i];
+            if (row && String(row["MonthAndYear"] || "").trim().toUpperCase() === matchToken) {
+                filtered.push(row);
+            }
+        }
+        currentFilteredGrid1Data = filtered;
+
+        currentFilteredGrid1Data.sort((a, b) => {
+            return String(b["Order No."] || "").localeCompare(String(a["Order No."] || ""), undefined, { numeric: true, sensitivity: 'base' });
         });
     }
 
-    function computeCompleteFinancialChainMetrics() {
-        const sortedList = getChronologicallySortedOrders();
-        const computedChainMap = {};
-        let currentRollingBalanceAccumulator = 0;
+    /* GROUP RAW ITEMS INTO ORDER ENTRIES FOR DATA GRID VIEW */
+    function getGroupedOrders(filteredRecords) {
+        const orderMap = new Map();
 
-        for (let i = 0; i < sortedList.length; i++) {
-            const order = sortedList[i];
-            const baseIncome = parseFloat(order.bulkIncome) || 0;
-            const baseExpense = parseFloat(order.bulkExpense) || 0;
-            let itemIncome = 0;
-            let itemExpense = 0;
-
-            if (order.items && Array.isArray(order.items)) {
-                for (let j = 0; j < order.items.length; j++) {
-                    const item = order.items[j];
-                    if (item.type === 'Income') itemIncome += item.amount;
-                    else if (item.type === 'Expense') itemExpense += item.amount;
-                }
+        filteredRecords.forEach(row => {
+            const orderNo = row["Order No."];
+            if (!orderMap.has(orderNo)) {
+                orderMap.set(orderNo, {
+                    orderNo: orderNo,
+                    description: row["Description"] || "",
+                    monthAndYear: row["MonthAndYear"] || "",
+                    date: row["Date"] || new Date().toISOString().split('T')[0],
+                    items: []
+                });
             }
+            orderMap.get(orderNo).items.push(row);
+        });
 
-            const totalIncomeThisBlock = baseIncome + itemIncome;
-            const totalExpenseThisBlock = baseExpense + itemExpense;
-            const netBlockProfitLoss = totalIncomeThisBlock - totalExpenseThisBlock;
-            const carryForwardBroughtDown = currentRollingBalanceAccumulator;
-            const closingBalanceCarriedForward = carryForwardBroughtDown + netBlockProfitLoss;
+        const groupedList = [];
+        orderMap.forEach((data, orderNo) => {
+            let incomeSum = 0;
+            let expenseSum = 0;
+            const categoryTags = [];
 
-            computedChainMap[order.id] = {
-                broughtDown: carryForwardBroughtDown,
-                income: totalIncomeThisBlock,
-                expense: totalExpenseThisBlock,
-                balance: netBlockProfitLoss,
-                carriedForward: closingBalanceCarriedForward
-            };
-
-            currentRollingBalanceAccumulator = closingBalanceCarriedForward;
-        }
-
-        return { chainMap: computedChainMap, finalGlobalRollingBalance: currentRollingBalanceAccumulator };
-    }
-
-    function handleGlobalFilterChange() {
-        if (DOM.globalPeriodFilterMode.value === 'ALL') {
-            DOM.globalPeriodFilter.setAttribute('disabled', 'true');
-        } else {
-            DOM.globalPeriodFilter.removeAttribute('disabled');
-        }
-        renderMasterTableLedgerGrid();
-    }
-
-    function recalculateGlobalFinancialLedgers() {
-        const filterMode = DOM.globalPeriodFilterMode.value;
-        const targetFilterPeriod = DOM.globalPeriodFilter.value;
-        const metricsEngine = computeCompleteFinancialChainMetrics();
-        const sortedList = getChronologicallySortedOrders();
-
-        let visibleIncomeSum = 0;
-        let visibleExpenseSum = 0;
-        let displayBalanceValue = 0;
-
-        if (filterMode === 'SELECTED' && targetFilterPeriod) {
-            DOM.incomePanelLabel.innerText = `Revenue (${formatPeriodStringToMmmYyyy(targetFilterPeriod)})`;
-            DOM.expensePanelLabel.innerText = `Expenses (${formatPeriodStringToMmmYyyy(targetFilterPeriod)})`;
-            DOM.balancePanelLabel.innerText = `Carried Forward Balance (C/F)`;
-
-            let lastMatchingBlockMetrics = null;
-            for (let i = 0; i < sortedList.length; i++) {
-                if (sortedList[i].period === targetFilterPeriod) {
-                    const nodeMetrics = metricsEngine.chainMap[sortedList[i].id];
-                    if (nodeMetrics) {
-                        visibleIncomeSum += nodeMetrics.income;
-                        visibleExpenseSum += nodeMetrics.expense;
-                        lastMatchingBlockMetrics = nodeMetrics; 
-                    }
+            data.items.forEach(item => {
+                const amt = parseFloat(item["Amount"]) || 0;
+                const type = item["Type"] || "Expense";
+                
+                if (type === "Income") {
+                    incomeSum += amt;
+                } else {
+                    expenseSum += amt;
                 }
-            }
 
-            if (lastMatchingBlockMetrics) {
-                displayBalanceValue = lastMatchingBlockMetrics.carriedForward;
-            } else {
-                let lastPriorBalance = 0;
-                for (let i = 0; i < sortedList.length; i++) {
-                    if (sortedList[i].period < targetFilterPeriod) {
-                        const m = metricsEngine.chainMap[sortedList[i].id];
-                        if (m) lastPriorBalance = m.carriedForward;
-                    } else {
-                        break;
-                    }
-                }
-                displayBalanceValue = lastPriorBalance;
-            }
-        } else {
-            DOM.incomePanelLabel.innerText = "Total System Revenue";
-            DOM.expensePanelLabel.innerText = "Total System Expenses";
-            DOM.balancePanelLabel.innerText = "Net Portfolio Valuation";
-
-            sortedList.forEach(order => {
-                const nodeMetrics = metricsEngine.chainMap[order.id];
-                if (nodeMetrics) {
-                    visibleIncomeSum += nodeMetrics.income;
-                    visibleExpenseSum += nodeMetrics.expense;
-                }
+                categoryTags.push({
+                    category: item["Category"],
+                    type: type,
+                    amount: amt
+                });
             });
-            displayBalanceValue = metricsEngine.finalGlobalRollingBalance;
-        }
 
-        DOM.lblGlobalIncome.innerText = `$${visibleIncomeSum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        DOM.lblGlobalExpenses.innerText = `$${visibleExpenseSum.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        DOM.lblGlobalClosing.innerText = `$${displayBalanceValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        
-        DOM.lblGlobalClosing.className = displayBalanceValue < 0 ? "fw-extrabold m-0 text-danger font-mono" : 
-                                         (displayBalanceValue > 0 ? "fw-extrabold m-0 text-success font-mono" : "fw-extrabold m-0 text-white font-mono");
-    }
+            const netCategorySum = incomeSum - expenseSum;
 
-    function initiateNewOrderCreation() {
-        System.activeEditingOrderId = null; 
-        DOM.frmMasterOrder.reset();
-        
-        let activeFilterPeriod = DOM.globalPeriodFilter.value;
-        if(!activeFilterPeriod) {
-            const dateObj = new Date();
-            activeFilterPeriod = `${dateObj.getFullYear()}-${(dateObj.getMonth()+1).toString().padStart(2,'0')}`;
-        }
-        
-        DOM.inpOrderPeriod.value = activeFilterPeriod;
-        DOM.inpOrderNum.value = generateAlphabeticalOrderToken(System.globalCounterIndex, activeFilterPeriod);
-        DOM.inpBulkIncome.value = '';
-        DOM.inpBulkExpense.value = '';
+            const bulkData = orderBulkMap[orderNo];
+            let hasManualBulk = bulkData && bulkData.amount !== undefined && bulkData.amount !== null && bulkData.amount !== "";
 
-        System.localActiveOrderRecords = [];
-        syncActiveRecordsUiBadges();
-        System.modalBootstrapContext.show();
-    }
+            let manualBulkVal = 0;
+            let bulkType = "Expense";
 
-    function handleModalPeriodChange() {
-        if(System.activeEditingOrderId === null) {
-            DOM.inpOrderNum.value = generateAlphabeticalOrderToken(System.globalCounterIndex, DOM.inpOrderPeriod.value);
-        }
-    }
-
-    function getDynamicSuggestionsMap() {
-        const dictionary = {};
-        for(let i = 0; i < System.databaseOrdersStore.length; i++) {
-            const items = System.databaseOrdersStore[i].items;
-            if(items) {
-                for(let j = 0; j < items.length; j++) {
-                    if(items[j].name) dictionary[items[j].name.trim()] = items[j].type;
-                }
+            if (hasManualBulk) {
+                manualBulkVal = parseFloat(bulkData.amount) || 0;
+                bulkType = bulkData.type || "Expense";
+            } else if (typeof bulkData === "number" || typeof bulkData === "string") {
+                hasManualBulk = true;
+                manualBulkVal = parseFloat(bulkData) || 0;
+                bulkType = "Expense";
             }
-        }
-        return dictionary;
+
+            const effectiveSubtotal = hasManualBulk 
+                ? (bulkType === "Income" ? manualBulkVal : -manualBulkVal)
+                : netCategorySum;
+
+            groupedList.push({
+                orderNo: orderNo,
+                description: data.description,
+                monthAndYear: data.monthAndYear,
+                date: data.date,
+                categoryTags: categoryTags,
+                incomeSum: incomeSum,
+                expenseSum: expenseSum,
+                netCategorySum: netCategorySum,
+                bulkAmount: manualBulkVal,
+                bulkType: bulkType,
+                isManualBulk: hasManualBulk,
+                subtotal: effectiveSubtotal,
+                rawItems: data.items
+            });
+        });
+
+        return groupedList;
     }
 
-    function initializeCustomTagListeners() {
-        DOM.inpTagTrigger.addEventListener('input', () => {
-            const rawString = DOM.inpTagTrigger.value;
-            if (rawString.includes(',')) {
-                let cleaned = rawString.replace(/,/g, '').trim();
-                if (cleaned.length > 0) launchInlineConfigurationFlow(toTitleCase(cleaned));
-                DOM.inpTagTrigger.value = '';
-                DOM.boxSuggestions.classList.add('d-none');
+    /* DASHBOARD SUMMARY CALCULATIONS */
+    function renderDashboardSummaries() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const currentSelectedMonthYear = formConfigStateCache.entryMonth || "JULY-2026";
+        const currentSelectedKey = getMonthSortKey(currentSelectedMonthYear);
+        const selectedYear = currentSelectedMonthYear.split('-')[1] || "2026";
+
+        let todayInc = 0, todayExp = 0;
+        let monthInc = 0, monthExp = 0;
+        let yearInc = 0, yearExp = 0;
+        let carryoverBalance = 0;
+
+        const allOrderMap = new Map();
+        grid1Storage.forEach(row => {
+            const oNo = row["Order No."];
+            if (!allOrderMap.has(oNo)) {
+                allOrderMap.set(oNo, {
+                    orderNo: oNo,
+                    date: row["Date"] || todayStr,
+                    monthAndYear: row["MonthAndYear"] || "",
+                    items: []
+                });
+            }
+            allOrderMap.get(oNo).items.push(row);
+        });
+
+        allOrderMap.forEach((data, oNo) => {
+            let inc = 0, exp = 0;
+            const oKey = getMonthSortKey(data.monthAndYear);
+            const oYear = (data.monthAndYear || "").split('-')[1];
+
+            const bulkData = orderBulkMap[oNo];
+            const hasManualBulk = bulkData && bulkData.amount !== undefined && bulkData.amount !== null && bulkData.amount !== "";
+
+            if (hasManualBulk) {
+                const bAmt = parseFloat(bulkData.amount) || 0;
+                const bType = bulkData.type || "Expense";
+                if (bType === "Income") inc = bAmt;
+                else exp = bAmt;
+            } else if (typeof bulkData === "number" || typeof bulkData === "string") {
+                exp = parseFloat(bulkData) || 0;
+            } else {
+                data.items.forEach(item => {
+                    const amt = parseFloat(item["Amount"]) || 0;
+                    if (item["Type"] === "Income") inc += amt;
+                    else exp += amt;
+                });
+            }
+
+            const netOrderAmount = inc - exp;
+
+            if (oKey < currentSelectedKey) {
+                carryoverBalance += netOrderAmount;
+            }
+
+            if (data.date === todayStr) {
+                todayInc += inc;
+                todayExp += exp;
+            }
+
+            if (data.monthAndYear === currentSelectedMonthYear) {
+                monthInc += inc;
+                monthExp += exp;
+            }
+
+            if (oYear === selectedYear) {
+                yearInc += inc;
+                yearExp += exp;
+            }
+        });
+
+        const todayBal = todayInc - todayExp;
+        const monthNet = monthInc - monthExp;
+        const monthTotalBalance = monthNet + carryoverBalance;
+        const yearBal = yearInc - yearExp;
+
+        const formatVal = (v) => (v >= 0 ? `+${v.toFixed(2)}` : `${v.toFixed(2)}`);
+        const getColorClass = (v) => (v >= 0 ? 'text-success' : 'text-danger');
+
+        const elTodayInc = document.getElementById('dashTodayInc');
+        const elTodayExp = document.getElementById('dashTodayExp');
+        const elTodayBal = document.getElementById('dashTodayBal');
+        if (elTodayInc) elTodayInc.innerText = todayInc.toFixed(2);
+        if (elTodayExp) elTodayExp.innerText = todayExp.toFixed(2);
+        if (elTodayBal) {
+            elTodayBal.innerText = formatVal(todayBal);
+            elTodayBal.className = `fw-bold ${getColorClass(todayBal)}`;
+        }
+
+        const elMonthInc = document.getElementById('dashMonthInc');
+        const elMonthExp = document.getElementById('dashMonthExp');
+        const elMonthCarry = document.getElementById('dashMonthCarry');
+        const elMonthBal = document.getElementById('dashMonthBal');
+        const elMonthLabel = document.getElementById('dashMonthLabel');
+        if (elMonthLabel) elMonthLabel.innerText = currentSelectedMonthYear;
+        if (elMonthInc) elMonthInc.innerText = monthInc.toFixed(2);
+        if (elMonthExp) elMonthExp.innerText = monthExp.toFixed(2);
+        if (elMonthCarry) elMonthCarry.innerText = formatVal(carryoverBalance);
+        if (elMonthBal) {
+            elMonthBal.innerText = formatVal(monthTotalBalance);
+            elMonthBal.className = `fw-bold ${getColorClass(monthTotalBalance)}`;
+        }
+
+        const elYearInc = document.getElementById('dashYearInc');
+        const elYearExp = document.getElementById('dashYearExp');
+        const elYearBal = document.getElementById('dashYearBal');
+        const elYearLabel = document.getElementById('dashYearLabel');
+        if (elYearLabel) elYearLabel.innerText = `Year ${selectedYear}`;
+        if (elYearInc) elYearInc.innerText = yearInc.toFixed(2);
+        if (elYearExp) elYearExp.innerText = yearExp.toFixed(2);
+        if (elYearBal) {
+            elYearBal.innerText = formatVal(yearBal);
+            elYearBal.className = `fw-bold ${getColorClass(yearBal)}`;
+        }
+    }
+
+    function initializeWorkspacePageListeners() {
+        const grid1Header = document.getElementById('grid1Header');
+        if (grid1Header) {
+            grid1Header.innerHTML = `<th style="width: 130px; text-align: center;">ACTIONS</th>` + 
+                grid1DisplayFields.map(f => `<th>${f}</th>`).join('');
+        }
+
+        document.querySelectorAll('.pagination-trigger').forEach(btn => {
+            btn.addEventListener('click', () => {
+                changeGridPage(parseInt(btn.getAttribute('data-grid')), parseInt(btn.getAttribute('data-dir')));
+            });
+        });
+
+        const grid1Body = document.getElementById('grid1Body');
+        if (grid1Body) {
+            grid1Body.addEventListener('click', (e) => {
+                const btn = e.target.closest('.grid-action-btn');
+                if (!btn) return;
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                if (isNaN(idx)) return;
+                if (btn.classList.contains('action-view')) viewGrid1RowModal(idx);
+                else if (btn.classList.contains('action-edit')) editGrid1RowModal(idx);
+                else if (btn.classList.contains('action-del')) deleteGrid1SingleRow(idx);
+            });
+        }
+        
+        currentGrid1Page = 1;
+        renderGrid1();
+    }
+
+    /* TYPE CONFIRMATION POPUP FOR NEW CATEGORY ITEM */
+    function promptCategoryTypeModal(categoryName, onSelectCallback) {
+        const popupBackdrop = document.createElement('div');
+        popupBackdrop.className = 'porto-modal-backdrop';
+        popupBackdrop.style.zIndex = '99999';
+        popupBackdrop.innerHTML = `
+            <div class="porto-modal" style="width: 380px; max-width: 90%; z-index: 100000; position: relative;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="window-dots">
+                        <span class="window-dot dot-red"></span>
+                        <span class="window-dot dot-yellow"></span>
+                        <span class="window-dot dot-green"></span>
+                    </div>
+                </div>
+                <h6 class="mb-2 text-dark font-weight-bold" style="font-size:15px;">Select Category Type</h6>
+                <p class="text-secondary mb-3" style="font-size:13px; line-height:1.4;">
+                    Select transaction type for <strong>"${toProperCase(categoryName)}"</strong>:
+                </p>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn-mac-secondary" id="btnTypeCancel" type="button" title="Cancel">Cancel</button>
+                    <button class="btn-mac-danger" id="btnTypeExpense" type="button" title="Expense">Expense</button>
+                    <button class="btn-mac-success" id="btnTypeIncome" type="button" title="Income">Income</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popupBackdrop);
+
+        popupBackdrop.querySelector('#btnTypeCancel').onclick = () => popupBackdrop.remove();
+        popupBackdrop.querySelector('#btnTypeExpense').onclick = () => {
+            popupBackdrop.remove();
+            onSelectCallback('Expense');
+        };
+        popupBackdrop.querySelector('#btnTypeIncome').onclick = () => {
+            popupBackdrop.remove();
+            onSelectCallback('Income');
+        };
+    }
+
+    /* CREATE ORDER MODAL */
+    function openCreateOrderModal() {
+        const generatedOrderNo = generateOrderNumber(formConfigStateCache.entryMonth, getNextOrderSequence());
+        let pendingCategoryItems = [];
+
+        const modalContainer = document.getElementById('portoModalContainer');
+        modalContainer.innerHTML = `
+            <div class="porto-modal-backdrop">
+                <div class="porto-modal" style="width: 520px; max-width: 95%;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="window-dots me-2">
+                                <span class="window-dot dot-red"></span>
+                                <span class="window-dot dot-yellow"></span>
+                                <span class="window-dot dot-green"></span>
+                            </div>
+                            <h6 class="m-0 font-weight-bold text-dark" style="font-size:15px;">Create Order (${generatedOrderNo})</h6>
+                        </div>
+                        <button class="grid-action-btn" id="btnCloseOrderModalTop" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <form id="formCreateOrder" class="d-flex flex-column gap-3" style="overflow-y: auto;">
+                        <div class="row g-2">
+                            <div class="col-7">
+                                <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Bulk Amount (Manual)</label>
+                                <input type="number" step="0.01" class="form-control" id="mAmount" placeholder="0.00">
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Bulk Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="mBulkType">
+                                    <option value="">-- Select --</option>
+                                    <option value="Expense">Expense</option>
+                                    <option value="Income">Income</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="autocomplete-wrapper position-relative">
+                            <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Category Items (Type comma ',' or press Enter) <span class="text-danger">*</span></label>
+                            <div id="categoryTagList" class="d-flex flex-wrap gap-1 mb-2"></div>
+                            <input type="text" class="form-control" id="mCategoryInput" placeholder="e.g. Rice, Raw Materials..." autocomplete="off">
+                            <div id="modalCategorySuggestions" class="autocomplete-suggestions" style="display: none;"></div>
+                        </div>
+
+                        <div>
+                            <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Description</label>
+                            <textarea class="form-control" id="mDescription" rows="2" placeholder="Add transaction details..."></textarea>
+                        </div>
+                        <div class="text-end pt-3 border-top d-flex justify-content-end gap-2">
+                            <button type="button" class="btn-mac-secondary" id="btnCloseOrderModalBot" title="Cancel">Cancel</button>
+                            <button type="submit" class="btn-mac-primary" id="btnSaveOrderRecord" title="Save Order">
+                                Save Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => modalContainer.innerHTML = '';
+        document.getElementById('btnCloseOrderModalTop').onclick = closeModal;
+        document.getElementById('btnCloseOrderModalBot').onclick = closeModal;
+
+        const catInput = document.getElementById('mCategoryInput');
+        const tagListContainer = document.getElementById('categoryTagList');
+        const catSugBox = document.getElementById('modalCategorySuggestions');
+
+        function renderCategoryTags() {
+            tagListContainer.innerHTML = '';
+            pendingCategoryItems.forEach((item, index) => {
+                const badge = document.createElement('span');
+                const badgeBg = item.type === 'Income' ? 'bg-success' : 'bg-danger';
+                badge.className = `badge ${badgeBg} rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1`;
+                badge.style.fontSize = '11px';
+                
+                badge.innerHTML = `
+                    <span>${item.category} (${item.type})</span>
+                    <span style="cursor:pointer; margin-left:4px; font-weight:bold;" data-idx="${index}">&times;</span>
+                `;
+                badge.querySelector('span:last-child').onclick = () => {
+                    pendingCategoryItems.splice(index, 1);
+                    renderCategoryTags();
+                };
+                tagListContainer.appendChild(badge);
+            });
+        }
+
+        function processCategoryInputItem(rawVal, callback) {
+            const cleanVal = toProperCase(rawVal.replace(/,/g, '').trim());
+            if (!cleanVal) {
+                if (callback) callback();
                 return;
             }
 
-            const query = rawString.trim().toLowerCase();
-            if (query.length > 0) {
-                const dynamicMap = getDynamicSuggestionsMap();
-                const matchedKeys = Object.keys(dynamicMap).filter(key => key.toLowerCase().includes(query));
-                
-                if(matchedKeys.length > 0) {
-                    DOM.boxSuggestions.innerHTML = matchedKeys.map(key => {
-                        const typeVal = dynamicMap[key];
-                        return `
-                            <div class="suggestion-row" data-value="${escapeHtml(toTitleCase(key))}" data-type="${typeVal}">
-                                <span class="fw-semibold text-dark small">${escapeHtml(toTitleCase(key))}</span>
-                                <span class="badge border px-2 py-1 font-mono fs-8 ${typeVal === 'Income' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">${typeVal.toUpperCase()}</span>
-                            </div>
-                        `;
-                    }).join('');
-                    DOM.boxSuggestions.classList.remove('d-none');
-                } else {
-                    DOM.boxSuggestions.classList.add('d-none');
-                }
+            const knownCategories = getCategorySuggestions();
+            const existing = knownCategories.find(c => c.category.toLowerCase() === cleanVal.toLowerCase());
+
+            if (existing) {
+                pendingCategoryItems.push({
+                    category: existing.category,
+                    type: existing.type,
+                    amount: 0
+                });
+                renderCategoryTags();
+                catInput.value = '';
+                if (callback) callback();
             } else {
-                DOM.boxSuggestions.classList.add('d-none');
+                promptCategoryTypeModal(cleanVal, (selectedType) => {
+                    pendingCategoryItems.push({
+                        category: cleanVal,
+                        type: selectedType,
+                        amount: 0
+                    });
+                    renderCategoryTags();
+                    catInput.value = '';
+                    if (callback) callback();
+                });
+            }
+        }
+
+        catInput.addEventListener('input', () => {
+            if (catInput.value.includes(',')) {
+                const parts = catInput.value.split(',');
+                const tagCandidate = parts[0];
+                catInput.value = parts.slice(1).join(',');
+                catSugBox.style.display = 'none';
+                processCategoryInputItem(tagCandidate);
+            } else {
+                const val = catInput.value.toLowerCase().trim();
+                const categories = getCategorySuggestions();
+                const matched = val ? categories.filter(c => c.category.toLowerCase().includes(val)) : categories;
+
+                if (matched.length > 0) {
+                    catSugBox.innerHTML = matched.map(c => 
+                        `<div class="autocomplete-suggestion" data-cat="${c.category}">${c.category} <span class="text-secondary">(${c.type})</span></div>`
+                    ).join('');
+                    catSugBox.style.display = 'block';
+                } else {
+                    catSugBox.style.display = 'none';
+                }
             }
         });
 
-        DOM.inpTagTrigger.addEventListener('keydown', (e) => {
+        catInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                let cleaned = DOM.inpTagTrigger.value.trim();
-                if (cleaned.length > 0) {
-                    const currentMap = getDynamicSuggestionsMap();
-                    let exactMatchKey = Object.keys(currentMap).find(k => k.toLowerCase() === cleaned.toLowerCase());
-                    if(exactMatchKey) launchInlineConfigurationFlow(toTitleCase(exactMatchKey), null, currentMap[exactMatchKey]);
-                    else launchInlineConfigurationFlow(toTitleCase(cleaned));
+                if (catInput.value.trim()) {
+                    catSugBox.style.display = 'none';
+                    processCategoryInputItem(catInput.value);
                 }
-                DOM.inpTagTrigger.value = '';
-                DOM.boxSuggestions.classList.add('d-none');
             }
         });
 
-        DOM.boxSuggestions.addEventListener('click', (e) => {
-            const selectedRow = e.target.closest('.suggestion-row');
-            if (selectedRow) {
-                DOM.inpTagTrigger.value = '';
-                DOM.boxSuggestions.classList.add('d-none');
-                launchInlineConfigurationFlow(toTitleCase(selectedRow.getAttribute('data-value')), null, selectedRow.getAttribute('data-type'));
+        catSugBox.addEventListener('click', (e) => {
+            const suggestItem = e.target.closest('.autocomplete-suggestion');
+            if (suggestItem) {
+                const selectedCat = suggestItem.getAttribute('data-cat') || suggestItem.innerText;
+                catSugBox.style.display = 'none';
+                processCategoryInputItem(selectedCat);
             }
         });
 
-        document.addEventListener('click', (event) => {
-            if (!event.target.closest('#tagWrapperBox')) DOM.boxSuggestions.classList.add('d-none');
-        });
-    }
+        document.getElementById('formCreateOrder').onsubmit = (e) => {
+            e.preventDefault();
 
-    function validateTypeRequirement() {
-        const checked = document.querySelector('input[name="optFlowType"]:checked');
-        if (checked) {
-            DOM.btnOverlayConfirm.removeAttribute('disabled');
-            DOM.typeFeedbackMsg.classList.add('d-none');
-        } else {
-            DOM.btnOverlayConfirm.setAttribute('disabled', 'true');
-            DOM.typeFeedbackMsg.classList.remove('d-none');
-        }
-    }
+            const finalizeOrder = () => {
+                if (pendingCategoryItems.length === 0) {
+                    showNotification("Please add at least one category item.", "warning");
+                    return;
+                }
 
-    function launchInlineConfigurationFlow(itemName, tagIndexToEdit = null, autoInjectedType = null) {
-        System.stateCurrentTargetItemText = itemName;
-        System.activeEditingTagIndex = tagIndexToEdit;
+                const rawBulkAmtInput = document.getElementById('mAmount').value.trim();
+                const bulkType = document.getElementById('mBulkType').value;
+                const hasBulkAmount = rawBulkAmtInput !== "" && !isNaN(parseFloat(rawBulkAmtInput)) && parseFloat(rawBulkAmtInput) > 0;
 
-        DOM.lblTargetItem.innerText = itemName;
-        DOM.configModalTitle.innerText = tagIndexToEdit !== null ? "Modify Element Parameters" : "Configure Parameters";
-        
-        if (tagIndexToEdit !== null) {
-            const sourceItem = System.localActiveOrderRecords[tagIndexToEdit];
-            DOM.txtSubrecordAmount.value = sourceItem.amount > 0 ? sourceItem.amount : '';
-            DOM.flowIncome.checked = sourceItem.type === 'Income';
-            DOM.flowExpense.checked = sourceItem.type === 'Expense';
-        } else {
-            DOM.txtSubrecordAmount.value = '';
-            DOM.flowIncome.checked = autoInjectedType === 'Income';
-            DOM.flowExpense.checked = autoInjectedType === 'Expense';
-        }
+                if (hasBulkAmount && !bulkType) {
+                    showNotification("Please select a Type (Expense or Income) for the bulk amount before saving.", "warning");
+                    return;
+                }
 
-        validateTypeRequirement();
-        DOM.configOverlayPanel.classList.add('active');
-        DOM.txtSubrecordAmount.focus();
-    }
+                const bulkValue = hasBulkAmount ? parseFloat(rawBulkAmtInput) : 0;
+                const description = document.getElementById('mDescription').value.trim();
 
-    function commitConfiguredRecordItem() {
-        const checkedTypeElement = document.querySelector('input[name="optFlowType"]:checked');
-        if (!checkedTypeElement) return;
+                const monthYearParts = (formConfigStateCache.entryMonth || "JULY-2026").split("-");
+                const entryMonthFormattedString = `${monthYearParts[0] || 'JULY'}-${monthYearParts[1] || '2026'}`;
+                const todayFormattedDate = new Date().toISOString().split('T')[0];
 
-        const inputAmountRaw = DOM.txtSubrecordAmount.value;
-        const packageData = {
-            name: System.stateCurrentTargetItemText,
-            type: checkedTypeElement.value,
-            amount: inputAmountRaw === '' ? 0.00 : parseFloat(inputAmountRaw)
-        };
+                if (hasBulkAmount) {
+                    orderBulkMap[generatedOrderNo] = {
+                        amount: bulkValue,
+                        type: bulkType
+                    };
+                } else {
+                    delete orderBulkMap[generatedOrderNo];
+                }
 
-        if (System.activeEditingTagIndex !== null) {
-            System.localActiveOrderRecords[System.activeEditingTagIndex] = packageData;
-        } else {
-            System.localActiveOrderRecords.push(packageData);
-        }
-
-        DOM.configOverlayPanel.classList.remove('active');
-        System.activeEditingTagIndex = null;
-        syncActiveRecordsUiBadges();
-        setTimeout(() => DOM.inpTagTrigger.focus(), 100);
-    }
-
-    function syncActiveRecordsUiBadges() {
-        DOM.tagWrapperBox.querySelectorAll('.badge-clickable-tag').forEach(node => node.remove());
-
-        System.localActiveOrderRecords.forEach((record, arrayIndex) => {
-            const spanBadge = document.createElement('span');
-            spanBadge.className = `badge-clickable-tag ${record.type === 'Income' ? 'badge-income' : 'badge-expense'}`;
-            spanBadge.addEventListener('click', () => launchInlineConfigurationFlow(record.name, arrayIndex));
-            
-            spanBadge.innerHTML = `
-                <small class="fw-bold me-1 text-uppercase font-mono" style="font-size:0.65rem;">[${record.type === 'Income' ? 'INC' : 'EXP'}]</small>
-                <span class="fw-semibold">${escapeHtml(record.name)}</span>
-                <span class="ms-1 opacity-75 font-mono">($${record.amount.toFixed(2)})</span>
-                <i class="fa-solid fa-circle-xmark remove-tag-btn" title="Remove element"></i>
-            `;
-
-            spanBadge.querySelector('.remove-tag-btn').addEventListener('click', (event) => {
-                event.stopPropagation();
-                System.localActiveOrderRecords.splice(arrayIndex, 1);
-                syncActiveRecordsUiBadges();
-            });
-
-            DOM.tagWrapperBox.insertBefore(spanBadge, DOM.inpTagTrigger);
-        });
-    }
-
-    function processFinalOrderCommit() {
-        if(!DOM.inpOrderPeriod.value) {
-            showCustomNotification("Please specify a baseline temporal parameters month context structure.", "danger");
-            return;
-        }
-
-        const inputIncVal = DOM.inpBulkIncome.value;
-        const inputExpVal = DOM.inpBulkExpense.value;
-        const targetDataStructure = {
-            id: DOM.inpOrderNum.value,
-            period: DOM.inpOrderPeriod.value,
-            bulkIncome: inputIncVal === '' ? 0.00 : parseFloat(inputIncVal),
-            bulkExpense: inputExpVal === '' ? 0.00 : parseFloat(inputExpVal),
-            items: [...System.localActiveOrderRecords]
-        };
-
-        if (System.activeEditingOrderId !== null) {
-            const targetIndex = System.databaseOrdersStore.findIndex(o => o.id === System.activeEditingOrderId);
-            if (targetIndex !== -1) System.databaseOrdersStore[targetIndex] = targetDataStructure;
-            showCustomNotification(`Ledger node entry token block ${targetDataStructure.id} updated successfully.`, "success");
-        } else {
-            System.databaseOrdersStore.push(targetDataStructure);
-            System.globalCounterIndex++; 
-            showCustomNotification(`Instantiated block ${targetDataStructure.id} appended to master ledger.`, "success");
-        }
-
-        localStorage.setItem('ledger_orders_v96', JSON.stringify(System.databaseOrdersStore));
-        System.modalBootstrapContext.hide();
-        renderMasterTableLedgerGrid();
-    }
-
-    function renderMasterTableLedgerGrid() {
-        DOM.masterGridBody.innerHTML = '';
-        const filterMode = DOM.globalPeriodFilterMode.value;
-        const targetFilterPeriod = DOM.globalPeriodFilter.value;
-
-        DOM.gridTitleContext.innerText = (filterMode === 'SELECTED' && targetFilterPeriod) ? 
-            `Ledger Balance Audit: ${formatPeriodStringToMmmYyyy(targetFilterPeriod)}` : "Historical Matrix Roll Logs";
-
-        if (System.databaseOrdersStore.length === 0) {
-            DOM.masterGridBody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center py-5 text-muted">
-                        <div class="p-4 text-center">
-                            <i class="fa-solid fa-bezier-curve fa-3x mb-3 text-secondary opacity-30"></i>
-                            <h6 class="fw-bold text-dark">No Ledger Nodes Localized</h6>
-                            <p class="small text-muted mb-0">Generate your initial accounting block to instantiate tracking data structures.</p>
-                        </div>
-                    </td>
-                </tr>`;
-            DOM.ledgerCounter.innerText = "0 Records";
-            recalculateGlobalFinancialLedgers();
-            return;
-        }
-
-        const runningEngineMetrics = computeCompleteFinancialChainMetrics();
-        const sortedDisplayList = getChronologicallySortedOrders();
-        const visibleRowsList = sortedDisplayList.filter(order => filterMode === 'ALL' || order.period === targetFilterPeriod).reverse();
-
-        DOM.ledgerCounter.innerText = `${visibleRowsList.length} Allocated Block${visibleRowsList.length === 1 ? '' : 's'}`;
-
-        if(visibleRowsList.length === 0) {
-            DOM.masterGridBody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center py-5 text-muted bg-white">
-                        <i class="fa-regular fa-calendar-minus fa-2x mb-2 text-muted opacity-40"></i>
-                        <span class="small d-block text-secondary fw-semibold">No elements registered on this timescale slice.</span>
-                    </td>
-                </tr>`;
-            recalculateGlobalFinancialLedgers();
-            return;
-        }
-
-        // Optimize visual layout pipeline frame cycle 
-        requestAnimationFrame(() => {
-            const documentFragmentContainer = document.createDocumentFragment();
-            
-            visibleRowsList.forEach(order => {
-                const nodeMetrics = runningEngineMetrics.chainMap[order.id] || { broughtDown:0, income:0, expense:0, carriedForward:0 };
-                const labelCollection = [];
-                
-                if((parseFloat(order.bulkIncome) || 0) > 0) labelCollection.push(`Base Revenue ($${parseFloat(order.bulkIncome).toFixed(2)})`);
-                if((parseFloat(order.bulkExpense) || 0) > 0) labelCollection.push(`Base Expense ($${parseFloat(order.bulkExpense).toFixed(2)})`);
-                
-                order.items.forEach(item => {
-                    labelCollection.push(`${item.name} [${item.type === 'Income' ? 'INC' : 'EXP'}] ($${item.amount.toFixed(2)})`);
+                pendingCategoryItems.forEach(item => {
+                    const recordObj = {
+                        "Order No.": generatedOrderNo,
+                        "Type": item.type,
+                        "Category": item.category,
+                        "Description": description,
+                        "Amount": hasBulkAmount ? "0.00" : (parseFloat(item.amount) || 0).toFixed(2),
+                        "MonthAndYear": entryMonthFormattedString,
+                        "Date": todayFormattedDate
+                    };
+                    grid1Storage.push(recordObj);
                 });
 
-                const commaSeparatedHtml = labelCollection.length > 0 
-                    ? labelCollection.map(txt => `<span class="comma-item me-1 mb-1">${escapeHtml(txt)}</span>`).join(' ')
-                    : `<span class="text-muted small italic">No nested mappings.</span>`;
+                applyTimeSelectionFilters();
+                modalContainer.innerHTML = '';
+                showNotification(`Order ${generatedOrderNo} created successfully.`, "success");
 
-                const tr = document.createElement('tr');
-                tr.className = "align-middle";
-                tr.innerHTML = `
-                    <td class="fw-bold text-dark text-nowrap">
-                        <span class="d-flex align-items-center gap-2">
-                            <span class="p-2 bg-light rounded-2 text-primary" style="font-size: 0.85rem;"><i class="fa-solid fa-calendar-day"></i></span>
-                            ${formatPeriodStringToMmmYyyy(order.period)}
-                        </span>
+                renderGrid1();
+                saveApplicationStateToDatabase();
+            };
+
+            if (catInput.value.trim()) {
+                processCategoryInputItem(catInput.value, finalizeOrder);
+            } else {
+                finalizeOrder();
+            }
+        };
+    }
+
+    /* GRID 1 RENDERING SYSTEM */
+    function renderGrid1() {
+        const countLabel = document.getElementById('grid1Count');
+        if (!countLabel) return;
+        
+        let groupedOrders = getGroupedOrders(currentFilteredGrid1Data);
+
+        countLabel.innerText = `${groupedOrders.length} Orders`;
+
+        const tbody = document.getElementById('grid1Body');
+        if (!tbody) return;
+        
+        if (!groupedOrders.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted font-monospace">No order records found for current timeframe.</td></tr>`;
+            const pageIndicator = document.getElementById('g1PageIndicator');
+            if (pageIndicator) pageIndicator.innerText = "Page 1 / 1";
+            renderDashboardSummaries();
+            return;
+        }
+
+        const totalPages = Math.ceil(groupedOrders.length / maxRowsPerPage) || 1;
+        if (currentGrid1Page > totalPages) currentGrid1Page = totalPages;
+        
+        const pageIndicator = document.getElementById('g1PageIndicator');
+        if (pageIndicator) pageIndicator.innerText = `Page ${currentGrid1Page} / ${totalPages}`;
+        
+        const startIdx = (currentGrid1Page - 1) * maxRowsPerPage;
+        const sliceData = groupedOrders.slice(startIdx, startIdx + maxRowsPerPage);
+
+        const frag = document.createDocumentFragment();
+        
+        sliceData.forEach((order, idx) => {
+            const globalIdx = startIdx + idx;
+            const orderNumberOnPage = idx + 1;
+            
+            const tr = document.createElement('tr');
+            
+            // Actions Column
+            const actionTd = document.createElement('td');
+            actionTd.className = "text-center";
+            actionTd.style.whiteSpace = "nowrap";
+            actionTd.innerHTML = `
+                <div class="d-flex gap-1 justify-content-center">
+                    <button type="button" class="grid-action-btn action-view" data-idx="${globalIdx}" title="View"><i class="fa-solid fa-eye"></i></button>
+                    <button type="button" class="grid-action-btn action-edit" data-idx="${globalIdx}" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button type="button" class="grid-action-btn btn-act-delete action-del" data-idx="${globalIdx}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+            tr.appendChild(actionTd);
+
+            // 1. Order No.
+            const tdOrderNo = document.createElement('td');
+            tdOrderNo.className = "fw-bold text-dark";
+            tdOrderNo.innerText = order.orderNo;
+            tr.appendChild(tdOrderNo);
+
+            // 2. Category Tags & Type
+            const tdCatTags = document.createElement('td');
+            const tagsHtml = order.categoryTags.map(tag => {
+                const badgeClass = tag.type === 'Income' ? 'bg-success' : 'bg-danger';
+                const amtSuffix = tag.amount > 0 ? ` : ${tag.amount.toFixed(2)}` : '';
+                return `<span class="badge ${badgeClass} rounded-pill me-1 mb-1" style="font-size: 11px; padding: 4px 8px;">
+                            ${tag.category} <span class="opacity-75">(${tag.type}${amtSuffix})</span>
+                        </span>`;
+            }).join('');
+            tdCatTags.innerHTML = tagsHtml || '<i class="text-muted">No Categories</i>';
+            tr.appendChild(tdCatTags);
+
+            // 3. Description
+            const tdDesc = document.createElement('td');
+            tdDesc.className = "text-dark";
+            tdDesc.innerText = order.description || '';
+            tr.appendChild(tdDesc);
+
+            // 4. Subtotal / Bulk Amount
+            const tdSubtotal = document.createElement('td');
+            tdSubtotal.className = `fw-bold ${order.subtotal >= 0 ? 'text-success' : 'text-danger'}`;
+            tdSubtotal.innerText = (order.subtotal >= 0 ? '+' : '') + order.subtotal.toFixed(2);
+            tr.appendChild(tdSubtotal);
+
+            // 5. Month & Year
+            const tdMonth = document.createElement('td');
+            tdMonth.className = "text-dark";
+            tdMonth.innerText = order.monthAndYear || '';
+            tr.appendChild(tdMonth);
+
+            frag.appendChild(tr);
+
+            if (orderNumberOnPage % 2 !== 0) {
+                const subtr = document.createElement('tr');
+                subtr.className = "subtotal-row";
+                subtr.innerHTML = `
+                    <td colspan="4" class="text-end fw-bold py-1 text-dark" style="font-size:12px;">
+                        <i class="fa-solid fa-calculator text-warning me-1"></i> Subtotal (Order ${order.orderNo}):
                     </td>
-                    <td class="font-mono fw-bold text-primary small">${order.id}</td>
-                    <td><div class="lh-base py-1">${commaSeparatedHtml}</div></td>
-                    <td>
-                        <div class="order-summary-box font-mono small">
-                            <div class="d-flex justify-content-between text-secondary mb-0.5" style="font-size:0.75rem;">
-                                <span>Brought Down (B/D):</span><span>$${nodeMetrics.broughtDown.toFixed(2)}</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-success mb-0.5" style="font-size:0.75rem;">
-                                <span>Period Revenue:</span><span>+$${nodeMetrics.income.toFixed(2)}</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-danger mb-1" style="font-size:0.75rem;">
-                                <span>Period Expenses:</span><span>-$${nodeMetrics.expense.toFixed(2)}</span>
-                            </div>
-                            <div class="d-flex justify-content-between border-top pt-1 fw-bold ${nodeMetrics.carriedForward < 0 ? 'text-danger' : 'text-dark'}" style="font-size:0.8rem;">
-                                <span>Carried Forward (C/F):</span><span>$${nodeMetrics.carriedForward.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="text-end">
-                        <div class="d-inline-flex gap-1.5">
-                            <button class="btn btn-sm btn-white border rounded-2 px-2.5 py-1.5 btn-show-action fw-medium text-secondary">
-                                <i class="fa-solid fa-expand text-info me-1"></i> View
-                            </button>
-                            <button class="btn btn-sm btn-white border rounded-2 px-2.5 py-1.5 btn-edit-action fw-medium text-secondary">
-                                <i class="fa-solid fa-sliders text-primary me-1"></i> Edit
-                            </button>
-                        </div>
+                    <td colspan="2" class="fw-bold py-1 ${order.subtotal >= 0 ? 'text-success' : 'text-danger'}" style="font-size:13px;">
+                        ${(order.subtotal >= 0 ? '+' : '') + order.subtotal.toFixed(2)}
                     </td>
                 `;
+                frag.appendChild(subtr);
+            }
+        });
 
-                tr.querySelector('.btn-show-action').addEventListener('click', () => triggerDeepInspectorView(order.id));
-                tr.querySelector('.btn-edit-action').addEventListener('click', () => triggerOrderStructureEdit(order.id));
-                documentFragmentContainer.appendChild(tr);
+        tbody.replaceChildren(frag);
+        renderDashboardSummaries();
+    }
+
+    /* VIEW ORDER MODAL */
+    function viewGrid1RowModal(groupedIdx) {
+        const groupedOrders = getGroupedOrders(currentFilteredGrid1Data);
+        const targetOrder = groupedOrders[groupedIdx];
+        if (!targetOrder) return;
+
+        let tagsDetail = targetOrder.categoryTags.map(t => 
+            `<span class="badge ${t.type === 'Income' ? 'bg-success' : 'bg-danger'} rounded-pill me-1 mb-1 p-2">
+                ${t.category} (${t.type}${t.amount > 0 ? ' - ' + t.amount.toFixed(2) : ''})
+             </span>`
+        ).join(' ');
+
+        const container = document.getElementById('portoModalContainer');
+        container.innerHTML = `
+            <div class="porto-modal-backdrop">
+                <div class="porto-modal porto-modal-lg">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="window-dots me-2">
+                                <span class="window-dot dot-red"></span>
+                                <span class="window-dot dot-yellow"></span>
+                                <span class="window-dot dot-green"></span>
+                            </div>
+                            <h6 class="m-0 font-weight-bold text-dark" style="font-size:15px;">Order Inspector — ${targetOrder.orderNo}</h6>
+                        </div>
+                        <button class="grid-action-btn" id="btnInspectorCloseTop" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="row g-2" style="overflow-y:auto; flex:1;">
+                        <div class="col-12 col-sm-6">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Order No.</span>
+                                <span class="text-dark font-weight-bold">${targetOrder.orderNo}</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Timeframe</span>
+                                <span class="text-dark font-weight-bold">${targetOrder.monthAndYear}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Categories & Types</span>
+                                <div>${tagsDetail}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Total Income</span>
+                                <span class="text-success font-weight-bold">${targetOrder.incomeSum.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Total Expense</span>
+                                <span class="text-danger font-weight-bold">${targetOrder.expenseSum.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="p-2 border bg-light rounded-3" style="font-size:12px;">
+                                <span class="text-secondary d-block mb-1">Income - Expense</span>
+                                <span class="text-dark font-weight-bold">${targetOrder.netCategorySum.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-2 border bg-warning bg-opacity-10 border-warning rounded-3" style="font-size:12px;">
+                                <span class="text-dark font-weight-bold d-block mb-1">Effective Subtotal / Bulk Amount:</span>
+                                <span class="fs-5 fw-bold ${targetOrder.subtotal >= 0 ? 'text-success' : 'text-danger'}">${(targetOrder.subtotal >= 0 ? '+' : '') + targetOrder.subtotal.toFixed(2)} (${targetOrder.isManualBulk ? 'Manual ' + targetOrder.bulkType : 'Category Calculated'})</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end pt-3 mt-2 border-top">
+                        <button class="btn-mac-secondary" id="btnInspectorCloseBot" title="Close Inspector">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const closeInspector = () => container.innerHTML = '';
+        document.getElementById('btnInspectorCloseTop').onclick = closeInspector;
+        document.getElementById('btnInspectorCloseBot').onclick = closeInspector;
+    }
+
+    /* EDIT ORDER MODAL WITH INDIVIDUAL CATEGORY DELETE BUTTONS */
+    function editGrid1RowModal(groupedIdx) {
+        const groupedOrders = getGroupedOrders(currentFilteredGrid1Data);
+        const targetOrder = groupedOrders[groupedIdx];
+        if (!targetOrder) return;
+
+        // Clone local copies of items for non-destructive edit manipulation
+        let currentEditingItems = targetOrder.rawItems.map(item => ({ ...item }));
+
+        const bulkInputValue = targetOrder.isManualBulk ? targetOrder.bulkAmount.toFixed(2) : '';
+        const bulkTypeSelected = targetOrder.isManualBulk ? targetOrder.bulkType : '';
+
+        const container = document.getElementById('portoModalContainer');
+
+        function renderEditModalContent() {
+            let itemsFormHtml = '';
+            currentEditingItems.forEach((item, i) => {
+                itemsFormHtml += `
+                    <div class="p-2 mb-2 border rounded-3 bg-light cat-item-row" data-item-idx="${i}">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label mb-1 text-dark fw-bold" style="font-size:11px;">Category</label>
+                                <input type="text" class="form-control form-control-sm edit-cat-name" value="${item.Category || ''}">
+                            </div>
+                            <div class="col-5 col-sm-3">
+                                <label class="form-label mb-1 text-dark fw-bold" style="font-size:11px;">Type</label>
+                                <select class="form-select form-select-sm edit-cat-type">
+                                    <option value="Expense" ${item.Type === 'Expense' ? 'selected' : ''}>Expense</option>
+                                    <option value="Income" ${item.Type === 'Income' ? 'selected' : ''}>Income</option>
+                                </select>
+                            </div>
+                            <div class="col-5 col-sm-3">
+                                <label class="form-label mb-1 text-dark fw-bold" style="font-size:11px;">Amount</label>
+                                <input type="number" step="0.01" class="form-control form-control-sm edit-cat-amt" value="${parseFloat(item.Amount || 0).toFixed(2)}">
+                            </div>
+                            <div class="col-2 col-sm-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-category-item rounded-2" data-item-idx="${i}" title="Delete Category Item">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
 
-            DOM.masterGridBody.appendChild(documentFragmentContainer);
-            recalculateGlobalFinancialLedgers();
+            container.innerHTML = `
+                <div class="porto-modal-backdrop">
+                    <div class="porto-modal porto-modal-lg">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="window-dots me-2">
+                                    <span class="window-dot dot-red"></span>
+                                    <span class="window-dot dot-yellow"></span>
+                                    <span class="window-dot dot-green"></span>
+                                </div>
+                                <h6 class="m-0 font-weight-bold text-dark" style="font-size:15px;">Edit Order — ${targetOrder.orderNo}</h6>
+                            </div>
+                            <button class="grid-action-btn" id="btnEditCloseTop" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div style="overflow-y:auto; flex:1;" class="pe-1">
+                            <div class="mb-3">
+                                <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Description</label>
+                                <input type="text" class="form-control" id="mEditDescription" value="${targetOrder.description || ''}">
+                            </div>
+
+                            <div class="mb-3 p-2 border rounded-3 bg-warning bg-opacity-10 border-warning">
+                                <label class="form-label mb-1 fw-bold text-dark" style="font-size:12px;">Manual Bulk Amount Option</label>
+                                <div class="row g-2">
+                                    <div class="col-7">
+                                        <input type="number" step="0.01" class="form-control" id="mEditBulkAmount" value="${bulkInputValue}" placeholder="0.00">
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-select" id="mEditBulkType">
+                                            <option value="">-- Bulk Type --</option>
+                                            <option value="Expense" ${bulkTypeSelected === 'Expense' ? 'selected' : ''}>Expense</option>
+                                            <option value="Income" ${bulkTypeSelected === 'Income' ? 'selected' : ''}>Income</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <small class="text-secondary d-block mt-1" style="font-size:11px;">
+                                    * Note: Entering a bulk amount resets individual item amounts to zero. Entering individual amounts resets bulk amount to zero.
+                                </small>
+                            </div>
+
+                            <h6 class="fw-bold fs-6 mb-2 text-dark">Category Items</h6>
+                            <div id="editCategoryItemsContainer">
+                                ${itemsFormHtml || '<i class="text-muted d-block mb-2">No category items found.</i>'}
+                            </div>
+                        </div>
+                        <div class="text-end pt-3 mt-2 border-top d-flex justify-content-end gap-2">
+                            <button class="btn-mac-secondary" id="btnEditCloseBot" title="Cancel">Cancel</button>
+                            <button class="btn-mac-primary" id="btnEditSave" title="Save Changes">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            bindModalEvents();
+        }
+
+        function syncInputStateToEditingItems() {
+            const rows = container.querySelectorAll('.cat-item-row');
+            rows.forEach(row => {
+                const idx = parseInt(row.getAttribute('data-item-idx'));
+                if (!isNaN(idx) && currentEditingItems[idx]) {
+                    const catEl = row.querySelector('.edit-cat-name');
+                    const typeEl = row.querySelector('.edit-cat-type');
+                    const amtEl = row.querySelector('.edit-cat-amt');
+
+                    if (catEl) currentEditingItems[idx]["Category"] = catEl.value;
+                    if (typeEl) currentEditingItems[idx]["Type"] = typeEl.value;
+                    if (amtEl) currentEditingItems[idx]["Amount"] = amtEl.value;
+                }
+            });
+        }
+
+        function bindModalEvents() {
+            document.getElementById('btnEditCloseTop').onclick = () => container.innerHTML = '';
+            document.getElementById('btnEditCloseBot').onclick = () => container.innerHTML = '';
+
+            const editBulkInput = document.getElementById('mEditBulkAmount');
+            const itemsContainer = container.querySelector('#editCategoryItemsContainer');
+
+            // MUTUAL EXCLUSIVITY EVENT LISTENERS:
+            // 1. Entering bulk amount resets individual amounts to zero
+            if (editBulkInput) {
+                editBulkInput.addEventListener('input', () => {
+                    const val = editBulkInput.value.trim();
+                    if (val !== '' && !isNaN(parseFloat(val)) && parseFloat(val) > 0) {
+                        const amtInputs = container.querySelectorAll('.edit-cat-amt');
+                        amtInputs.forEach(input => {
+                            input.value = "0.00";
+                        });
+                        currentEditingItems.forEach(item => {
+                            item["Amount"] = "0.00";
+                        });
+                    }
+                });
+            }
+
+            // 2. Entering individual amounts resets bulk amount to zero
+            if (itemsContainer) {
+                itemsContainer.addEventListener('input', (e) => {
+                    if (e.target.classList.contains('edit-cat-amt')) {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val > 0) {
+                            if (editBulkInput) editBulkInput.value = '';
+                            const editBulkType = document.getElementById('mEditBulkType');
+                            if (editBulkType) editBulkType.value = '';
+                        }
+                    }
+                });
+
+                itemsContainer.addEventListener('click', (e) => {
+                    const btnDel = e.target.closest('.btn-remove-category-item');
+                    if (btnDel) {
+                        const targetIdx = parseInt(btnDel.getAttribute('data-item-idx'));
+                        if (!isNaN(targetIdx)) {
+                            syncInputStateToEditingItems();
+                            currentEditingItems.splice(targetIdx, 1);
+                            renderEditModalContent();
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('btnEditSave').onclick = () => {
+                syncInputStateToEditingItems();
+
+                if (currentEditingItems.length === 0) {
+                    showNotification("Order must contain at least one category item. Otherwise, delete the whole order.", "warning");
+                    return;
+                }
+
+                const desc = document.getElementById('mEditDescription').value.trim();
+                const rawBulkInput = document.getElementById('mEditBulkAmount').value.trim();
+                const editBulkType = document.getElementById('mEditBulkType').value;
+
+                // Check if any individual category item has an amount > 0
+                const hasCategoryAmounts = currentEditingItems.some(item => parseFloat(item["Amount"] || 0) > 0);
+
+                let hasManualBulk = false;
+                if (hasCategoryAmounts) {
+                    // If individual category amounts exist, reset/clear bulk amount
+                    delete orderBulkMap[targetOrder.orderNo];
+                } else {
+                    hasManualBulk = rawBulkInput !== "" && !isNaN(parseFloat(rawBulkInput)) && parseFloat(rawBulkInput) > 0;
+
+                    if (hasManualBulk && !editBulkType) {
+                        showNotification("Please select a Type (Expense or Income) for the bulk amount.", "warning");
+                        return;
+                    }
+
+                    if (hasManualBulk) {
+                        orderBulkMap[targetOrder.orderNo] = {
+                            amount: parseFloat(rawBulkInput),
+                            type: editBulkType
+                        };
+                        // Ensure individual category amounts are zeroed out in storage
+                        currentEditingItems.forEach(item => {
+                            item["Amount"] = "0.00";
+                        });
+                    } else {
+                        delete orderBulkMap[targetOrder.orderNo];
+                    }
+                }
+
+                // Update items array cleanly inside main grid storage
+                grid1Storage = grid1Storage.filter(r => r["Order No."] !== targetOrder.orderNo);
+
+                currentEditingItems.forEach(item => {
+                    const parsedItemAmt = parseFloat(item["Amount"]) || 0;
+                    grid1Storage.push({
+                        "Order No.": targetOrder.orderNo,
+                        "Type": item["Type"] || "Expense",
+                        "Category": toProperCase(item["Category"] || ""),
+                        "Description": desc,
+                        "Amount": parsedItemAmt.toFixed(2),
+                        "MonthAndYear": targetOrder.monthAndYear,
+                        "Date": targetOrder.date
+                    });
+                });
+
+                applyTimeSelectionFilters();
+                renderGrid1();
+                saveApplicationStateToDatabase();
+                container.innerHTML = '';
+                showNotification(`Updated details for Order ${targetOrder.orderNo}.`, "success");
+            };
+        }
+
+        renderEditModalContent();
+    }
+
+    function deleteGrid1SingleRow(groupedIdx) {
+        const groupedOrders = getGroupedOrders(currentFilteredGrid1Data);
+        const targetOrder = groupedOrders[groupedIdx];
+        if (!targetOrder) return;
+
+        showConfirmModal(`Permanently delete Order ${targetOrder.orderNo} and all its categories?`, () => {
+            grid1Storage = grid1Storage.filter(r => r["Order No."] !== targetOrder.orderNo);
+            delete orderBulkMap[targetOrder.orderNo];
+
+            applyTimeSelectionFilters();
+            renderGrid1();
+            saveApplicationStateToDatabase();
+            showNotification("Order successfully removed.", "danger");
         });
     }
 
-    function triggerDeepInspectorView(orderId) {
-        const order = System.databaseOrdersStore.find(o => o.id === orderId);
-        if(!order) return;
-
-        DOM.viewModalTokenId.innerText = order.id;
-        DOM.viewModalPeriod.innerText = formatPeriodStringToMmmYyyy(order.period);
-
-        const rowElements = [
-            { name: 'Baseline Allocation Revenue', type: 'Income', amount: parseFloat(order.bulkIncome) || 0 },
-            { name: 'Baseline Allocation Expense', type: 'Expense', amount: parseFloat(order.bulkExpense) || 0 }
-        ];
+    function changeGridPage(targetGridId, directionalIncrement) {
+        let groupedOrders = getGroupedOrders(currentFilteredGrid1Data);
         
-        if(order.items) rowElements.push(...order.items);
-        const validRows = rowElements.filter(rowItem => rowItem.amount > 0);
-
-        DOM.viewModalItemsBox.innerHTML = validRows.length === 0 
-            ? `<div class="p-4 text-muted small text-center italic">No dynamic mapped assets inside this node container.</div>`
-            : validRows.map(rowItem => `
-                <div class="d-flex justify-content-between align-items-center p-3 border-bottom px-3 font-mono">
-                    <span class="text-secondary small fw-medium">${escapeHtml(rowItem.name)}</span>
-                    <span class="badge rounded-pill px-2.5 py-1.5 ${rowItem.type === 'Income' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">
-                        ${rowItem.type === 'Income' ? '+' : '-'}$${rowItem.amount.toFixed(2)}
-                    </span>
-                </div>
-            `).join('');
-
-        System.infoModalContext.show();
+        const totalPages = Math.ceil(groupedOrders.length / maxRowsPerPage) || 1;
+        let targetPage = currentGrid1Page + directionalIncrement;
+        if (targetPage >= 1 && targetPage <= totalPages) { 
+            currentGrid1Page = targetPage; 
+            renderGrid1(); 
+        }
     }
 
-    function triggerOrderStructureEdit(orderId) {
-        const target = System.databaseOrdersStore.find(o => o.id === orderId);
-        if (!target) return;
-
-        System.activeEditingOrderId = orderId; 
-        DOM.inpOrderPeriod.value = target.period || '';
-        DOM.inpOrderNum.value = target.id;
-        DOM.inpBulkIncome.value = target.bulkIncome || '';
-        DOM.inpBulkExpense.value = target.bulkExpense || '';
-        System.localActiveOrderRecords = JSON.parse(JSON.stringify(target.items || []));
-        
-        syncActiveRecordsUiBadges();
-        System.modalBootstrapContext.show();
+    function clearGrid1DataStore() {
+        if(!currentFilteredGrid1Data.length) return;
+        showConfirmModal("Are you sure you want to delete all entries inside this month's frame?", () => {
+            const monthYearParts = (formConfigStateCache.entryMonth || "JULY-2026").split("-");
+            const matchToken = `${monthYearParts[0]}-${monthYearParts[1]}`;
+            
+            grid1Storage = grid1Storage.filter(row => 
+                String(row["MonthAndYear"]).trim().toUpperCase() !== matchToken
+            );
+            
+            applyTimeSelectionFilters();
+            currentGrid1Page = 1;
+            renderGrid1();
+            saveApplicationStateToDatabase();
+            showNotification("Cleared timeframe records from Data Grid 1.", "danger");
+        });
     }
 
-    function escapeHtml(stringInput) {
-        return String(stringInput).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    /* JSON EXPORT & IMPORT UTILITIES */
+    function exportToJsonFile() {
+        try {
+            const exportData = {
+                version: "1.0",
+                exportDate: new Date().toISOString(),
+                formConfigStateCache: formConfigStateCache,
+                orderBulkMap: orderBulkMap,
+                grid1Data: grid1Storage
+            };
+
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const currentMonthYearSelected = formConfigStateCache.entryMonth || "JULY-2026";
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = `FEM_Backup_${currentMonthYearSelected}.json`;
+            
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(url);
+
+            showNotification("Data exported to JSON successfully.", "success");
+        } catch (err) {
+            console.error("Export error:", err);
+            showNotification("Failed to export JSON file.", "danger");
+        }
     }
+
+    function importFromJsonFile(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+
+                if (!importedData || (!importedData.grid1Data && !importedData.orderBulkMap)) {
+                    showNotification("Invalid or corrupted JSON file structure.", "danger");
+                    return;
+                }
+
+                if (importedData.formConfigStateCache) {
+                    formConfigStateCache = importedData.formConfigStateCache;
+                }
+                if (importedData.grid1Data && Array.isArray(importedData.grid1Data)) {
+                    grid1Storage = importedData.grid1Data;
+                }
+                if (importedData.orderBulkMap && typeof importedData.orderBulkMap === 'object') {
+                    orderBulkMap = importedData.orderBulkMap;
+                }
+
+                restoreHeaderMonthValue();
+                applyTimeSelectionFilters();
+                renderGrid1();
+                saveApplicationStateToDatabase();
+
+                showNotification("JSON data imported successfully!", "success");
+            } catch (err) {
+                console.error("Import error:", err);
+                showNotification("Failed to parse JSON file.", "danger");
+            } finally {
+                event.target.value = '';
+            }
+        };
+
+        reader.readAsText(file);
+    }
+
+    /* CATEGORY AUTOCOMPLETE SUGGESTIONS */
+    function getCategorySuggestions() {
+        const catMap = new Map();
+        for (let i = grid1Storage.length - 1; i >= 0; i--) {
+            const cName = grid1Storage[i]["Category"];
+            const cType = grid1Storage[i]["Type"] || "Expense";
+            if (cName && !catMap.has(cName.toLowerCase())) {
+                catMap.set(cName.toLowerCase(), { category: cName, type: cType });
+            }
+        }
+        return Array.from(catMap.values());
+    }
+})();
 </script>
 </body>
 </html>
