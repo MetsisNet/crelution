@@ -40,8 +40,6 @@
             width: 100%;
             box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.01);
             text-align: center;
-            will-change: transform;
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .app-icon {
@@ -92,8 +90,9 @@
             transform: translateY(-1px);
         }
 
-        .btn-download:active {
-            transform: translateY(1px);
+        .btn-download:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         .meta-info {
@@ -120,7 +119,7 @@
 
         <!-- Direct Download Button -->
         <button id="downloadBtn" class="btn btn-download mb-3">
-            <i class="bi bi-download"></i> Download APK
+            <i class="bi bi-download"></i> <span id="btnText">Download APK</span>
         </button>
 
         <div class="meta-info">
@@ -130,20 +129,43 @@
     </div>
 
     <script>
-        // Exact APK filename configured for your web server root folder
-        const apkFileName = 'metsisstudio.apk'; 
+        const apkFileName = 'Metsisstudio.apk';
 
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            // Generates absolute path to file in root directory
-            const apkUrl = '/' + apkFileName;
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const btn = this;
+            const btnText = document.getElementById('btnText');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Starting download...';
 
-            // Creates non-blocking download anchor and executes click
-            const link = document.createElement('a');
-            link.href = apkUrl;
-            link.setAttribute('download', apkFileName);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            try {
+                // Fetch file as raw binary data stream
+                const response = await fetch('/' + apkFileName);
+                if (!response.ok) throw new Error('File not found');
+                
+                const blob = await response.blob();
+                
+                // Force Android package MIME-Type
+                const apkBlob = new Blob([blob], { type: 'application/vnd.android.package-archive' });
+                const blobUrl = URL.createObjectURL(apkBlob);
+
+                // Create download link with explicit .apk extension
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = apkFileName;
+                document.body.appendChild(link);
+                link.click();
+                
+                // Cleanup
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                // Fallback to direct navigation if fetch is restricted
+                window.location.href = '/' + apkFileName;
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Download APK';
+            }
         });
     </script>
 </body>
