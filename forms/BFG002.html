@@ -7,67 +7,174 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         :root {
-            --bs-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bs-font-sans-serif: 'Poppins', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             --bs-font-monospace: 'JetBrains Mono', monospace;
             
-            --zx-bg: #f4f5f8;
-            --zx-sidebar: #ffffff;
-            --zx-card: #ffffff;
-            --zx-border: #e2e8f0;
-            --zx-border-focus: rgba(99, 102, 241, 0.4);
+            /* Porto Theme Classic Palette */
+            --porto-primary: #0088cc;
+            --porto-primary-hover: #0077b3;
+            --porto-primary-light: #f0f7fc;
+            --porto-primary-subtle: #d0e7f7;
+            --porto-dark: #212529;
+            --porto-heading: #1e2229;
+            --porto-bg: #f4f6f9;
+            --porto-card: #ffffff;
+            --porto-border: #e2e8f0;
+            --porto-border-focus: #0088cc;
+            --porto-text-main: #212529;
+            --porto-text-muted: #6c757d;
             
-            --zx-primary: #4f46e5;
-            --zx-primary-rgb: 79, 70, 229;
-            --zx-gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            --zx-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --zx-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            --zx-gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            
-            --zx-text-main: #1e293b;
-            --zx-text-muted: #64748b;
+            /* Mapping variables */
+            --zx-bg: var(--porto-bg);
+            --zx-sidebar: var(--porto-card);
+            --zx-card: var(--porto-card);
+            --zx-border: var(--porto-border);
+            --zx-primary: var(--porto-primary);
+            --zx-primary-rgb: 0, 136, 204;
+            --zx-text-main: var(--porto-text-main);
+            --zx-text-muted: var(--porto-text-muted);
         }
 
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: var(--zx-bg);
-            color: var(--zx-text-main);
+            background-color: var(--porto-bg);
+            color: var(--porto-text-main);
             font-family: var(--bs-font-sans-serif);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* --- Porto Classic Buttons --- */
+        .btn {
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .btn-sm {
+            padding: 0.35rem 0.85rem;
+            font-size: 0.75rem;
+        }
+        .btn-primary {
+            background-color: var(--porto-primary) !important;
+            border-color: var(--porto-primary) !important;
+            color: #ffffff !important;
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--porto-primary-hover) !important;
+            border-color: var(--porto-primary-hover) !important;
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.25);
+        }
+        .btn-outline-primary {
+            border: 2px solid var(--porto-primary) !important;
+            color: var(--porto-primary) !important;
+            background-color: transparent !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--porto-primary) !important;
+            color: #ffffff !important;
+        }
+        .btn-secondary, .btn-outline-secondary {
+            border: 1px solid var(--porto-border) !important;
+            background-color: #ffffff !important;
+            color: var(--porto-text-main) !important;
+        }
+        .btn-secondary:hover, .btn-outline-secondary:hover {
+            background-color: #f8f9fa !important;
+            border-color: #cbd5e1 !important;
+            color: var(--porto-dark) !important;
+        }
+        .btn-danger {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+            color: #ffffff !important;
+        }
+        .btn-danger:hover {
+            background-color: #c82333 !important;
+            border-color: #bd2130 !important;
+        }
+        .btn-warning {
+            background-color: #ffc107 !important;
+            border-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+        .btn-outline-info {
+            border-color: var(--porto-border) !important;
+            color: var(--porto-primary) !important;
+            background: #ffffff !important;
+        }
+        .btn-outline-info:hover {
+            background: var(--porto-primary-light) !important;
+            border-color: var(--porto-primary) !important;
+        }
+
+        /* --- Porto Classic Textboxes & Inputs --- */
+        .form-control, .form-select, .input-group-text {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            color: var(--porto-text-main);
+            border-radius: 4px;
+            padding: 0.6rem 1rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-group .form-control:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .input-group .input-group-text:first-child {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+            background-color: #f8f9fa;
+            color: var(--porto-text-muted);
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: var(--porto-primary);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.18);
+        }
+
+        /* --- Auth Screen --- */
         #auth-screen {
             min-height: 100vh;
             width: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%), var(--zx-bg);
+            background-color: var(--porto-bg);
             display: flex;
             align-items: center;
             justify-content: center;
+            border-top: 5px solid var(--porto-primary);
         }
         .auth-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--zx-border);
-            border-radius: 1rem;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+            background: #ffffff;
+            border: 1px solid var(--porto-border);
+            border-top: 4px solid var(--porto-primary);
+            border-radius: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         }
 
+        /* --- App Layout --- */
         .zx-wrapper {
             display: flex;
             width: 100vw;
             min-height: 100vh;
+            border-top: 4px solid var(--porto-primary);
         }
         
         .zx-sidebar {
             width: 260px;
-            background-color: var(--zx-sidebar);
-            border-right: 1px solid var(--zx-border);
+            background-color: var(--porto-card);
+            border-right: 1px solid var(--porto-border);
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -80,131 +187,147 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            background-color: var(--zx-bg);
+            background-color: var(--porto-bg);
         }
 
         .zx-navbar {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--zx-border);
+            background: #ffffff;
+            border-bottom: 1px solid var(--porto-border);
             height: 70px;
-            padding: 0 1.5rem;
+            padding: 0 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
 
         .sidebar-nav-link {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.85rem 1.25rem;
-            color: var(--zx-text-muted);
+            padding: 0.75rem 1.25rem;
+            color: var(--porto-text-main);
             text-decoration: none;
-            border-radius: 0.5rem;
+            border-radius: 4px;
             font-weight: 500;
-            transition: background 0.15s ease, color 0.15s ease;
-            margin: 0.2rem 0.75rem;
+            transition: background 0.15s ease, color 0.15s ease, border-left 0.15s ease;
+            margin: 0.15rem 0.75rem;
+            border-left: 3px solid transparent;
         }
-        .sidebar-nav-link:hover, .sidebar-nav-link.active {
-            background: rgba(79, 70, 229, 0.08);
-            color: var(--zx-primary);
+        .sidebar-nav-link:hover {
+            background: var(--porto-primary-light);
+            color: var(--porto-primary);
+            border-left-color: var(--porto-primary);
+        }
+        .sidebar-nav-link.active {
+            background: var(--porto-primary-light);
+            color: var(--porto-primary);
+            font-weight: 600;
+            border-left-color: var(--porto-primary);
         }
 
+        /* --- Porto Classic Cards --- */
         .zx-card {
-            background-color: var(--zx-card);
-            border: 1px solid var(--zx-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+            background-color: var(--porto-card);
+            border: 1px solid var(--porto-border);
+            border-top: 3px solid var(--porto-primary);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .zx-card:hover {
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
         }
         
         .widget-stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 0.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.35rem;
-            color: #fff;
+            font-size: 1.25rem;
+            background-color: var(--porto-primary-light);
+            color: var(--porto-primary);
         }
 
-        .form-control, .form-select {
-            background-color: #f8fafc;
-            border: 1px solid var(--zx-border);
-            color: var(--zx-text-main);
-            border-radius: 0.5rem;
-            padding: 0.6rem 1rem;
-        }
-        .form-control:focus, .form-select:focus {
-            background-color: #ffffff;
-            border-color: var(--zx-primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        }
-
+        /* --- Suggestion Dropdowns --- */
         .field-suggest-box, .google-suggest-dropdown {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
             background: #ffffff;
-            border: 1px solid var(--zx-border);
-            border-radius: 0.5rem;
+            border: 1px solid var(--porto-border);
+            border-radius: 4px;
             z-index: 2500;
             max-height: 250px;
             overflow-y: auto;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             display: none;
+            margin-top: 4px;
         }
         .field-suggest-item, .google-suggest-item {
             padding: 0.75rem 1.2rem;
             cursor: pointer;
             font-size: 0.875rem;
-            border-bottom: 1px solid #f1f5f9;
-            color: var(--zx-text-main);
+            border-bottom: 1px solid #f1f1f1;
+            color: var(--porto-text-main);
         }
         .field-suggest-item:hover, .google-suggest-item:hover {
-            background: #f1f5f9;
+            background: var(--porto-primary-light);
+            color: var(--porto-primary);
         }
 
+        /* --- Grid Table Styling --- */
         .grid-rows-container { contain: content; }
         .grid-header-strip {
             display: grid;
             grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
             gap: 0.75rem;
-            background: #f8fafc;
-            border: 1px solid var(--zx-border);
-            border-radius: 0.5rem 0.5rem 0 0;
+            background: #212529;
+            border: 1px solid #212529;
+            border-radius: 4px 4px 0 0;
             font-weight: 600;
             font-size: 0.75rem;
             text-transform: uppercase;
-            color: var(--zx-text-muted);
+            letter-spacing: 0.5px;
+            color: #ffffff;
         }
         .grid-row-item {
             display: grid;
             grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
             gap: 0.75rem;
-            background: var(--zx-card);
-            border: 1px solid var(--zx-border);
+            background: var(--porto-card);
+            border: 1px solid var(--porto-border);
             border-top: none;
             align-items: center;
+            transition: background-color 0.15s ease;
         }
-        .grid-row-item:hover { background-color: #f8fafc; }
+        .grid-row-item:last-child {
+            border-radius: 0 0 4px 4px;
+        }
+        .grid-row-item:hover { background-color: var(--porto-primary-light); }
         .grid-cell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .cell-label { display: none; }
 
+        /* --- Modals --- */
         .modal-content {
             background-color: #ffffff !important;
-            color: var(--zx-text-main) !important;
-            border: 1px solid var(--zx-border) !important;
+            color: var(--porto-text-main) !important;
+            border: 1px solid var(--porto-border) !important;
+            border-top: 4px solid var(--porto-primary) !important;
+            border-radius: 4px !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
         }
-        .view-row-detail { background-color: #f8fafc; border: 1px solid var(--zx-border); }
-        .btn-primary { background: var(--zx-gradient-primary); border: none; }
-        .btn-success { background: var(--zx-gradient-success); border: none; }
-        .btn-warning { background: var(--zx-gradient-warning); border: none; color: #fff; }
-        .btn-danger { background: var(--zx-gradient-danger); border: none; }
+        .modal-header {
+            border-bottom: 1px solid var(--porto-border) !important;
+            padding: 1.25rem 1.5rem !important;
+        }
+        .modal-footer {
+            border-top: 1px solid var(--porto-border) !important;
+            padding: 1rem 1.5rem !important;
+        }
+        .view-row-detail { background-color: var(--porto-bg); border: 1px solid var(--porto-border); }
 
+        /* --- Custom Toasts --- */
         .toast-container-custom {
             position: fixed;
             top: 24px;
@@ -218,9 +341,9 @@
         }
         .custom-toast {
             background: #ffffff;
-            border-left: 4px solid var(--zx-primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border-radius: 6px;
+            border-left: 4px solid var(--porto-primary);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-radius: 4px;
             padding: 16px;
             display: flex;
             align-items: flex-start;
@@ -229,13 +352,19 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .custom-toast.show { transform: translateX(0); }
-        .custom-toast.toast-success { border-left-color: #10b981; }
-        .custom-toast.toast-danger { border-left-color: #ef4444; }
-        .custom-toast.toast-warning { border-left-color: #f59e0b; }
+        .custom-toast.toast-success { border-left-color: var(--porto-primary); }
+        .custom-toast.toast-danger { border-left-color: #dc3545; }
+        .custom-toast.toast-warning { border-left-color: #ffc107; }
+
+        /* Switched style toggle */
+        .form-check-input:checked {
+            background-color: var(--porto-primary);
+            border-color: var(--porto-primary);
+        }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--zx-bg); }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--porto-bg); }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
         @media (max-width: 1400px) {
             .grid-header-strip { display: none; }
@@ -243,8 +372,8 @@
             .grid-row-item {
                 display: flex;
                 flex-direction: column;
-                border: 1px solid var(--zx-border) !important;
-                border-radius: 0.5rem;
+                border: 1px solid var(--porto-border) !important;
+                border-radius: 4px !important;
                 padding: 1.25rem !important;
             }
             .grid-cell {
@@ -252,7 +381,7 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 0.4rem 0;
-                border-bottom: 1px solid #f1f5f9;
+                border-bottom: 1px solid #f1f1f1;
                 width: 100%;
             }
             .grid-cell:last-of-type { border-bottom: none; }
@@ -260,7 +389,7 @@
                 display: block;
                 font-weight: 600;
                 font-size: 0.75rem;
-                color: var(--zx-text-muted);
+                color: var(--porto-text-muted);
                 text-transform: uppercase;
             }
             .grid-action-cell { justify-content: flex-end; padding-top: 0.75rem; }
@@ -277,10 +406,10 @@
     <div class="card auth-card w-100 mx-3 p-2" style="max-width: 460px;">
         <div class="card-body p-4 p-sm-5">
             <div class="text-center mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: rgba(79, 70, 229, 0.08); border-radius: 12px; border: 1px solid rgba(79, 70, 229, 0.15);">
-                    <i class="bi bi-shield-lock text-primary fs-2"></i>
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: var(--porto-primary-light); border-radius: 4px;">
+                    <i class="bi bi-shield-lock-fill fs-2" style="color: var(--porto-primary) !important;"></i>
                 </div>
-                <h3 class="fw-bold mb-1 text-dark">Metsis <span style="color: var(--zx-primary);">Vault</span></h3>
+                <h3 class="fw-bold mb-1 text-dark">Metsis <span style="color: var(--porto-primary);">Vault</span></h3>
                 <p class="text-muted small">Client Encrypted Node Registry</p>
             </div>
             <div class="mb-3">
@@ -304,33 +433,33 @@
 
 <div id="app-screen" class="d-none zx-wrapper">
     <aside class="zx-sidebar" id="appSidebar">
-        <div class="d-flex align-items-center px-4 justify-content-between header-logo" style="height: 70px; border-bottom: 1px solid var(--zx-border)">
+        <div class="d-flex align-items-center px-4 justify-content-between header-logo" style="height: 70px; border-bottom: 1px solid var(--porto-border)">
             <a class="navbar-brand fw-bold fs-4 text-dark d-flex align-items-center gap-2" href="#">
-                <i class="bi bi-safe2 text-primary"></i> Metsis <span style="color: var(--zx-primary); font-weight: 300;">Vault</span>
+                <i class="bi bi-safe2" style="color: var(--porto-primary);"></i> Metsis <span style="color: var(--porto-primary); font-weight: 600;">Vault</span>
             </a>
         </div>
         
         <div class="d-flex flex-column flex-grow-1 py-3 overflow-y-auto">
-            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mb-2 d-block opacity-70">Operational Core</span>
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mb-2 d-block opacity-70" style="font-size: 0.7rem; letter-spacing: 0.5px;">Operational Core</span>
             <a href="#" class="sidebar-nav-link active"><i class="bi bi-grid-1x2-fill"></i> Node Registry</a>
             
-            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Data Actions</span>
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70" style="font-size: 0.7rem; letter-spacing: 0.5px;">Data Actions</span>
             <a href="#" id="btn-sidebar-add" class="sidebar-nav-link"><i class="bi bi-plus-circle"></i> Add Asset Node</a>
             <a href="#" id="btn-sidebar-rotate" class="sidebar-nav-link"><i class="bi bi-arrow-left-right"></i> Key Rotation</a>
             
-            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Backups & Exports</span>
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70" style="font-size: 0.7rem; letter-spacing: 0.5px;">Backups & Exports</span>
             <a href="#" id="btn-sidebar-export-json" class="sidebar-nav-link"><i class="bi bi-file-earmark-code"></i> Export JSON</a>
             <a href="#" id="btn-sidebar-export-csv" class="sidebar-nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</a>
 
-            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70">Data Ingestion</span>
-            <a href="#" id="btn-import" class="sidebar-nav-link text-secondary"><i class="bi bi-upload text-secondary"></i> Import JSON</a>
-            <a href="#" id="btn-import-csv" class="sidebar-nav-link text-success"><i class="bi bi-box-arrow-in-down-left text-success"></i> Import CSV</a>
+            <span class="px-4 text-uppercase text-muted fw-bold fs-9 tracking-wider mt-4 mb-2 d-block opacity-70" style="font-size: 0.7rem; letter-spacing: 0.5px;">Data Ingestion</span>
+            <a href="#" id="btn-import" class="sidebar-nav-link"><i class="bi bi-upload"></i> Import JSON</a>
+            <a href="#" id="btn-import-csv" class="sidebar-nav-link"><i class="bi bi-box-arrow-in-down-left"></i> Import CSV</a>
             
             <input type="file" id="import-file-input" class="d-none" accept=".json">
             <input type="file" id="import-csv-input" class="d-none" accept=".csv">
         </div>
         
-        <div class="p-3 border-top" style="border-color: var(--zx-border) !important;">
+        <div class="p-3 border-top" style="border-color: var(--porto-border) !important;">
             <button id="btn-lock" class="btn btn-danger w-100 fw-semibold"><i class="bi bi-power me-2"></i>Sign Out</button>
         </div>
     </aside>
@@ -339,7 +468,7 @@
         <header class="zx-navbar d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn btn-sm btn-light d-xl-none border" id="sidebarToggle"><i class="bi bi-list"></i></button>
-                <span class="badge px-3 py-2" style="background: rgba(79, 70, 229, 0.08); color: var(--zx-primary); border: 1px solid rgba(79, 70, 229, 0.15);" id="display-tenant">Scope: Inactive</span>
+                <span class="badge px-3 py-2 fw-medium" style="background: var(--porto-primary-light); color: var(--porto-primary); border: 1px solid var(--porto-primary-subtle); border-radius: 4px;" id="display-tenant">Scope: Inactive</span>
             </div>
         </header>
 
@@ -348,28 +477,28 @@
                 <div class="col-sm-6 col-md-4">
                     <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Total Encrypted Registry</span>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block" style="font-size: 0.725rem;">Total Encrypted Registry</span>
                             <h3 class="fw-bold mt-1 mb-0 text-dark" id="count-total">0</h3>
                         </div>
-                        <div class="widget-stat-icon" style="background: var(--zx-gradient-primary)"><i class="bi bi-database-lock"></i></div>
+                        <div class="widget-stat-icon"><i class="bi bi-database-lock"></i></div>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-4">
                     <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Filtered Registry</span>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block" style="font-size: 0.725rem;">Filtered Registry</span>
                             <h3 class="fw-bold mt-1 mb-0 text-dark" id="count-matched">0</h3>
                         </div>
-                        <div class="widget-stat-icon" style="background: var(--zx-gradient-success)"><i class="bi bi-filter-square"></i></div>
+                        <div class="widget-stat-icon"><i class="bi bi-filter-square"></i></div>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-4">
                     <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block">Session Status</span>
-                            <h6 class="fw-semibold mt-2 mb-0 text-success"><i class="bi bi-shield-check me-1"></i> Fully Encrypted</h6>
+                            <span class="text-muted small fw-medium text-uppercase tracking-wide d-block" style="font-size: 0.725rem;">Session Status</span>
+                            <h6 class="fw-semibold mt-2 mb-0" style="color: var(--porto-primary);"><i class="bi bi-shield-check me-1"></i> Fully Encrypted</h6>
                         </div>
-                        <div class="widget-stat-icon" style="background: var(--zx-gradient-warning)"><i class="bi bi-fingerprint"></i></div>
+                        <div class="widget-stat-icon"><i class="bi bi-fingerprint"></i></div>
                     </div>
                 </div>
             </div>
@@ -380,33 +509,47 @@
                         <div class="d-flex gap-3 flex-wrap">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="chk-filter-site">
-                                <label class="form-check-label small text-muted" for="chk-filter-site">Site Name</label>
+                                <label class="form-check-label small text-muted fw-medium" for="chk-filter-site">Site Name</label>
                             </div>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="chk-filter-url" checked>
-                                <label class="form-check-label small text-muted" for="chk-filter-url">URL</label>
+                                <label class="form-check-label small text-muted fw-medium" for="chk-filter-url">URL</label>
                             </div>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="chk-filter-user">
-                                <label class="form-check-label small text-muted" for="chk-filter-user">Username</label>
+                                <label class="form-check-label small text-muted fw-medium" for="chk-filter-user">Username</label>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="search-container position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="google-search-input" class="form-control form-control-lg fs-6" placeholder="Search operational metadata components dynamically..." autocomplete="off">
-                            <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="visibility: hidden;"><i class="bi bi-x-lg"></i></button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="search-container position-relative">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="google-search-input" class="form-control form-control-lg fs-6" placeholder="Search operational metadata components dynamically..." autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="visibility: hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                                <div id="google-suggest-dropdown" class="google-suggest-dropdown"></div>
+                            </div>
                         </div>
-                        <div id="google-suggest-dropdown" class="google-suggest-dropdown"></div>
+                        <div class="col-md-6">
+                            <div class="search-container position-relative">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent text-muted"><i class="bi bi-person"></i></span>
+                                    <input type="text" id="user-search-input" class="form-control form-control-lg fs-6" placeholder="Live search all record fields..." autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-user-search" style="visibility: hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                                <div id="user-suggest-dropdown" class="google-suggest-dropdown"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex flex-column flex-grow-1">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="text-dark fw-semibold mb-0"><i class="bi bi-hdd-stack text-primary me-2"></i>Node Data</h5>
+                    <h5 class="text-dark fw-bold mb-0"><i class="bi bi-hdd-stack me-2" style="color: var(--porto-primary);"></i>Node Data</h5>
                     <button id="btn-open-entry" class="btn btn-primary btn-sm fw-semibold"><i class="bi bi-plus-lg me-1"></i>Add Registry Node</button>
                 </div>
                 
@@ -423,7 +566,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title fw-semibold"><i class="bi bi-hdd-network text-primary me-2"></i>Registry Asset Node Entry</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-hdd-network me-2" style="color: var(--porto-primary);"></i>Registry Asset Node Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="vault-form">
@@ -489,7 +632,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title fw-semibold text-warning"><i class="bi bi-shield-fill-exclamation me-2"></i>Administrative Key Rotation</h5>
+                <h5 class="modal-title fw-bold text-warning"><i class="bi bi-shield-fill-exclamation me-2"></i>Administrative Key Rotation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="master-reset-form">
@@ -526,16 +669,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title fw-semibold"><i class="bi bi-eye text-primary me-2"></i>View Registry Item Mapping</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-eye me-2" style="color: var(--porto-primary);"></i>View Registry Item Mapping</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body d-flex flex-column gap-2 p-4" id="view-modal-body">
                 <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
-                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Site Name</span><span id="mv-site-name" class="fw-bold text-primary d-block text-truncate">—</span></div>
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">Site Name</span><span id="mv-site-name" class="fw-bold text-dark d-block text-truncate">—</span></div>
                     <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteName">Copy</button>
                 </div>
                 <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
-                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">URL</span><span id="mv-url" class="monospace text-wrap d-block text-truncate text-info">—</span></div>
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">URL</span><span id="mv-url" class="monospace text-wrap d-block text-truncate" style="color: var(--porto-primary);">—</span></div>
                     <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteUrl">Copy</button>
                 </div>
                 <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
@@ -585,7 +728,7 @@ const Toast = {
         const t = document.createElement('div');
         t.className = `custom-toast toast-${type}`;
         let icon = 'info-circle text-primary';
-        if(type === 'success') icon = 'check-circle text-success';
+        if(type === 'success') icon = 'check-circle text-primary';
         if(type === 'danger') icon = 'exclamation-octagon text-danger';
         if(type === 'warning') icon = 'exclamation-triangle text-warning';
         
@@ -612,6 +755,9 @@ const DOM = {
     searchInput: document.getElementById('google-search-input'),
     clearSearch: document.getElementById('btn-clear-search'),
     gDropdown: document.getElementById('google-suggest-dropdown'),
+    userSearchInput: document.getElementById('user-search-input'),
+    clearUserSearch: document.getElementById('btn-clear-user-search'),
+    uDropdown: document.getElementById('user-suggest-dropdown'),
     tenantDisplay: document.getElementById('display-tenant'),
     authScreen: document.getElementById('auth-screen'),
     appScreen: document.getElementById('app-screen'),
@@ -806,25 +952,42 @@ function queueRefresh() {
 
 function executeLiveInterfaceRefresh() {
     const term = DOM.searchInput.value.toLowerCase().trim();
+    const userTerm = DOM.userSearchInput ? DOM.userSearchInput.value.toLowerCase().trim() : '';
     const cSite = DOM.chkSite.checked, cUrl = DOM.chkUrl.checked, cUser = DOM.chkUser.checked;
-    DOM.clearSearch.style.visibility = term.length > 0 ? "visible" : "hidden";
     
-    let matches = [];
+    DOM.clearSearch.style.visibility = term.length > 0 ? "visible" : "hidden";
+    if(DOM.clearUserSearch) DOM.clearUserSearch.style.visibility = userTerm.length > 0 ? "visible" : "hidden";
+    
+    let matches = localCacheRecords;
     if(term && (cSite || cUrl || cUser)) {
-        for(let i=0, len=localCacheRecords.length; i<len; i++) {
-            const r = localCacheRecords[i];
-            if((cSite && r.siteName?.toLowerCase().includes(term)) || (cUrl && r.siteUrl?.toLowerCase().includes(term)) || (cUser && r.username?.toLowerCase().includes(term))) matches.push(r);
-        }
-        renderGrid(matches);
-    } else { matches = localCacheRecords; renderGrid(localCacheRecords); }
+        matches = matches.filter(r => 
+            (cSite && r.siteName?.toLowerCase().includes(term)) || 
+            (cUrl && r.siteUrl?.toLowerCase().includes(term)) || 
+            (cUser && r.username?.toLowerCase().includes(term))
+        );
+    }
+    if(userTerm) {
+        matches = matches.filter(r => 
+            r.siteName?.toLowerCase().includes(userTerm) ||
+            r.siteUrl?.toLowerCase().includes(userTerm) ||
+            r.username?.toLowerCase().includes(userTerm) ||
+            r.pin?.toLowerCase().includes(userTerm) ||
+            r.pin2?.toLowerCase().includes(userTerm) ||
+            r.pin3?.toLowerCase().includes(userTerm) ||
+            r.comments?.toLowerCase().includes(userTerm) ||
+            r.others?.toLowerCase().includes(userTerm)
+        );
+    }
+    
+    renderGrid(matches);
     DOM.countTotal.innerText = localCacheRecords.length;
-    DOM.countMatched.innerText = term ? matches.length : localCacheRecords.length;
+    DOM.countMatched.innerText = (term || userTerm) ? matches.length : localCacheRecords.length;
 }
 
 function renderGrid(list) {
     requestAnimationFrame(() => {
         DOM.workspaceGridRows.innerHTML = "";
-        if(list.length === 0) { DOM.workspaceGridRows.innerHTML = `<p class="text-muted text-center py-5 small border-top mb-0">No asset rows match processing filters.</p>`; return; }
+        if(list.length === 0) { DOM.workspaceGridRows.innerHTML = `<p class="text-muted text-center py-5 small bg-white border rounded-bottom mb-0">No asset rows match processing filters.</p>`; return; }
         
         const chunk = list.slice(-150), f = document.createDocumentFragment();
         for(let i = chunk.length - 1; i >= 0; i--) {
@@ -833,7 +996,7 @@ function renderGrid(list) {
             row.innerHTML = `
                 <div class="grid-cell"><span class="cell-label">S.No.</span><span class="fw-bold text-dark">${idx}</span></div>
                 <div class="grid-cell"><span class="cell-label">Site Name</span><strong class="text-dark">${esc(r.siteName)}</strong></div>
-                <div class="grid-cell"><span class="cell-label">URL</span><span>${r.siteUrl ? `<a href="${esc(r.siteUrl)}" target="_blank" class="text-info text-decoration-underline">Link</a>` : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">URL</span><span>${r.siteUrl ? `<a href="${esc(r.siteUrl)}" target="_blank" class="fw-medium text-decoration-underline" style="color: var(--porto-primary);">Link</a>` : '—'}</span></div>
                 <div class="grid-cell"><span class="cell-label">Username</span><span class="text-dark">${esc(r.username)}</span></div>
                 <div class="grid-cell"><span class="cell-label">Password</span><span class="text-muted opacity-50 monospace">••••••••</span></div>
                 <div class="grid-cell"><span class="cell-label">PIN 1</span><span class="monospace text-dark">${r.pin ? esc(r.pin) : '—'}</span></div>
@@ -874,6 +1037,13 @@ DOM.clearSearch.addEventListener('click', () => {
     DOM.gDropdown.style.display="none"; 
     executeLiveInterfaceRefresh(); 
     DOM.searchInput.focus(); 
+});
+
+DOM.clearUserSearch.addEventListener('click', () => { 
+    DOM.userSearchInput.value=""; 
+    DOM.uDropdown.style.display="none"; 
+    executeLiveInterfaceRefresh(); 
+    DOM.userSearchInput.focus(); 
 });
 
 function launchModal(id) {
@@ -920,6 +1090,10 @@ DOM.searchInput.addEventListener('focus', buildSuggestions);
 DOM.searchInput.addEventListener('click', buildSuggestions);
 DOM.searchInput.addEventListener('input', () => { queueRefresh(); buildSuggestions(); });
 
+DOM.userSearchInput.addEventListener('focus', buildUserSuggestions); 
+DOM.userSearchInput.addEventListener('click', buildUserSuggestions);
+DOM.userSearchInput.addEventListener('input', () => { queueRefresh(); buildUserSuggestions(); });
+
 ['chk-filter-site', 'chk-filter-url', 'chk-filter-user'].forEach(id => 
     document.getElementById(id).addEventListener('change', () => { executeLiveInterfaceRefresh(); buildSuggestions(); })
 );
@@ -958,7 +1132,58 @@ function createSugNode(v, t) {
     return d;
 }
 
-document.addEventListener('click', (e) => { if(!e.target.closest('.search-container')) DOM.gDropdown.style.display="none"; });
+function buildUserSuggestions() {
+    const userTerm = DOM.userSearchInput.value.toLowerCase().trim();
+    DOM.uDropdown.innerHTML = "";
+    
+    let tracking = new Set(), f = document.createDocumentFragment(), count = 0;
+    const fieldConfigs = [
+        { key: 'siteName', label: 'Site' },
+        { key: 'siteUrl', label: 'URL' },
+        { key: 'username', label: 'User' },
+        { key: 'pin', label: 'PIN 1' },
+        { key: 'pin2', label: 'PIN 2' },
+        { key: 'pin3', label: 'PIN 3' },
+        { key: 'comments', label: 'Comments' },
+        { key: 'others', label: 'Others' }
+    ];
+
+    for(let i = localCacheRecords.length - 1; i >= 0; i--) {
+        if(count >= 8) break;
+        const r = localCacheRecords[i];
+        for(let j = 0; j < fieldConfigs.length; j++) {
+            if(count >= 8) break;
+            const { key, label } = fieldConfigs[j];
+            const val = r[key];
+            if(val && typeof val === 'string' && val.trim() !== '') {
+                const trimmedVal = val.trim();
+                if(!userTerm || trimmedVal.toLowerCase().includes(userTerm)) {
+                    const trackingKey = label + ":" + trimmedVal.toLowerCase();
+                    if(!tracking.has(trackingKey)) {
+                        tracking.add(trackingKey);
+                        f.appendChild(createUserSugNode(trimmedVal, label));
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+    if(count > 0) { DOM.uDropdown.style.display = "block"; DOM.uDropdown.appendChild(f); } else DOM.uDropdown.style.display = "none";
+}
+
+function createUserSugNode(v, t) {
+    const d = document.createElement('div'); d.className = "google-suggest-item d-flex justify-content-between align-items-center";
+    d.innerHTML = `<span class="text-truncate" style="max-width: 85%;">${esc(v)}</span><span class="badge bg-light border text-muted fs-8">${esc(t)}</span>`;
+    d.addEventListener('click', (e) => {
+        e.stopPropagation(); DOM.userSearchInput.value = v; DOM.uDropdown.style.display="none"; executeLiveInterfaceRefresh();
+    });
+    return d;
+}
+
+document.addEventListener('click', (e) => {
+    if(!DOM.searchInput.contains(e.target) && !DOM.gDropdown.contains(e.target)) DOM.gDropdown.style.display="none";
+    if(!DOM.userSearchInput.contains(e.target) && !DOM.uDropdown.contains(e.target)) DOM.uDropdown.style.display="none";
+});
 
 document.getElementById('btn-sidebar-export-json').addEventListener('click', (e) => {
     e.preventDefault();
@@ -1120,7 +1345,7 @@ function parseCSVRowString(rowTextLine) {
 
 document.getElementById('btn-lock').addEventListener('click', () => {
     derivedKey = null; activeSessionUser = ""; activeSessionPass = ""; localCacheRecords = []; uniqueRowFingerprints.clear(); sessionStorage.clear();
-    document.getElementById('master-password').value = ""; DOM.searchInput.value = ""; DOM.workspaceGridRows.innerHTML = "";
+    document.getElementById('master-password').value = ""; DOM.searchInput.value = ""; DOM.userSearchInput.value = ""; DOM.workspaceGridRows.innerHTML = "";
     document.getElementById('vault-form').reset(); document.getElementById('master-reset-form').reset();
     
     for(let key in _instances) { _instances[key].hide(); delete _instances[key]; }
