@@ -7,124 +7,124 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         :root {
-            --bs-font-sans-serif: 'Poppins', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bs-font-sans-serif: 'Public Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --bs-font-monospace: 'JetBrains Mono', monospace;
             
-            /* Porto Theme Classic Palette */
-            --porto-primary: #0088cc;
-            --porto-primary-hover: #0077b3;
-            --porto-primary-light: #f0f7fc;
-            --porto-primary-subtle: #d0e7f7;
-            --porto-dark: #212529;
-            --porto-heading: #1e2229;
-            --porto-bg: #f4f6f9;
-            --porto-card: #ffffff;
-            --porto-border: #e2e8f0;
-            --porto-border-focus: #0088cc;
-            --porto-text-main: #212529;
-            --porto-text-muted: #6c757d;
-            
-            /* Mapping variables */
-            --zx-bg: var(--porto-bg);
-            --zx-sidebar: var(--porto-card);
-            --zx-card: var(--porto-card);
-            --zx-border: var(--porto-border);
-            --zx-primary: var(--porto-primary);
-            --zx-primary-rgb: 0, 136, 204;
-            --zx-text-main: var(--porto-text-main);
-            --zx-text-muted: var(--porto-text-muted);
+            /* Materialize Admin Palette */
+            --mat-primary: #8C57FF;
+            --mat-primary-hover: #7E4EE6;
+            --mat-primary-light: rgba(140, 87, 255, 0.12);
+            --mat-primary-subtle: rgba(140, 87, 255, 0.22);
+            --mat-dark: #2A2B2D;
+            --mat-heading: #434050;
+            --mat-bg: #F4F5FA;
+            --mat-card: #FFFFFF;
+            --mat-border: #E6E6E8;
+            --mat-border-focus: #8C57FF;
+            --mat-text-main: #434050;
+            --mat-text-muted: #8A8D93;
+            --mat-shadow-sm: 0 0.125rem 0.375rem rgba(165, 163, 174, 0.12);
+            --mat-shadow: 0 0.25rem 0.875rem rgba(38, 43, 67, 0.12);
+            --mat-shadow-lg: 0 0.5rem 1.25rem rgba(38, 43, 67, 0.16);
+            --mat-radius: 0.625rem;
+            --mat-radius-sm: 0.375rem;
         }
 
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: var(--porto-bg);
-            color: var(--porto-text-main);
+            background-color: var(--mat-bg);
+            color: var(--mat-text-main);
             font-family: var(--bs-font-sans-serif);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Porto Classic Buttons --- */
+        /* --- Materialize Buttons --- */
         .btn {
-            font-weight: 600;
-            border-radius: 4px;
-            padding: 0.5rem 1.25rem;
-            transition: all 0.2s ease-in-out;
-            font-size: 0.8125rem;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
+            font-weight: 500;
+            border-radius: var(--mat-radius-sm);
+            padding: 0.55rem 1.25rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.875rem;
+            letter-spacing: 0.3px;
         }
         .btn-sm {
             padding: 0.35rem 0.85rem;
             font-size: 0.75rem;
+            border-radius: var(--mat-radius-sm);
         }
         .btn-primary {
-            background-color: var(--porto-primary) !important;
-            border-color: var(--porto-primary) !important;
+            background-color: var(--mat-primary) !important;
+            border-color: var(--mat-primary) !important;
             color: #ffffff !important;
+            box-shadow: 0 0.125rem 0.375rem 0 rgba(140, 87, 255, 0.38);
         }
         .btn-primary:hover, .btn-primary:focus {
-            background-color: var(--porto-primary-hover) !important;
-            border-color: var(--porto-primary-hover) !important;
-            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.25);
+            background-color: var(--mat-primary-hover) !important;
+            border-color: var(--mat-primary-hover) !important;
+            box-shadow: 0 0.25rem 0.75rem 0 rgba(140, 87, 255, 0.48);
+            transform: translateY(-1px);
         }
         .btn-outline-primary {
-            border: 2px solid var(--porto-primary) !important;
-            color: var(--porto-primary) !important;
+            border: 1px solid var(--mat-primary) !important;
+            color: var(--mat-primary) !important;
             background-color: transparent !important;
         }
         .btn-outline-primary:hover {
-            background-color: var(--porto-primary) !important;
-            color: #ffffff !important;
+            background-color: var(--mat-primary-light) !important;
+            color: var(--mat-primary) !important;
         }
         .btn-secondary, .btn-outline-secondary {
-            border: 1px solid var(--porto-border) !important;
+            border: 1px solid var(--mat-border) !important;
             background-color: #ffffff !important;
-            color: var(--porto-text-main) !important;
+            color: var(--mat-text-muted) !important;
         }
         .btn-secondary:hover, .btn-outline-secondary:hover {
             background-color: #f8f9fa !important;
             border-color: #cbd5e1 !important;
-            color: var(--porto-dark) !important;
+            color: var(--mat-heading) !important;
         }
         .btn-danger {
-            background-color: #dc3545 !important;
-            border-color: #dc3545 !important;
+            background-color: #FF4D49 !important;
+            border-color: #FF4D49 !important;
             color: #ffffff !important;
+            box-shadow: 0 0.125rem 0.375rem 0 rgba(255, 77, 73, 0.38);
         }
         .btn-danger:hover {
-            background-color: #c82333 !important;
-            border-color: #bd2130 !important;
+            background-color: #e04440 !important;
+            border-color: #e04440 !important;
+            box-shadow: 0 0.25rem 0.75rem 0 rgba(255, 77, 73, 0.48);
         }
         .btn-warning {
-            background-color: #ffc107 !important;
-            border-color: #ffc107 !important;
-            color: #212529 !important;
+            background-color: #FFB400 !important;
+            border-color: #FFB400 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0.125rem 0.375rem 0 rgba(255, 180, 0, 0.38);
         }
         .btn-outline-info {
-            border-color: var(--porto-border) !important;
-            color: var(--porto-primary) !important;
-            background: #ffffff !important;
+            border-color: var(--mat-primary-subtle) !important;
+            color: var(--mat-primary) !important;
+            background: var(--mat-primary-light) !important;
         }
         .btn-outline-info:hover {
-            background: var(--porto-primary-light) !important;
-            border-color: var(--porto-primary) !important;
+            background: var(--mat-primary) !important;
+            color: #ffffff !important;
         }
 
-        /* --- Porto Classic Textboxes & Inputs --- */
+        /* --- Materialize Textboxes & Inputs --- */
         .form-control, .form-select, .input-group-text {
             background-color: #ffffff;
-            border: 1px solid #ced4da;
-            color: var(--porto-text-main);
-            border-radius: 4px;
-            padding: 0.6rem 1rem;
+            border: 1px solid var(--mat-border);
+            color: var(--mat-text-main);
+            border-radius: var(--mat-radius-sm);
+            padding: 0.625rem 0.875rem;
             font-size: 0.875rem;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
@@ -136,31 +136,29 @@
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             border-right: none;
-            background-color: #f8f9fa;
-            color: var(--porto-text-muted);
+            background-color: #FAFAFA;
+            color: var(--mat-text-muted);
         }
         .form-control:focus, .form-select:focus {
             background-color: #ffffff;
-            border-color: var(--porto-primary);
-            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.18);
+            border-color: var(--mat-primary);
+            box-shadow: 0 0 0 0.25rem rgba(140, 87, 255, 0.18);
         }
 
         /* --- Auth Screen --- */
         #auth-screen {
             min-height: 100vh;
             width: 100%;
-            background-color: var(--porto-bg);
+            background-color: var(--mat-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-top: 5px solid var(--porto-primary);
         }
         .auth-card {
             background: #ffffff;
-            border: 1px solid var(--porto-border);
-            border-top: 4px solid var(--porto-primary);
-            border-radius: 4px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--mat-border);
+            border-radius: var(--mat-radius);
+            box-shadow: var(--mat-shadow);
         }
 
         /* --- App Layout --- */
@@ -168,18 +166,18 @@
             display: flex;
             width: 100vw;
             min-height: 100vh;
-            border-top: 4px solid var(--porto-primary);
         }
         
         .zx-sidebar {
             width: 260px;
-            background-color: var(--porto-card);
-            border-right: 1px solid var(--porto-border);
+            background-color: var(--mat-card);
+            border-right: 1px solid var(--mat-border);
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             z-index: 1040;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--mat-shadow-sm);
         }
 
         .zx-content-page {
@@ -187,65 +185,66 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            background-color: var(--porto-bg);
+            background-color: var(--mat-bg);
         }
 
         .zx-navbar {
             background: #ffffff;
-            border-bottom: 1px solid var(--porto-border);
-            height: 70px;
-            padding: 0 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            margin: 1rem 1.5rem 0 1.5rem;
+            border-radius: var(--mat-radius);
+            border: 1px solid var(--mat-border);
+            height: 64px;
+            padding: 0 1.5rem;
+            box-shadow: var(--mat-shadow-sm);
         }
 
         .sidebar-nav-link {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1.25rem;
-            color: var(--porto-text-main);
+            padding: 0.625rem 1rem;
+            color: var(--mat-text-main);
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: var(--mat-radius-sm);
             font-weight: 500;
-            transition: background 0.15s ease, color 0.15s ease, border-left 0.15s ease;
-            margin: 0.15rem 0.75rem;
-            border-left: 3px solid transparent;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            margin: 0.25rem 0.875rem;
+            border-left: none;
         }
         .sidebar-nav-link:hover {
-            background: var(--porto-primary-light);
-            color: var(--porto-primary);
-            border-left-color: var(--porto-primary);
+            background: var(--mat-primary-light);
+            color: var(--mat-primary);
         }
         .sidebar-nav-link.active {
-            background: var(--porto-primary-light);
-            color: var(--porto-primary);
+            background: linear-gradient(72.47deg, #8C57FF 0%, #9E70FF 100%);
+            color: #ffffff;
+            box-shadow: 0 0.125rem 0.375rem 0 rgba(140, 87, 255, 0.4);
             font-weight: 600;
-            border-left-color: var(--porto-primary);
         }
 
-        /* --- Porto Classic Cards --- */
+        /* --- Materialize Cards --- */
         .zx-card {
-            background-color: var(--porto-card);
-            border: 1px solid var(--porto-border);
-            border-top: 3px solid var(--porto-primary);
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: var(--mat-card);
+            border: 1px solid var(--mat-border);
+            border-radius: var(--mat-radius);
+            box-shadow: var(--mat-shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .zx-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+            box-shadow: var(--mat-shadow);
         }
         
         .widget-stat-icon {
             width: 44px;
             height: 44px;
-            border-radius: 4px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
-            background-color: var(--porto-primary-light);
-            color: var(--porto-primary);
+            background-color: var(--mat-primary-light);
+            color: var(--mat-primary);
         }
 
         /* --- Suggestion Dropdowns --- */
@@ -255,25 +254,26 @@
             left: 0;
             right: 0;
             background: #ffffff;
-            border: 1px solid var(--porto-border);
-            border-radius: 4px;
+            border: 1px solid var(--mat-border);
+            border-radius: var(--mat-radius-sm);
             z-index: 2500;
             max-height: 250px;
             overflow-y: auto;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--mat-shadow-lg);
             display: none;
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .field-suggest-item, .google-suggest-item {
-            padding: 0.75rem 1.2rem;
+            padding: 0.625rem 1rem;
             cursor: pointer;
             font-size: 0.875rem;
-            border-bottom: 1px solid #f1f1f1;
-            color: var(--porto-text-main);
+            border-bottom: 1px solid #F4F5FA;
+            color: var(--mat-text-main);
+            transition: background 0.15s ease;
         }
         .field-suggest-item:hover, .google-suggest-item:hover {
-            background: var(--porto-primary-light);
-            color: var(--porto-primary);
+            background: var(--mat-primary-light);
+            color: var(--mat-primary);
         }
 
         /* --- Grid Table Styling --- */
@@ -282,50 +282,49 @@
             display: grid;
             grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
             gap: 0.75rem;
-            background: #212529;
-            border: 1px solid #212529;
-            border-radius: 4px 4px 0 0;
+            background: #F4F5FA;
+            border: 1px solid var(--mat-border);
+            border-radius: var(--mat-radius) var(--mat-radius) 0 0;
             font-weight: 600;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #ffffff;
+            color: var(--mat-heading);
         }
         .grid-row-item {
             display: grid;
             grid-template-columns: 60px 1.4fr 1.2fr 1.4fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1fr 120px;
             gap: 0.75rem;
-            background: var(--porto-card);
-            border: 1px solid var(--porto-border);
+            background: var(--mat-card);
+            border: 1px solid var(--mat-border);
             border-top: none;
             align-items: center;
             transition: background-color 0.15s ease;
         }
         .grid-row-item:last-child {
-            border-radius: 0 0 4px 4px;
+            border-radius: 0 0 var(--mat-radius) var(--mat-radius);
         }
-        .grid-row-item:hover { background-color: var(--porto-primary-light); }
+        .grid-row-item:hover { background-color: rgba(140, 87, 255, 0.03); }
         .grid-cell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .cell-label { display: none; }
 
         /* --- Modals --- */
         .modal-content {
             background-color: #ffffff !important;
-            color: var(--porto-text-main) !important;
-            border: 1px solid var(--porto-border) !important;
-            border-top: 4px solid var(--porto-primary) !important;
-            border-radius: 4px !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+            color: var(--mat-text-main) !important;
+            border: 1px solid var(--mat-border) !important;
+            border-radius: var(--mat-radius) !important;
+            box-shadow: var(--mat-shadow-lg) !important;
         }
         .modal-header {
-            border-bottom: 1px solid var(--porto-border) !important;
+            border-bottom: 1px solid var(--mat-border) !important;
             padding: 1.25rem 1.5rem !important;
         }
         .modal-footer {
-            border-top: 1px solid var(--porto-border) !important;
+            border-top: 1px solid var(--mat-border) !important;
             padding: 1rem 1.5rem !important;
         }
-        .view-row-detail { background-color: var(--porto-bg); border: 1px solid var(--porto-border); }
+        .view-row-detail { background-color: var(--mat-bg); border: 1px solid var(--mat-border); }
 
         /* --- Custom Toasts --- */
         .toast-container-custom {
@@ -341,9 +340,9 @@
         }
         .custom-toast {
             background: #ffffff;
-            border-left: 4px solid var(--porto-primary);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            border-radius: 4px;
+            border-left: 4px solid var(--mat-primary);
+            box-shadow: var(--mat-shadow-lg);
+            border-radius: var(--mat-radius-sm);
             padding: 16px;
             display: flex;
             align-items: flex-start;
@@ -352,19 +351,19 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .custom-toast.show { transform: translateX(0); }
-        .custom-toast.toast-success { border-left-color: var(--porto-primary); }
-        .custom-toast.toast-danger { border-left-color: #dc3545; }
-        .custom-toast.toast-warning { border-left-color: #ffc107; }
+        .custom-toast.toast-success { border-left-color: #56CA00; }
+        .custom-toast.toast-danger { border-left-color: #FF4D49; }
+        .custom-toast.toast-warning { border-left-color: #FFB400; }
 
         /* Switched style toggle */
         .form-check-input:checked {
-            background-color: var(--porto-primary);
-            border-color: var(--porto-primary);
+            background-color: var(--mat-primary);
+            border-color: var(--mat-primary);
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--porto-bg); }
-        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--mat-bg); }
+        ::-webkit-scrollbar-thumb { background: #d0d0d5; border-radius: 4px; }
 
         @media (max-width: 1400px) {
             .grid-header-strip { display: none; }
@@ -372,8 +371,8 @@
             .grid-row-item {
                 display: flex;
                 flex-direction: column;
-                border: 1px solid var(--porto-border) !important;
-                border-radius: 4px !important;
+                border: 1px solid var(--mat-border) !important;
+                border-radius: var(--mat-radius) !important;
                 padding: 1.25rem !important;
             }
             .grid-cell {
@@ -381,7 +380,7 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 0.4rem 0;
-                border-bottom: 1px solid #f1f1f1;
+                border-bottom: 1px solid #F4F5FA;
                 width: 100%;
             }
             .grid-cell:last-of-type { border-bottom: none; }
@@ -389,12 +388,13 @@
                 display: block;
                 font-weight: 600;
                 font-size: 0.75rem;
-                color: var(--porto-text-muted);
+                color: var(--mat-text-muted);
                 text-transform: uppercase;
             }
             .grid-action-cell { justify-content: flex-end; padding-top: 0.75rem; }
             .zx-sidebar { transform: translateX(-260px); position: absolute; height: 100%; }
             .zx-sidebar.open { transform: translateX(0); }
+            .zx-navbar { margin: 1rem 1rem 0 1rem; }
         }
     </style>
 </head>
@@ -406,10 +406,10 @@
     <div class="card auth-card w-100 mx-3 p-2" style="max-width: 460px;">
         <div class="card-body p-4 p-sm-5">
             <div class="text-center mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: var(--porto-primary-light); border-radius: 4px;">
-                    <i class="bi bi-shield-lock-fill fs-2" style="color: var(--porto-primary) !important;"></i>
+                <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: var(--mat-primary-light); border-radius: 50%;">
+                    <i class="bi bi-shield-lock-fill fs-2" style="color: var(--mat-primary) !important;"></i>
                 </div>
-                <h3 class="fw-bold mb-1 text-dark">Metsis <span style="color: var(--porto-primary);">Vault</span></h3>
+                <h3 class="fw-bold mb-1 text-dark">Metsis <span style="color: var(--mat-primary);">Vault</span></h3>
                 <p class="text-muted small">Client Encrypted Node Registry</p>
             </div>
             <div class="mb-3">
@@ -433,9 +433,9 @@
 
 <div id="app-screen" class="d-none zx-wrapper">
     <aside class="zx-sidebar" id="appSidebar">
-        <div class="d-flex align-items-center px-4 justify-content-between header-logo" style="height: 70px; border-bottom: 1px solid var(--porto-border)">
+        <div class="d-flex align-items-center px-4 justify-content-between header-logo" style="height: 70px; border-bottom: 1px solid var(--mat-border)">
             <a class="navbar-brand fw-bold fs-4 text-dark d-flex align-items-center gap-2" href="#">
-                <i class="bi bi-safe2" style="color: var(--porto-primary);"></i> Metsis <span style="color: var(--porto-primary); font-weight: 600;">Vault</span>
+                <i class="bi bi-safe2" style="color: var(--mat-primary);"></i> Metsis <span style="color: var(--mat-primary); font-weight: 600;">Vault</span>
             </a>
         </div>
         
@@ -459,7 +459,7 @@
             <input type="file" id="import-csv-input" class="d-none" accept=".csv">
         </div>
         
-        <div class="p-3 border-top" style="border-color: var(--porto-border) !important;">
+        <div class="p-3 border-top" style="border-color: var(--mat-border) !important;">
             <button id="btn-lock" class="btn btn-danger w-100 fw-semibold"><i class="bi bi-power me-2"></i>Sign Out</button>
         </div>
     </aside>
@@ -468,7 +468,7 @@
         <header class="zx-navbar d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn btn-sm btn-light d-xl-none border" id="sidebarToggle"><i class="bi bi-list"></i></button>
-                <span class="badge px-3 py-2 fw-medium" style="background: var(--porto-primary-light); color: var(--porto-primary); border: 1px solid var(--porto-primary-subtle); border-radius: 4px;" id="display-tenant">Scope: Inactive</span>
+                <span class="badge px-3 py-2 fw-medium" style="background: var(--mat-primary-light); color: var(--mat-primary); border-radius: 0.375rem;" id="display-tenant">Scope: Inactive</span>
             </div>
         </header>
 
@@ -496,7 +496,7 @@
                     <div class="card zx-card p-3 d-flex flex-row align-items-center justify-content-between">
                         <div>
                             <span class="text-muted small fw-medium text-uppercase tracking-wide d-block" style="font-size: 0.725rem;">Session Status</span>
-                            <h6 class="fw-semibold mt-2 mb-0" style="color: var(--porto-primary);"><i class="bi bi-shield-check me-1"></i> Fully Encrypted</h6>
+                            <h6 class="fw-semibold mt-2 mb-0" style="color: var(--mat-primary);"><i class="bi bi-shield-check me-1"></i> Fully Encrypted</h6>
                         </div>
                         <div class="widget-stat-icon"><i class="bi bi-fingerprint"></i></div>
                     </div>
@@ -549,7 +549,7 @@
 
             <div class="d-flex flex-column flex-grow-1">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="text-dark fw-bold mb-0"><i class="bi bi-hdd-stack me-2" style="color: var(--porto-primary);"></i>Node Data</h5>
+                    <h5 class="text-dark fw-bold mb-0"><i class="bi bi-hdd-stack me-2" style="color: var(--mat-primary);"></i>Node Data</h5>
                     <button id="btn-open-entry" class="btn btn-primary btn-sm fw-semibold"><i class="bi bi-plus-lg me-1"></i>Add Registry Node</button>
                 </div>
                 
@@ -566,7 +566,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-hdd-network me-2" style="color: var(--porto-primary);"></i>Registry Asset Node Entry</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-hdd-network me-2" style="color: var(--mat-primary);"></i>Registry Asset Node Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="vault-form">
@@ -669,7 +669,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-eye me-2" style="color: var(--porto-primary);"></i>View Registry Item Mapping</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-eye me-2" style="color: var(--mat-primary);"></i>View Registry Item Mapping</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body d-flex flex-column gap-2 p-4" id="view-modal-body">
@@ -678,7 +678,7 @@
                     <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteName">Copy</button>
                 </div>
                 <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
-                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">URL</span><span id="mv-url" class="monospace text-wrap d-block text-truncate" style="color: var(--porto-primary);">—</span></div>
+                    <div class="min-w-0"><span class="d-block text-muted small fw-bold text-uppercase">URL</span><span id="mv-url" class="monospace text-wrap d-block text-truncate" style="color: var(--mat-primary);">—</span></div>
                     <button class="btn btn-sm btn-light border flex-shrink-0" data-copy="siteUrl">Copy</button>
                 </div>
                 <div class="p-2 view-row-detail rounded d-flex align-items-center justify-content-between gap-3">
@@ -728,7 +728,7 @@ const Toast = {
         const t = document.createElement('div');
         t.className = `custom-toast toast-${type}`;
         let icon = 'info-circle text-primary';
-        if(type === 'success') icon = 'check-circle text-primary';
+        if(type === 'success') icon = 'check-circle text-success';
         if(type === 'danger') icon = 'exclamation-octagon text-danger';
         if(type === 'warning') icon = 'exclamation-triangle text-warning';
         
@@ -996,7 +996,7 @@ function renderGrid(list) {
             row.innerHTML = `
                 <div class="grid-cell"><span class="cell-label">S.No.</span><span class="fw-bold text-dark">${idx}</span></div>
                 <div class="grid-cell"><span class="cell-label">Site Name</span><strong class="text-dark">${esc(r.siteName)}</strong></div>
-                <div class="grid-cell"><span class="cell-label">URL</span><span>${r.siteUrl ? `<a href="${esc(r.siteUrl)}" target="_blank" class="fw-medium text-decoration-underline" style="color: var(--porto-primary);">Link</a>` : '—'}</span></div>
+                <div class="grid-cell"><span class="cell-label">URL</span><span>${r.siteUrl ? `<a href="${esc(r.siteUrl)}" target="_blank" class="fw-medium text-decoration-underline" style="color: var(--mat-primary);">Link</a>` : '—'}</span></div>
                 <div class="grid-cell"><span class="cell-label">Username</span><span class="text-dark">${esc(r.username)}</span></div>
                 <div class="grid-cell"><span class="cell-label">Password</span><span class="text-muted opacity-50 monospace">••••••••</span></div>
                 <div class="grid-cell"><span class="cell-label">PIN 1</span><span class="monospace text-dark">${r.pin ? esc(r.pin) : '—'}</span></div>
