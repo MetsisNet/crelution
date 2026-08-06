@@ -5,48 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Private Messenger</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- MQTT.js for Real-time WebSockets -->
-  <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
-  <!-- CryptoJS for AES-256 Encryption & SHA-256 Hashing -->
+  <!-- PeerJS WebRTC Library -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- CryptoJS for Encryption & Hashing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    :root {
+      --upwork-green: #108a00;
+      --upwork-green-hover: #14a800;
+      --upwork-dark: #001e00;
+      --upwork-bg: #f9f9f9;
+      --upwork-border: #e4ebe4;
+      --peer-msg-bg: #f2f7f2;
+    }
+
+    body {
+      background-color: var(--upwork-bg);
+      color: var(--upwork-dark);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .upwork-card {
+      background: #ffffff;
+      border: 1px solid var(--upwork-border);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 30, 0, 0.04);
+    }
+
+    .btn-upwork {
+      background-color: var(--upwork-green);
+      color: #ffffff;
+      border-radius: 20px;
+      border: none;
+      font-weight: 600;
+      padding: 8px 20px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-upwork:hover {
+      background-color: var(--upwork-green-hover);
+      color: #ffffff;
+    }
+
+    .btn-upwork:disabled {
+      background-color: #a0d399;
+      color: #ffffff;
+    }
+
+    .form-control-upwork {
+      border: 1px solid var(--upwork-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--upwork-dark);
+    }
+
+    .form-control-upwork:focus {
+      border-color: var(--upwork-green);
+      box-shadow: 0 0 0 0.2rem rgba(16, 138, 0, 0.15);
+    }
+
+    .chat-box {
+      height: 380px;
+      overflow-y: auto;
+      background-color: #ffffff;
+      border: 1px solid var(--upwork-border);
+      border-radius: 12px;
+    }
+
+    .message-bubble {
+      max-width: 80%;
+      word-break: break-word;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+    }
+
+    .bubble-self {
+      background-color: var(--upwork-green);
+      color: #ffffff;
+      border-radius: 16px 16px 2px 16px;
+    }
+
+    .bubble-peer {
+      background-color: var(--peer-msg-bg);
+      color: var(--upwork-dark);
+      border: 1px solid var(--upwork-border);
+      border-radius: 16px 16px 16px 2px;
+    }
+  </style>
 </head>
-<body class="bg-dark text-light min-vh-100 d-flex align-items-center justify-content-center">
+<body class="min-vh-100 d-flex align-items-center justify-content-center">
 
 <div class="container py-4" style="max-width: 440px;">
 
-  <!-- LOGIN SCREEN (Password Only) -->
-  <div id="loginCard" class="card bg-secondary text-white shadow">
+  <!-- LOGIN CARD -->
+  <div id="loginCard" class="card upwork-card p-2">
     <div class="card-body text-center p-4">
-      <h3 class="card-title mb-3">🔒 Private Messenger</h3>
-      <p class="text-light small mb-4">Enter a shared password on both devices to chat instantly.</p>
+      <h3 class="fw-bold mb-3" style="color: var(--upwork-dark);">🔒 Private Messenger</h3>
+      <p class="text-muted small mb-4">Enter the exact same password on both devices to start chatting.</p>
       
       <div class="mb-3">
-        <input type="password" id="passwordInput" class="form-control form-control-lg text-center" placeholder="Enter Shared Password" onkeypress="if(event.key === 'Enter') startChat()">
+        <input type="password" id="passwordInput" class="form-control form-control-upwork text-center" placeholder="Enter Shared Password">
       </div>
       
-      <button id="connectBtn" class="btn btn-success btn-lg w-100 fw-bold" onclick="startChat()">Start Chatting</button>
-      <div id="statusText" class="mt-3 text-warning small d-none">Connecting to secure network...</div>
+      <button id="startBtn" class="btn btn-upwork btn-lg w-100">Start Chatting</button>
+      <div id="statusMsg" class="mt-3 text-muted small"></div>
     </div>
   </div>
 
   <!-- CHAT WINDOW -->
-  <div id="chatCard" class="card bg-secondary text-white shadow d-none">
-    <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white border-secondary py-3">
+  <div id="chatCard" class="card upwork-card p-2 d-none">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
       <div class="d-flex align-items-center">
         <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-        <span class="fw-bold small">Encrypted Channel</span>
+        <span class="fw-bold small" style="color: var(--upwork-dark);">Connected & Encrypted</span>
       </div>
-      <button class="btn btn-sm btn-outline-danger" onclick="location.reload()">Exit Chat</button>
+      <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="location.reload()">Exit</button>
     </div>
     
-    <div class="card-body p-3 bg-dark">
-      <div id="chatBox" class="border border-secondary rounded p-3 mb-3 bg-black" style="height: 380px; overflow-y: auto;">
-        <div class="text-center text-muted small my-2">Connected. Type a message to begin...</div>
+    <div class="card-body p-3 pt-0">
+      <div id="chatBox" class="chat-box p-3 mb-3">
+        <div class="text-center text-muted small my-2">Connected! Type a message below...</div>
       </div>
       
       <div class="input-group">
-        <input type="text" id="messageInput" class="form-control bg-dark text-white border-secondary" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button class="btn btn-primary fw-bold" onclick="sendMessage()">Send</button>
+        <input type="text" id="messageInput" class="form-control form-control-upwork me-2" placeholder="Type a message...">
+        <button id="sendBtn" class="btn btn-upwork">Send</button>
       </div>
     </div>
   </div>
@@ -54,106 +137,134 @@
 </div>
 
 <script>
-  let mqttClient = null;
-  let sharedPassword = '';
-  let secretTopic = '';
+  // Cache DOM References for Optimal Performance
+  const loginCard = document.getElementById('loginCard');
+  const chatCard = document.getElementById('chatCard');
+  const passwordInput = document.getElementById('passwordInput');
+  const messageInput = document.getElementById('messageInput');
+  const startBtn = document.getElementById('startBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const chatBox = document.getElementById('chatBox');
 
-  // Generate a random ID for this session to distinguish sent vs received messages
-  const mySessionId = 'user_' + Math.random().toString(36).substring(2, 9);
+  let peer = null;
+  let activeConn = null;
+  let sharedPassword = '';
+  let isConnected = false;
+  let retryTimer = null;
+
+  // Event Listeners
+  startBtn.addEventListener('click', startChat);
+  sendBtn.addEventListener('click', sendMessage);
+  passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startChat(); });
+  messageInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
 
   function startChat() {
-    const pass = document.getElementById('passwordInput').value.trim();
+    const pass = passwordInput.value.trim();
     if (!pass) return alert('Please enter a password!');
 
     sharedPassword = pass;
+    startBtn.disabled = true;
+    updateStatus('Connecting to network...');
 
-    // Show loading state
-    document.getElementById('connectBtn').disabled = true;
-    document.getElementById('statusText').classList.remove('d-none');
+    // Hash password to create secret deterministic peer IDs
+    const hash = CryptoJS.SHA256("p2p_room_key_" + sharedPassword).toString().substring(0, 24);
+    const slotA = "room_" + hash + "_A";
+    const slotB = "room_" + hash + "_B";
 
-    // Generate secret room topic by hashing the password
-    const passwordHash = CryptoJS.SHA256("private_room_" + sharedPassword).toString();
-    secretTopic = "chat/room/" + passwordHash;
-
-    // Connect to public MQTT WebSocket broker over TLS
-    mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', {
-      clientId: mySessionId,
-      clean: true,
-      connectTimeout: 8000
+    // Attempt to claim Slot A first
+    initPeerSlot(slotA, slotB, () => {
+      // If Slot A is already claimed by partner, claim Slot B
+      initPeerSlot(slotB, slotA, null);
     });
+  }
 
-    mqttClient.on('connect', () => {
-      // Subscribe to secret topic
-      mqttClient.subscribe(secretTopic, { qos: 0 }, (err) => {
-        if (!err) {
-          document.getElementById('loginCard').classList.add('d-none');
-          document.getElementById('chatCard').classList.remove('d-none');
-        } else {
-          alert('Failed to join room. Please try again.');
-          location.reload();
-        }
+  function initPeerSlot(myId, partnerId, onSlotTaken) {
+    peer = new Peer(myId, { debug: 0 });
+
+    peer.on('open', () => {
+      updateStatus('Waiting for second device to enter password...');
+
+      peer.on('connection', (conn) => {
+        setupConnection(conn);
       });
+
+      // Periodically check if partner is waiting in the opposite slot
+      retryTimer = setInterval(() => {
+        if (isConnected) {
+          clearInterval(retryTimer);
+          return;
+        }
+        setupConnection(peer.connect(partnerId));
+      }, 2000);
     });
 
-    mqttClient.on('message', (topic, message) => {
-      if (topic === secretTopic) {
-        try {
-          // Decrypt payload using the shared password
-          const decryptedBytes = CryptoJS.AES.decrypt(message.toString(), sharedPassword);
-          const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
+    peer.on('error', (err) => {
+      if (err.type === 'unavailable-id' && onSlotTaken) {
+        if (retryTimer) clearInterval(retryTimer);
+        peer.destroy();
+        onSlotTaken();
+      }
+    });
+  }
 
-          if (decryptedText) {
-            const data = JSON.parse(decryptedText);
-            const isSelf = data.senderId === mySessionId;
-            appendMessage(data.text, isSelf);
-          }
-        } catch (e) {
-          // Ignores unreadable or corrupted messages
+  function setupConnection(conn) {
+    conn.on('open', () => {
+      if (isConnected) return;
+      isConnected = true;
+      if (retryTimer) clearInterval(retryTimer);
+      activeConn = conn;
+
+      loginCard.classList.add('d-none');
+      chatCard.classList.remove('d-none');
+    });
+
+    conn.on('data', (encryptedMessage) => {
+      try {
+        const decryptedBytes = CryptoJS.AES.decrypt(encryptedMessage, sharedPassword);
+        const text = decryptedBytes.toString(CryptoJS.enc.Utf8);
+        if (text) {
+          appendMessage(text, false);
         }
+      } catch (e) {
+        // Ignore unreadable data
       }
     });
 
-    mqttClient.on('error', (err) => {
-      console.error('MQTT Error:', err);
-      alert('Network connection error. Refreshing page...');
+    conn.on('close', () => {
+      alert('Partner left the chat.');
       location.reload();
     });
   }
 
   function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const text = input.value.trim();
-    if (!text || !mqttClient) return;
+    const text = messageInput.value.trim();
+    if (!text || !activeConn) return;
 
-    const payload = JSON.stringify({
-      senderId: mySessionId,
-      text: text
-    });
+    // Encrypt text before sending
+    const encryptedMsg = CryptoJS.AES.encrypt(text, sharedPassword).toString();
+    activeConn.send(encryptedMsg);
 
-    // Encrypt payload with AES-256 before transmitting
-    const encryptedMsg = CryptoJS.AES.encrypt(payload, sharedPassword).toString();
-
-    mqttClient.publish(secretTopic, encryptedMsg);
-    input.value = '';
+    appendMessage(text, true);
+    messageInput.value = '';
   }
 
+  // Fast DOM manipulation avoiding innerHTML/string parsing overhead
   function appendMessage(text, isSelf) {
-    const chatBox = document.getElementById('chatBox');
     const msgDiv = document.createElement('div');
     msgDiv.className = `d-flex mb-2 ${isSelf ? 'justify-content-end' : 'justify-content-start'}`;
 
-    msgDiv.innerHTML = `
-      <div class="p-2 px-3 rounded ${isSelf ? 'bg-primary text-white' : 'bg-secondary text-white border border-dark'}" style="max-width: 80%; word-break: break-word;">
-        <span>${escapeHtml(text)}</span>
-      </div>
-    `;
+    const bubble = document.createElement('div');
+    bubble.className = `message-bubble ${isSelf ? 'bubble-self' : 'bubble-peer'}`;
+    bubble.textContent = text;
 
+    msgDiv.appendChild(bubble);
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function updateStatus(msg) {
+    statusMsg.textContent = msg;
   }
 </script>
 
