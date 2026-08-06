@@ -1,510 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SMS</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --modern-primary: #6366f1;
-            --modern-primary-hover: #4f46e5;
-            --modern-bg: #f8fafc;
-            --modern-surface: #ffffff;
-            --modern-text: #0f172a;
-            --modern-text-muted: #64748b;
-            --modern-border: #e2e8f0;
-            --bubble-me: #6366f1;
-            --bubble-them: #f1f5f9;
-        }
-
-        body { 
-            background-color: var(--modern-bg); 
-            height: 100vh;
-            height: 100dvh;
-            display: flex; 
-            flex-direction: column; 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--modern-text);
-            margin: 0;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .fade-layer {
-            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
-            opacity: 1;
-            transform: scale(1);
-            visibility: visible;
-            will-change: transform, opacity;
-        }
-        .fade-layer.hidden {
-            opacity: 0;
-            transform: scale(0.99);
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        #pin-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--modern-bg); z-index: 2000; 
-            display: flex; align-items: center; justify-content: center; 
-            padding: 24px;
-        }
-        .modern-auth-card { 
-            max-width: 400px; width: 100%; background: var(--modern-surface); 
-            border: 1px solid var(--modern-border); border-radius: 16px; padding: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        #chat-container { 
-            flex: 1; 
-            display: flex;
-            flex-direction: column; 
-            max-width: 960px; margin: 0 auto; width: 100%;
-            background: var(--modern-surface); 
-            height: 100%;
-            position: relative;
-            border-left: 1px solid var(--modern-border);
-            border-right: 1px solid var(--modern-border);
-        }
-
-        .app-header {
-            background: var(--modern-surface);
-            border-bottom: 1px solid var(--modern-border);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        #messages { 
-            flex: 1; overflow-y: auto; padding: 24px; 
-            display: flex; flex-direction: column; gap: 12px; 
-            background-color: var(--modern-surface);
-            scroll-behavior: auto; /* Fast scrolling snap for heavy rendering feeds */
-        }
-
-        #messages::-webkit-scrollbar { width: 5px; }
-        #messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        .msg-wrapper {
-            display: flex;
-            width: 100%;
-            position: relative;
-            margin-bottom: 4px;
-        }
-        
-        .msg { 
-            max-width: 70%; padding: 12px 18px; 
-            font-size: 0.93rem; line-height: 1.5; 
-            word-wrap: break-word; position: relative;
-        }
-
-        .wrapper-me { justify-content: flex-end; }
-        .wrapper-me .msg {
-            background-color: var(--bubble-me); color: #ffffff; 
-            border-radius: 16px 16px 4px 16px;
-        }
-
-        .wrapper-them { justify-content: flex-start; }
-        .wrapper-them .msg {
-            background-color: var(--bubble-them); color: var(--modern-text); 
-            border-radius: 16px 16px 16px 4px;
-        }
-
-        .inline-del-btn {
-            background: transparent; border: none; color: #ef4444; padding: 0 8px;
-            display: none; align-items: center; cursor: pointer; opacity: 0.7;
-        }
-        .inline-del-btn:hover { opacity: 1; }
-        .msg-wrapper:hover .inline-del-btn { display: flex; }
-        .wrapper-me .inline-del-btn { order: -1; }
-
-        .action-bar {
-            background: var(--modern-surface);
-            border-top: 1px solid var(--modern-border);
-            padding: 16px 20px;
-        }
-        .modern-pill-input {
-            border: 1px solid var(--modern-border); background-color: #f8fafc; color: var(--modern-text);
-            border-radius: 12px; padding: 12px 18px; font-size: 0.95rem;
-            transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
-        }
-        .modern-pill-input:focus {
-            background-color: #ffffff; border-color: var(--modern-primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12); outline: 0;
-        }
-
-        .btn-modern {
-            font-size: 0.85rem; font-weight: 600; padding: 8px 14px;
-            border-radius: 10px; transition: all 0.15s ease;
-            display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent;
-        }
-        .btn-modern-primary { background-color: var(--modern-primary); color: #ffffff; }
-        .btn-modern-primary:hover { background-color: var(--modern-primary-hover); color: #ffffff; }
-        .btn-modern-secondary { background-color: #ffffff; border-color: var(--modern-border); color: var(--modern-text-muted); }
-        .btn-modern-secondary:hover { background-color: #f1f5f9; color: var(--modern-text); border-color: #cbd5e1; }
-        .btn-modern-danger { background-color: #fff1f2; color: #e11d48; }
-        .btn-modern-danger:hover { background-color: #ffe4e6; color: #be123c; }
-
-        .custom-modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(4px);
-            z-index: 3000; display: flex; align-items: center; justify-content: center;
-            padding: 24px; opacity: 0; pointer-events: none; 
-            transition: opacity 0.15s ease-out;
-            will-change: opacity;
-        }
-        .custom-modal-backdrop.show { opacity: 1; pointer-events: auto; }
-        .custom-modal-box {
-            background: var(--modern-surface); border-radius: 16px; max-width: 400px; width: 100%;
-            padding: 24px; border: 1px solid var(--modern-border);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: scale(0.96); transition: transform 0.15s ease-out;
-            will-change: transform;
-        }
-        .custom-modal-backdrop.show .custom-modal-box { transform: scale(1); }
-
-        @media (max-width: 576px) {
-            #chat-container { border-left: none; border-right: none; }
-            .btn-modern span { display: none; } 
-            .btn-modern { padding: 8px 10px; }
-            #messages { padding: 16px; gap: 10px; }
-            .msg { max-width: 85%; }
-            .modern-auth-card { padding: 24px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Messenger</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- MQTT.js for Real-time WebSockets -->
+  <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
+  <!-- CryptoJS for AES-256 Encryption & SHA-256 Hashing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
-<body>
+<body class="bg-dark text-light min-vh-100 d-flex align-items-center justify-content-center">
 
-<!-- 1. MODERN MINIMALIST AUTH GATEWAY -->
-<div id="pin-screen" class="fade-layer">
-    <div class="modern-auth-card">
-        <h4 class="fw-bold mb-2" style="letter-spacing: -0.5px;">Login</h4>
-        <form id="auth-form">
-            <input type="password" id="pin-input" class="form-control text-center mb-3 modern-pill-input fw-bold" placeholder="••••" required autocomplete="off">
-            <button type="submit" class="btn btn-modern btn-modern-primary w-100 py-2.5 justify-content-center">Verify Access</button>
-        </form>
+<div class="container py-4" style="max-width: 440px;">
+
+  <!-- LOGIN SCREEN (Password Only) -->
+  <div id="loginCard" class="card bg-secondary text-white shadow">
+    <div class="card-body text-center p-4">
+      <h3 class="card-title mb-3">🔒 Private Messenger</h3>
+      <p class="text-light small mb-4">Enter a shared password on both devices to chat instantly.</p>
+      
+      <div class="mb-3">
+        <input type="password" id="passwordInput" class="form-control form-control-lg text-center" placeholder="Enter Shared Password" onkeypress="if(event.key === 'Enter') startChat()">
+      </div>
+      
+      <button id="connectBtn" class="btn btn-success btn-lg w-100 fw-bold" onclick="startChat()">Start Chatting</button>
+      <div id="statusText" class="mt-3 text-warning small d-none">Connecting to secure network...</div>
     </div>
+  </div>
+
+  <!-- CHAT WINDOW -->
+  <div id="chatCard" class="card bg-secondary text-white shadow d-none">
+    <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white border-secondary py-3">
+      <div class="d-flex align-items-center">
+        <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+        <span class="fw-bold small">Encrypted Channel</span>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" onclick="location.reload()">Exit Chat</button>
+    </div>
+    
+    <div class="card-body p-3 bg-dark">
+      <div id="chatBox" class="border border-secondary rounded p-3 mb-3 bg-black" style="height: 380px; overflow-y: auto;">
+        <div class="text-center text-muted small my-2">Connected. Type a message to begin...</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="messageInput" class="form-control bg-dark text-white border-secondary" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button class="btn btn-primary fw-bold" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
 </div>
-
-<!-- 2. MAIN APPLICATION INTERACTION CONTAINER -->
-<div id="chat-container" class="fade-layer hidden">
-    <div class="app-header">
-        <div class="d-flex gap-2">
-            <button class="btn-modern btn-modern-secondary" id="btn-share" title="Copy Link Token">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.586-.586a1.003 1.003 0 0 0 .154-.199 2 2 0 0 1-.861-3.337L8.88 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/></svg>
-                <span>Share Room</span>
-            </button>
-            <button class="btn-modern btn-modern-danger" id="btn-delete-all" title="Wipe History Database">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
-                <span>Delete History</span>
-            </button>
-            <button class="btn-modern btn-modern-secondary text-dark" id="btn-logout" title="Disconnect Pipeline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/><path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/></svg>
-                <span>Logout</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Active Text Dialogue Field Layout -->
-    <div id="messages">
-        <div class="text-center text-muted small my-auto py-5 opacity-50" id="welcome-note">
-            Secure offline-first tracking configuration connected.
-        </div>
-    </div>
-
-    <!-- Messaging Drawer Input Node -->
-    <div class="action-bar">
-        <form id="chat-form" class="d-flex gap-2">
-            <input type="text" id="msg-input" class="form-control modern-pill-input" placeholder="Write a secure message..." autocomplete="off" required>
-            <button type="submit" class="btn btn-modern btn-modern-primary px-4 shadow-sm">Send</button>
-        </form>
-    </div>
-</div>
-
-<!-- 3. CUSTOM MODERN SYSTEM OVERLAY DIALOG -->
-<div id="custom-modal" class="custom-modal-backdrop">
-    <div class="custom-modal-box">
-        <h5 id="modal-title" class="fw-bold mb-2">System Notice</h5>
-        <p id="modal-message" class="small mb-4 text-secondary" style="line-height: 1.5;"></p>
-        <div id="modal-actions" class="d-flex justify-content-end gap-2"></div>
-    </div>
-</div>
-
-<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
 
 <script>
-    const MY_PUBLISH_KEY = "demo"; 
-    const MY_SUBSCRIBE_KEY = "demo";
+  let mqttClient = null;
+  let sharedPassword = '';
+  let secretTopic = '';
 
-    let pubnub, finalSecretChannel, myId, dbKey;
-    let messagesCache = []; // Highly optimized internal state tracker to completely replace read calls
+  // Generate a random ID for this session to distinguish sent vs received messages
+  const mySessionId = 'user_' + Math.random().toString(36).substring(2, 9);
 
-    // Centralized Cached DOM Elements Map
-    const DOM = {
-        pinScreen: document.getElementById('pin-screen'),
-        pinInput: document.getElementById('pin-input'),
-        authForm: document.getElementById('auth-form'),
-        chatContainer: document.getElementById('chat-container'),
-        messages: document.getElementById('messages'),
-        chatForm: document.getElementById('chat-form'),
-        msgInput: document.getElementById('msg-input'),
-        welcomeNote: document.getElementById('welcome-note'),
-        modal: document.getElementById('custom-modal'),
-        modalTitle: document.getElementById('modal-title'),
-        modalMessage: document.getElementById('modal-message'),
-        modalActions: document.getElementById('modal-actions'),
-        btnShare: document.getElementById('btn-share'),
-        btnDeleteAll: document.getElementById('btn-delete-all'),
-        btnLogout: document.getElementById('btn-logout')
-    };
+  function startChat() {
+    const pass = document.getElementById('passwordInput').value.trim();
+    if (!pass) return alert('Please enter a password!');
 
-    // Parse URL room configs instantly
-    const urlParams = new URLSearchParams(window.location.search);
-    let roomId = urlParams.get('room');
-    if (!roomId) {
-        roomId = Math.random().toString(36).substring(2, 9);
-        urlParams.set('room', roomId);
-        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
-    }
+    sharedPassword = pass;
 
-    myId = localStorage.getItem('modern_chat_user_id');
-    if (!myId) {
-        myId = 'UID_' + Math.floor(1000 + Math.random() * 9000);
-        localStorage.setItem('modern_chat_user_id', myId);
-    }
+    // Show loading state
+    document.getElementById('connectBtn').disabled = true;
+    document.getElementById('statusText').classList.remove('d-none');
 
-    // Modal Control System
-    function openPopup({ title, message, type = "alert", confirmText = "Confirm", onConfirm = null }) {
-        DOM.modalTitle.innerText = title;
-        DOM.modalMessage.innerText = message;
-        DOM.modalActions.innerHTML = ''; 
+    // Generate secret room topic by hashing the password
+    const passwordHash = CryptoJS.SHA256("private_room_" + sharedPassword).toString();
+    secretTopic = "chat/room/" + passwordHash;
 
-        if (type === "confirm") {
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = "btn btn-modern btn-modern-secondary py-1.5";
-            cancelBtn.innerText = "Cancel";
-            cancelBtn.onclick = closePopup;
-            DOM.modalActions.appendChild(cancelBtn);
+    // Connect to public MQTT WebSocket broker over TLS
+    mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', {
+      clientId: mySessionId,
+      clean: true,
+      connectTimeout: 8000
+    });
 
-            const confirmBtn = document.createElement('button');
-            confirmBtn.className = "btn btn-modern btn-modern-primary py-1.5";
-            confirmBtn.innerText = confirmText;
-            confirmBtn.onclick = () => {
-                if (onConfirm) onConfirm();
-                closePopup();
-            };
-            DOM.modalActions.appendChild(confirmBtn);
+    mqttClient.on('connect', () => {
+      // Subscribe to secret topic
+      mqttClient.subscribe(secretTopic, { qos: 0 }, (err) => {
+        if (!err) {
+          document.getElementById('loginCard').classList.add('d-none');
+          document.getElementById('chatCard').classList.remove('d-none');
         } else {
-            const okBtn = document.createElement('button');
-            okBtn.className = "btn btn-modern btn-modern-primary px-4 py-1.5";
-            okBtn.innerText = "OK";
-            okBtn.onclick = closePopup;
-            DOM.modalActions.appendChild(okBtn);
+          alert('Failed to join room. Please try again.');
+          location.reload();
         }
-        DOM.modal.classList.add('show');
-    }
-
-    function closePopup() {
-        DOM.modal.classList.remove('show');
-    }
-
-    // Initialization routine
-    function unlockChat(e) {
-        if(e) e.preventDefault();
-        
-        const pinValue = DOM.pinInput.value.trim();
-        if(!pinValue) return;
-
-        finalSecretChannel = `chan_mod_${roomId}_${pinValue}`;
-        dbKey = `moderndb_history_${roomId}_${pinValue}`;
-
-        localStorage.setItem('modern_session_room', roomId);
-        localStorage.setItem('modern_session_pin', pinValue);
-
-        loadLocalHistory();
-
-        pubnub = new PubNub({
-            publishKey: MY_PUBLISH_KEY,
-            subscribeKey: MY_SUBSCRIBE_KEY,
-            userId: myId
-        });
-
-        pubnub.addListener({ message: (event) => processIncomingPayload(event.message) });
-        pubnub.subscribe({ channels: [finalSecretChannel] });
-
-        DOM.pinScreen.classList.add('hidden');
-        DOM.chatContainer.classList.remove('hidden');
-    }
-
-    // High performance History batch-processor utilizing single reflow DocumentFragments
-    function loadLocalHistory() {
-        const cache = localStorage.getItem(dbKey);
-        messagesCache = cache ? JSON.parse(cache) : [];
-        
-        if (messagesCache.length > 0) {
-            if (DOM.welcomeNote) DOM.welcomeNote.remove();
-            
-            const fragment = document.createDocumentFragment();
-            messagesCache.forEach(msg => {
-                fragment.appendChild(createMessageElement(msg.id, msg.sender, msg.text));
-            });
-            DOM.messages.appendChild(fragment);
-            DOM.messages.scrollTop = DOM.messages.scrollHeight;
-        }
-    }
-
-    function processIncomingPayload(payload) {
-        if (payload.isControlMessage) {
-            if (payload.action === "clear_all_screens") {
-                messagesCache = [];
-                localStorage.removeItem(dbKey);
-                DOM.messages.innerHTML = '<div class="text-center text-muted small my-auto opacity-40">Conversation history deleted.</div>';
-            } else if (payload.action === "delete_single_msg") {
-                removeMessageFromUIAndStorage(payload.targetId, false);
-            }
-            return;
-        }
-
-        if (payload.text) {
-            // Rapid state duplicate checks utilizing local cache array values directly
-            if (!messagesCache.some(m => m.id === payload.id)) {
-                messagesCache.push({ id: payload.id, sender: payload.sender, text: payload.text });
-                localStorage.setItem(dbKey, JSON.stringify(messagesCache));
-                
-                if (DOM.welcomeNote) DOM.welcomeNote.remove();
-
-                DOM.messages.appendChild(createMessageElement(payload.id, payload.sender, payload.text));
-                DOM.messages.scrollTop = DOM.messages.scrollHeight;
-            }
-        }
-    }
-
-    // Safe Node Builder avoiding execution overhead inside innerHTML strings
-    function createMessageElement(id, sender, text) {
-        const isMe = sender === myId;
-        
-        const wrapper = document.createElement('div');
-        wrapper.className = `msg-wrapper ${isMe ? 'wrapper-me' : 'wrapper-them'}`;
-        wrapper.id = `msg-wrap-${id}`;
-        
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'msg shadow-sm';
-        
-        const textContainer = document.createElement('div');
-        textContainer.style.wordBreak = 'break-word';
-        textContainer.textContent = text; // Native textContent completely bypasses programmatic regex safety overhead
-        
-        msgDiv.appendChild(textContainer);
-        wrapper.appendChild(msgDiv);
-        
-        const delBtn = document.createElement('button');
-        delBtn.className = 'inline-del-btn';
-        delBtn.setAttribute('data-id', id); // Binding identifier directly to data properties
-        delBtn.title = 'Delete message';
-        delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/></svg>`;
-        
-        wrapper.appendChild(delBtn);
-        return wrapper;
-    }
-
-    function sendMessage(e) {
-        e.preventDefault();
-        const text = DOM.msgInput.value.trim();
-        if (!text) return;
-
-        const messageId = 'MSG_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-
-        pubnub.publish({
-            channel: finalSecretChannel,
-            message: { id: messageId, sender: myId, text: text }
-        }, function(status) {
-            if (!status.error) DOM.msgInput.value = '';
-        });
-    }
-
-    function removeMessageFromUIAndStorage(id, broadcast = false) {
-        messagesCache = messagesCache.filter(m => m.id !== id);
-        localStorage.setItem(dbKey, JSON.stringify(messagesCache));
-
-        const element = document.getElementById(`msg-wrap-${id}`);
-        if (element) element.remove();
-
-        if (broadcast && pubnub) {
-            pubnub.publish({
-                channel: finalSecretChannel,
-                message: { isControlMessage: true, action: "delete_single_msg", targetId: id }
-            });
-        }
-    }
-
-    // Highly optimized event delegation engine attaching single event handler onto parent layout
-    DOM.messages.addEventListener('click', (e) => {
-        const button = e.target.closest('.inline-del-btn');
-        if (button) {
-            const messageId = button.getAttribute('data-id');
-            removeMessageFromUIAndStorage(messageId, true);
-        }
+      });
     });
 
-    // Event Bindings
-    DOM.authForm.addEventListener('submit', unlockChat);
-    DOM.chatForm.addEventListener('submit', sendMessage);
-    
-    DOM.btnShare.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href);
-        openPopup({ title: "Clipboard Synced", message: "The clean layout token parameter has been captured successfully.", type: "alert" });
-    });
+    mqttClient.on('message', (topic, message) => {
+      if (topic === secretTopic) {
+        try {
+          // Decrypt payload using the shared password
+          const decryptedBytes = CryptoJS.AES.decrypt(message.toString(), sharedPassword);
+          const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
 
-    DOM.btnDeleteAll.addEventListener('click', () => {
-        openPopup({
-            title: "Clear All History Logs?",
-            message: "This will clean your local device data indexes completely and wipe screens globally across connected terminal participants.",
-            type: "confirm",
-            confirmText: "Wipe Log",
-            onConfirm: () => {
-                pubnub.publish({
-                    channel: finalSecretChannel,
-                    message: { isControlMessage: true, action: "clear_all_screens" }
-                });
-            }
-        });
-    });
-
-    DOM.btnLogout.addEventListener('click', () => {
-        openPopup({
-            title: "Exit Chat Session?",
-            message: "Active updates stand down. History nodes stay locked inside your offline local database blocks securely until you re-authenticate.",
-            type: "confirm",
-            confirmText: "Logout",
-            onConfirm: () => {
-                localStorage.removeItem('modern_session_room');
-                localStorage.removeItem('modern_session_pin');
-                
-                if (pubnub) pubnub.unsubscribeAll();
-                
-                DOM.pinInput.value = '';
-                DOM.chatContainer.classList.add('hidden');
-                DOM.pinScreen.classList.remove('hidden');
-                DOM.messages.innerHTML = '<div class="text-center text-muted small my-auto py-5 opacity-50" id="welcome-note">Secure offline-first tracking configuration connected.</div>';
-                messagesCache = [];
-            }
-        });
-    });
-
-    // Page Load Validation checks
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedRoom = localStorage.getItem('modern_session_room');
-        const savedPin = localStorage.getItem('modern_session_pin');
-        
-        if (savedRoom === roomId && savedPin) {
-            DOM.pinInput.value = savedPin;
-            unlockChat(null);
+          if (decryptedText) {
+            const data = JSON.parse(decryptedText);
+            const isSelf = data.senderId === mySessionId;
+            appendMessage(data.text, isSelf);
+          }
+        } catch (e) {
+          // Ignores unreadable or corrupted messages
         }
+      }
     });
+
+    mqttClient.on('error', (err) => {
+      console.error('MQTT Error:', err);
+      alert('Network connection error. Refreshing page...');
+      location.reload();
+    });
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text || !mqttClient) return;
+
+    const payload = JSON.stringify({
+      senderId: mySessionId,
+      text: text
+    });
+
+    // Encrypt payload with AES-256 before transmitting
+    const encryptedMsg = CryptoJS.AES.encrypt(payload, sharedPassword).toString();
+
+    mqttClient.publish(secretTopic, encryptedMsg);
+    input.value = '';
+  }
+
+  function appendMessage(text, isSelf) {
+    const chatBox = document.getElementById('chatBox');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `d-flex mb-2 ${isSelf ? 'justify-content-end' : 'justify-content-start'}`;
+
+    msgDiv.innerHTML = `
+      <div class="p-2 px-3 rounded ${isSelf ? 'bg-primary text-white' : 'bg-secondary text-white border border-dark'}" style="max-width: 80%; word-break: break-word;">
+        <span>${escapeHtml(text)}</span>
+      </div>
+    `;
+
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
 </script>
+
 </body>
 </html>
